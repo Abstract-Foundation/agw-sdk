@@ -15,8 +15,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm ci
-      - run: npm test
+      - run: pnpm install
+      - run: pnpn build
 
   publish-gpr:
     needs: build
@@ -30,6 +30,7 @@ jobs:
         with:
           node-version: 20
           registry-url: https://npm.pkg.github.com/
+      - run: pnpm install
       - run: npm build
       - run: pnpm publish -r
         env:

@@ -8,30 +8,27 @@ on:
     types: [created]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: pnpm install
-      - run: pnpn build
-
-  publish-gpr:
+  publish:
     needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: https://npm.pkg.github.com/
+          
       - run: pnpm install
-      - run: npm build
+      - run: pnpm build
       - run: pnpm publish -r
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

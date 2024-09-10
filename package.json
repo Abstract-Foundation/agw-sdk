@@ -1,7 +1,7 @@
 {
     "private": true,
     "scripts": {
-        "build": "yarn workspaces --since run build"
+      "build": "pnpm run --r --filter \"./packages/**\" build"
     },
     "workspaces": [
         "packages/*"

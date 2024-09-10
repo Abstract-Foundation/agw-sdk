@@ -1,37 +1,46 @@
 {
-    "name": "@abstract-foundation/agw-sdk",
-    "description": "Abstract Global Wallet SDK",
-    "version": "0.0.1",
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/abstract-foundation/agw-sdk.git",
-        "directory": "packages/agw-sdk"
-    },
-    "type": "module",
-    "scripts": {
-        "build": "yarn run clean && yarn run build:esm+types",
-        "build:esm+types": "tsc --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types",
-        "clean": "rm -rf dist tsconfig.tsbuildinfo",
-        "typecheck": "tsc --noEmit"
-    },
-    "main": "./dist/esm/exports/index.js",
-    "types": "./dist/types/exports/index.d.ts",
-    "typings": "./dist/types/exports/index.d.ts",
-    "exports": {
-        ".": {
-            "types": "./dist/types/exports/index.d.ts",
-            "default": "./dist/esm/exports/index.js"
-        }
-    },
-    "peerDependencies": {
-        "typescript": ">=5.0.4",
-        "viem": ">=2.22.0"
-    },
-    "peerDependenciesMeta": {
-        "typescript": {
-            "optional": true
-        }
-    },
-    "keywords": ["eth", "ethereum", "smart-account", "abstract", "account-abstraction", "global-wallet", "wallet", "web3"]
+  "name": "@abstract-foundation/agw-sdk",
+  "description": "Abstract Global Wallet SDK",
+  "version": "0.0.1",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abstract-foundation/agw-sdk.git",
+    "directory": "packages/agw-sdk"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "pnpm run clean && pnpm run build:esm+types",
+    "build:esm+types": "tsc --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit"
+  },
+  "main": "./dist/esm/exports/index.js",
+  "types": "./dist/types/exports/index.d.ts",
+  "typings": "./dist/types/exports/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/exports/index.d.ts",
+      "default": "./dist/esm/exports/index.js"
+    }
+  },
+  "peerDependencies": {
+    "typescript": ">=5.0.4",
+    "viem": ">=2.19.0"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  },
+  "keywords": [
+    "eth",
+    "ethereum",
+    "smart-account",
+    "abstract",
+    "account-abstraction",
+    "global-wallet",
+    "wallet",
+    "web3"
+  ]
 }

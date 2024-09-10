@@ -28,6 +28,7 @@
     }
   },
   "peerDependencies": {
+    "abitype": "^1.0.0",
     "typescript": ">=5.0.4",
     "viem": "^2.19.0"
   },

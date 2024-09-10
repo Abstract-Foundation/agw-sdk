@@ -10,6 +10,9 @@ importers:
 
   packages/agw-sdk:
     dependencies:
+      abitype:
+        specifier: ^1.0.0
+        version: 1.0.5(typescript@5.6.2)
       typescript:
         specifier: '>=5.0.4'
         version: 5.6.2
@@ -71,7 +74,6 @@ packages:
         optional: true
     dependencies:
       typescript: 5.6.2
-    dev: true
 
   /isows@1.0.4(ws@8.17.1):
     resolution: {integrity: sha512-hEzjY+x9u9hPmBom9IIAqdJCwNLax+xrPb51vEPpERoFlIxgmZcHzsT5jKG06nvInKOBGvReAVz80Umed5CczQ==}

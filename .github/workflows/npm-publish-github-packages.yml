@@ -9,7 +9,6 @@ on:
 
 jobs:
   publish:
-    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: read

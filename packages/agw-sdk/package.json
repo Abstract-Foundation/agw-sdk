@@ -29,7 +29,10 @@
   },
   "peerDependencies": {
     "typescript": ">=5.0.4",
-    "viem": ">=2.19.0"
+    "viem": "^2.19.0"
+  },
+  "devDependencies": {
+    "viem": "^2.19.0"
   },
   "peerDependenciesMeta": {
     "typescript": {

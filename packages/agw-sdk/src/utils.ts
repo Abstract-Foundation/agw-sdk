@@ -9,7 +9,7 @@ import {
     keccak256,
     type Transport
   } from 'viem';
-  import ABI from "./AccountFactory.json";
+  import AccountFactoryAbi from "./AccountFactory.js";
   import { SMART_ACCOUNT_FACTORY_ADDRESS } from './constants.js';
   import { type ChainEIP712 } from 'viem/zksync';
   
@@ -87,7 +87,7 @@ import {
     // Get the deployed account address
     const accountAddress = await publicClient.readContract({
       address: SMART_ACCOUNT_FACTORY_ADDRESS,
-      abi: ABI,
+      abi: AccountFactoryAbi,
       functionName: 'getAddressForSalt',
       args: [salt],
     }) as Hex;

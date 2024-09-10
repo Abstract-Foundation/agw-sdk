@@ -1,7 +1,18 @@
 {
-    "private": true,
-    "scripts": {
-      "build": "pnpm run --r --filter \"./packages/**\" build"
-    },
-    "packageManager": "pnpm@9.4.0"
+  "private": true,
+  "scripts": {
+    "build": "pnpm run --r --filter \"./packages/**\" build",
+    "lint:check": "eslint",
+    "lint:fix": "eslint --fix",
+    "prettier-format": "prettier --config .prettierrc './**/*.ts' --write",
+    "prettier-check": "prettier --config .prettierrc './**/*.ts' --check"
+  },
+  "packageManager": "pnpm@9.4.0",
+  "devDependencies": {
+    "@types/eslint__js": "^8.42.3",
+    "eslint": "^9.10.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "prettier": "^3.3.3",
+    "typescript-eslint": "^8.5.0"
+  }
 }

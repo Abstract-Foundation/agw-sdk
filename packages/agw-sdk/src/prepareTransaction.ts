@@ -1,64 +1,59 @@
-import type { Address } from 'abitype'
+import type { Address } from 'abitype';
 import {
   type Account,
-  type Client,
-  type Transport,
-  type TransactionRequest,
+  BaseError,
   type Chain,
+  type Client,
+  type DeriveAccount,
+  type DeriveChain,
+  type ExactPartial,
+  formatGwei,
+  type FormattedTransactionRequest,
+  type GetChainParameter,
+  type GetTransactionRequestKzgParameter,
+  type IsNever,
+  type NonceManager,
+  type Prettify,
+  type PublicClient,
+  type SendTransactionParameters,
+  type TransactionRequest,
   type TransactionRequestEIP1559,
   type TransactionRequestEIP2930,
   type TransactionRequestEIP4844,
   type TransactionRequestEIP7702,
   type TransactionRequestLegacy,
-  type DeriveAccount,
-  type DeriveChain,
-  type GetChainParameter,
-  type GetTransactionRequestKzgParameter,
-  type ExactPartial,
-  type IsNever,
-  type Prettify,
+  type Transport,
   type UnionOmit,
   type UnionRequiredBy,
-  type FormattedTransactionRequest,
-  type NonceManager,
-  type SendTransactionParameters,
-  BaseError,
-  formatGwei,
-  type PublicClient,
-  type WalletClient
-} from "viem";
-
-import {
-  type ParseAccountErrorType,
-} from "viem/accounts";
-
+  type WalletClient,
+} from 'viem';
+import { type ParseAccountErrorType } from 'viem/accounts';
 import {
   type EstimateFeesPerGasErrorType,
+  estimateGas,
   type EstimateGasErrorType,
   type EstimateGasParameters,
-  estimateGas,
   type GetBlockErrorType,
-  type GetTransactionCountErrorType,
+  getChainId as getChainId_,
   getTransactionCount,
-  getChainId as getChainId_
-} from "viem/actions";
-
+  type GetTransactionCountErrorType,
+} from 'viem/actions';
 import {
-  getAction,
-  type AssertRequestErrorType,
   assertRequest,
+  type AssertRequestErrorType,
+  getAction,
   type GetTransactionType,
   parseAccount,
-} from "viem/utils";
-
+} from 'viem/utils';
 import {
+  type ChainEIP712,
   estimateFee,
   type EstimateFeeParameters,
-  type ChainEIP712
-} from "viem/zksync"
-import {CONTRACT_DEPLOYER_ADDRESS} from "./constants.js"
+} from 'viem/zksync';
 
-export type IsUndefined<T> = [undefined] extends [T] ? true : false
+import { CONTRACT_DEPLOYER_ADDRESS } from './constants.js';
+
+export type IsUndefined<T> = [undefined] extends [T] ? true : false;
 
 export const defaultParameters = [
   'blobVersionedHashes',
@@ -67,17 +62,17 @@ export const defaultParameters = [
   'gas',
   'nonce',
   'type',
-] as const
+] as const;
 
 export type AssertRequestParameters = ExactPartial<
   SendTransactionParameters<Chain>
->
+>;
 
 export class Eip1559FeesNotSupportedError extends BaseError {
   constructor() {
     super('Chain does not support EIP-1559 fees.', {
       name: 'Eip1559FeesNotSupportedError',
-    })
+    });
   }
 }
 
@@ -88,7 +83,7 @@ export class MaxFeePerGasTooLowError extends BaseError {
         maxPriorityFeePerGas,
       )} gwei).`,
       { name: 'MaxFeePerGasTooLowError' },
-    )
+    );
   }
 }
 
@@ -96,11 +91,12 @@ export type GetAccountParameter<
   account extends Account | undefined = Account | undefined,
   accountOverride extends Account | Address | undefined = Account | Address,
   required extends boolean = true,
-> = IsUndefined<account> extends true
-  ? required extends true
-    ? { account: accountOverride | Account | Address }
-    : { account?: accountOverride | Account | Address | undefined }
-  : { account?: accountOverride | Account | Address | undefined }
+> =
+  IsUndefined<account> extends true
+    ? required extends true
+      ? { account: accountOverride | Account | Address }
+      : { account?: accountOverride | Account | Address | undefined }
+    : { account?: accountOverride | Account | Address | undefined };
 
 export type PrepareTransactionRequestParameterType =
   | 'blobVersionedHashes'
@@ -109,31 +105,34 @@ export type PrepareTransactionRequestParameterType =
   | 'gas'
   | 'nonce'
   | 'sidecars'
-  | 'type'
+  | 'type';
 type ParameterTypeToParameters<
   parameterType extends PrepareTransactionRequestParameterType,
 > = parameterType extends 'fees'
   ? 'maxFeePerGas' | 'maxPriorityFeePerGas' | 'gasPrice'
-  : parameterType
+  : parameterType;
 
 export type PrepareTransactionRequestRequest<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   ///
-  _derivedChain extends ChainEIP712 | undefined = DeriveChain<chain, chainOverride>,
+  _derivedChain extends ChainEIP712 | undefined = DeriveChain<
+    chain,
+    chainOverride
+  >,
 > = UnionOmit<FormattedTransactionRequest<_derivedChain>, 'from'> &
   GetTransactionRequestKzgParameter & {
     /**
      * Nonce manager to use for the transaction request.
      */
-    nonceManager?: NonceManager | undefined
+    nonceManager?: NonceManager | undefined;
     /**
      * Parameters to prepare for the transaction request.
      *
      * @default ['blobVersionedHashes', 'chainId', 'fees', 'gas', 'nonce', 'type']
      */
-    parameters?: readonly PrepareTransactionRequestParameterType[] | undefined
-  }
+    parameters?: readonly PrepareTransactionRequestParameterType[] | undefined;
+  };
 
 export type PrepareTransactionRequestParameters<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
@@ -150,7 +149,7 @@ export type PrepareTransactionRequestParameters<
 > = request &
   GetAccountParameter<account, accountOverride, false> &
   GetChainParameter<chain, chainOverride> &
-  GetTransactionRequestKzgParameter<request> & { chainId?: number | undefined }
+  GetTransactionRequestKzgParameter<request> & { chainId?: number | undefined };
 
 export type PrepareTransactionRequestReturnType<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
@@ -202,7 +201,7 @@ export type PrepareTransactionRequestReturnType<
     >
   > &
     (unknown extends request['kzg'] ? {} : Pick<request, 'kzg'>)
->
+>;
 
 export type PrepareTransactionRequestErrorType =
   | AssertRequestErrorType
@@ -210,7 +209,7 @@ export type PrepareTransactionRequestErrorType =
   | GetBlockErrorType
   | GetTransactionCountErrorType
   | EstimateGasErrorType
-  | EstimateFeesPerGasErrorType
+  | EstimateFeesPerGasErrorType;
 
 /**
  * Prepares a transaction request for signing.
@@ -280,45 +279,54 @@ export async function prepareTransactionRequest<
   >
 > {
   const {
-    account: account_ = isInitialTransaction ? signerClient.account : client.account,
+    account: account_ = isInitialTransaction
+      ? signerClient.account
+      : client.account,
     chain,
     gas,
     nonce,
     nonceManager,
     parameters = defaultParameters,
-  } = args
-  const initiatorAccount = parseAccount(account_!)
-  const request = { ...args, ...(initiatorAccount ? { from: initiatorAccount?.address } : {}) }
+  } = args;
+  const initiatorAccount = parseAccount(account_!);
+  const request = {
+    ...args,
+    ...(initiatorAccount ? { from: initiatorAccount?.address } : {}),
+  };
 
-  let chainId: number | undefined
+  let chainId: number | undefined;
   async function getChainId(): Promise<number> {
-    if (chainId) return chainId
-    if (chain) return chain.id
-    if (typeof args.chainId !== 'undefined') return args.chainId
-    const chainId_ = await getAction(client, getChainId_, 'getChainId')({})
-    chainId = chainId_
-    return chainId
+    if (chainId) return chainId;
+    if (chain) return chain.id;
+    if (typeof args.chainId !== 'undefined') return args.chainId;
+    const chainId_ = await getAction(client, getChainId_, 'getChainId')({});
+    chainId = chainId_;
+    return chainId;
   }
 
-  if (parameters.includes('chainId')) request.chainId = await getChainId()
+  if (parameters.includes('chainId')) request.chainId = await getChainId();
 
-  if (parameters.includes('nonce') && typeof nonce === 'undefined' && initiatorAccount) {
+  if (
+    parameters.includes('nonce') &&
+    typeof nonce === 'undefined' &&
+    initiatorAccount
+  ) {
     if (nonceManager) {
-      const chainId = await getChainId()
+      const chainId = await getChainId();
       request.nonce = await nonceManager.consume({
         address: initiatorAccount.address,
         chainId,
         client,
-      })
+      });
     } else {
       request.nonce = await getAction(
-        publicClient,  // The public client is more reliable for fetching the latest nonce
+        publicClient, // The public client is more reliable for fetching the latest nonce
         getTransactionCount,
         'getTransactionCount',
       )({
         address: initiatorAccount.address,
         blockTag: 'pending',
-      })
+      });
     }
   }
 
@@ -334,7 +342,11 @@ export async function prepareTransactionRequest<
         maxFeePerGas = 25000000n;
         maxPriorityFeePerGas = 0n;
       } else {
-        const estimateFeeRequest: EstimateFeeParameters<chain, account | undefined, ChainEIP712> = {
+        const estimateFeeRequest: EstimateFeeParameters<
+          chain,
+          account | undefined,
+          ChainEIP712
+        > = {
           account: initiatorAccount,
           to: request.to,
           value: request.value,
@@ -342,13 +354,16 @@ export async function prepareTransactionRequest<
           gas: request.gas,
           nonce: request.nonce,
           chainId: request.chainId,
-          authorizationList: []
+          authorizationList: [],
         };
-        const feeEstimation = await estimateFee(publicClient, estimateFeeRequest);
+        const feeEstimation = await estimateFee(
+          publicClient,
+          estimateFeeRequest,
+        );
         maxFeePerGas = feeEstimation.maxFeePerGas;
         maxPriorityFeePerGas = feeEstimation.maxPriorityFeePerGas;
       }
-      
+
       if (
         typeof args.maxPriorityFeePerGas === 'undefined' &&
         args.maxFeePerGas &&
@@ -356,10 +371,10 @@ export async function prepareTransactionRequest<
       )
         throw new MaxFeePerGasTooLowError({
           maxPriorityFeePerGas,
-        })
+        });
 
-      request.maxPriorityFeePerGas = maxPriorityFeePerGas
-      request.maxFeePerGas = maxFeePerGas
+      request.maxPriorityFeePerGas = maxPriorityFeePerGas;
+      request.maxFeePerGas = maxFeePerGas;
     }
   }
 
@@ -373,11 +388,11 @@ export async function prepareTransactionRequest<
       account: initiatorAccount
         ? { address: initiatorAccount.address, type: 'json-rpc' }
         : undefined,
-    } as EstimateGasParameters)
+    } as EstimateGasParameters);
 
-  assertRequest(request as AssertRequestParameters)
+  assertRequest(request as AssertRequestParameters);
 
-  delete request.parameters
+  delete request.parameters;
 
-  return request as any
+  return request as any;
 }

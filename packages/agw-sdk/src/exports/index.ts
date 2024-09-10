@@ -1,9 +1,5 @@
-
 export {
-    createAbstractClient,
-    type AbstractClient
-} from "../abstractClient.js";
-
-export {
-    getSmartAccountAddressFromInitialSigner
-} from "../utils.js";
+  type AbstractClient,
+  createAbstractClient,
+} from '../abstractClient.js';
+export { getSmartAccountAddressFromInitialSigner } from '../utils.js';

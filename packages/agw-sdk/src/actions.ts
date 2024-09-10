@@ -58,7 +58,7 @@ import {
   } from "viem/zksync";
   import {prepareTransactionRequest} from "./prepareTransaction.js";
   import {BATCH_CALLER_ADDRESS, SMART_ACCOUNT_FACTORY_ADDRESS, CONTRACT_DEPLOYER_ADDRESS} from "./constants.js";
-  import AccountFactoryAbi from "./AccountFactory.json";
+  import AccountFactoryAbi from "./AccountFactory.js";
   
 
 const abstractTestnetEIP712 = abstractTestnet as unknown as Chain & ChainEIP712;

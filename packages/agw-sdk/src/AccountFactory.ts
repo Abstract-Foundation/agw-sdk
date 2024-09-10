@@ -1,4 +1,4 @@
-[
+const AccountFactoryAbi = [
     {
       "inputs": [
         {
@@ -316,3 +316,5 @@
       "type": "function"
     }
   ]
+
+  export default AccountFactoryAbi;

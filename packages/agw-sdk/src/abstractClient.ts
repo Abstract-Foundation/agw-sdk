@@ -27,6 +27,7 @@ import {
   
   export function createAbstractClient(parameters: CreateAbstractClientParameters): AbstractClient {
     const { smartAccountAddress, validatorAddress, signerAddress, eip1193Provider, chain } = parameters;
+
     const transport = custom(eip1193Provider);
   
     const baseClient = createClient({

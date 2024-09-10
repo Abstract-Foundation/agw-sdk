@@ -1,0 +1,13 @@
+{
+    "name": "agw-sdk",
+    "version": "0.0.1",
+    "type": "module",
+    "scripts": {
+        "build": "yarn run clean && yarn run build:esm+types",
+        "build:esm+types": "tsc --project tsconfig.json --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types",
+        "clean": "rm -rf dist tsconfig.tsbuildinfo"
+    },
+    "dependencies": {
+        "viem": "^2.21.1"
+    }
+}

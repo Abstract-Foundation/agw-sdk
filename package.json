@@ -3,7 +3,5 @@
     "scripts": {
       "build": "pnpm run --r --filter \"./packages/**\" build"
     },
-    "workspaces": [
-        "packages/*"
-    ]
+    "packageManager": "pnpm@9.4.0"
 }

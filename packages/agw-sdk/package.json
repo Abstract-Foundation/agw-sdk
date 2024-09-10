@@ -8,6 +8,9 @@
     "url": "https://github.com/abstract-foundation/agw-sdk.git",
     "directory": "packages/agw-sdk"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "type": "module",
   "scripts": {
     "build": "pnpm run clean && pnpm run build:esm+types",

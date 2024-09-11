@@ -58,8 +58,6 @@ import {
 } from './constants.js';
 import { prepareTransactionRequest } from './prepareTransaction.js';
 
-const abstractTestnetEIP712 = abstractTestnet as unknown as Chain & ChainEIP712;
-
 const ALLOWED_CHAINS: number[] = [abstractTestnet.id];
 
 export class AccountNotFoundError extends BaseError {
@@ -144,7 +142,7 @@ export function assertEip712Request(args: AssertEip712RequestParameters) {
 }
 
 export type AssertEip712RequestParameters = ExactPartial<
-  SendEip712TransactionParameters<typeof abstractTestnetEIP712>
+  SendEip712TransactionParameters<ChainEIP712>
 >;
 
 function getInitializerCalldata(

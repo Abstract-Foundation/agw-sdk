@@ -54,6 +54,7 @@ import {
   BATCH_CALLER_ADDRESS,
   CONTRACT_DEPLOYER_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
+  VALIDATOR_ADDRESS,
 } from './constants.js';
 import { prepareTransactionRequest } from './prepareTransaction.js';
 
@@ -664,16 +665,15 @@ export type AbstractWalletActions<
   sendTransactionBatch: <
     const request extends SendTransactionRequest<ChainEIP712>,
   >(
-    // eslint-disable-next-line no-unused-vars
     args: SendTransactionBatchParameters<request>,
   ) => Promise<SendTransactionReturnType>;
 };
 
 export function globalWalletActions(
-  validatorAddress: Hex,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
 ) {
+  const validatorAddress = VALIDATOR_ADDRESS;
   return (
     client: Client<Transport, ChainEIP712, Account>,
   ): AbstractWalletActions<Chain, Account> => ({

@@ -12,9 +12,30 @@ import { type ChainEIP712 } from 'viem/zksync';
 import { type AbstractWalletActions, globalWalletActions } from './actions.js';
 import { getSmartAccountAddressFromInitialSigner } from './utils.js';
 
+/**
+ * Parameters for creating an AbstractClient instance.
+ * @interface CreateAbstractClientParameters
+ */
 interface CreateAbstractClientParameters {
+  /**
+   * The account used for signing AGW transactions.
+   * @type {Account}
+   */
   signer: Account;
+
+  /**
+   * The chain configuration supporting EIP-712.
+   * @type {ChainEIP712}
+   */
   chain: ChainEIP712;
+
+  /**
+   * Optional transport layer for network communication.
+   * If not provided, a default HTTP transport will be used.
+   * @type {Transport}
+   * @optional
+   */
+  transport?: Transport;
 }
 
 type AbstractClientActions = AbstractWalletActions<ChainEIP712, Account>;
@@ -22,17 +43,18 @@ type AbstractClientActions = AbstractWalletActions<ChainEIP712, Account>;
 export type AbstractClient = Client<Transport, ChainEIP712, Account> &
   AbstractClientActions;
 
-export async function createAbstractClient(
-  parameters: CreateAbstractClientParameters,
-): Promise<AbstractClient> {
-  const { signer, chain } = parameters;
+export async function createAbstractClient({
+  signer,
+  transport,
+  chain,
+}: CreateAbstractClientParameters): Promise<AbstractClient> {
+  if (!transport) {
+    transport = http();
+  }
 
-  const transport = http();
-
-  // Create public client for reading contract code
   const publicClient = createPublicClient({
     chain: chain,
-    transport: http(),
+    transport,
   });
 
   const smartAccountAddress = await getSmartAccountAddressFromInitialSigner(

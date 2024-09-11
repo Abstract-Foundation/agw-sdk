@@ -60,8 +60,8 @@ import { prepareTransactionRequest } from './prepareTransaction.js';
 
 const abstractTestnetEIP712 = abstractTestnet as unknown as Chain & ChainEIP712;
 
-const ALLOWED_CHAINS: ChainEIP712[] = [
-  abstractTestnet as unknown as ChainEIP712,
+const ALLOWED_CHAINS: number[] = [
+  abstractTestnet.id
 ];
 
 export class AccountNotFoundError extends BaseError {
@@ -215,7 +215,7 @@ export async function signTransaction<
     ...(transaction as AssertEip712RequestParameters),
   });
 
-  if (!chain || !ALLOWED_CHAINS.includes(chain)) {
+  if (!chain || !ALLOWED_CHAINS.includes(chain.id)) {
     throw new BaseError('Invalid chain specified');
   }
 

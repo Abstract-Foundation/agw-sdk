@@ -50,7 +50,7 @@ export async function createAbstractClient(
   const signerWalletClient = createWalletClient({
     account: signer,
     chain: chain,
-    transport
+    transport,
   });
 
   const abstractClient = baseClient.extend(

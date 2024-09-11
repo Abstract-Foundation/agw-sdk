@@ -60,9 +60,7 @@ import { prepareTransactionRequest } from './prepareTransaction.js';
 
 const abstractTestnetEIP712 = abstractTestnet as unknown as Chain & ChainEIP712;
 
-const ALLOWED_CHAINS: number[] = [
-  abstractTestnet.id
-];
+const ALLOWED_CHAINS: number[] = [abstractTestnet.id];
 
 export class AccountNotFoundError extends BaseError {
   constructor({ docsPath }: { docsPath?: string | undefined } = {}) {

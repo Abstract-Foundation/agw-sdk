@@ -4,8 +4,6 @@ import {
   createClient,
   createPublicClient,
   createWalletClient,
-  custom,
-  type EIP1193Provider,
   http,
   type Transport,
 } from 'viem';
@@ -16,7 +14,6 @@ import { getSmartAccountAddressFromInitialSigner } from './utils.js';
 
 interface CreateAbstractClientParameters {
   signer: Account;
-  eip1193Provider: EIP1193Provider;
   chain: ChainEIP712;
 }
 
@@ -28,9 +25,9 @@ export type AbstractClient = Client<Transport, ChainEIP712, Account> &
 export async function createAbstractClient(
   parameters: CreateAbstractClientParameters,
 ): Promise<AbstractClient> {
-  const { signer, eip1193Provider, chain } = parameters;
+  const { signer, chain } = parameters;
 
-  const transport = custom(eip1193Provider);
+  const transport = http();
 
   // Create public client for reading contract code
   const publicClient = createPublicClient({
@@ -53,7 +50,7 @@ export async function createAbstractClient(
   const signerWalletClient = createWalletClient({
     account: signer,
     chain: chain,
-    transport: custom(eip1193Provider),
+    transport,
   });
 
   const abstractClient = baseClient.extend(

@@ -185,7 +185,7 @@ export async function signTransaction<
   chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
 >(
   client: Client<Transport, ChainEIP712, Account>,
-  signerClient: WalletClient<Transport, chain, account>,
+  signerClient: WalletClient<Transport, ChainEIP712, Account>,
   args: SignEip712TransactionParameters<chain, account, chainOverride>,
   validatorAddress: Hex,
   useSignerAddress = false,
@@ -203,7 +203,7 @@ export async function signTransaction<
       docsPath: '/docs/actions/wallet/signTransaction',
     });
   const smartAccount = parseAccount(account_);
-  const fromAccount = useSignerAddress ? signerClient.account! : smartAccount;
+  const fromAccount = useSignerAddress ? signerClient.account : smartAccount;
 
   assertEip712Request({
     account: smartAccount,
@@ -236,7 +236,7 @@ export async function signTransaction<
 
   const rawSignature = await signTypedData(signerClient, {
     ...eip712Domain,
-    account: signerClient.account!,
+    account: signerClient.account,
   });
 
   let signature;
@@ -272,8 +272,8 @@ export async function sendTransaction<
   > = SendTransactionRequest<chain, chainOverride>,
 >(
   client: Client<Transport, ChainEIP712, Account>,
-  signerClient: WalletClient<Transport, chain, account>,
-  publicClient: PublicClient<Transport, chain>,
+  signerClient: WalletClient<Transport, ChainEIP712, Account>,
+  publicClient: PublicClient<Transport, ChainEIP712>,
   parameters: SendEip712TransactionParameters<
     chain,
     account,
@@ -296,11 +296,11 @@ export async function sendTransaction<
 
     // Create calldata for initializing the proxy account
     const initializerCallData = getInitializerCalldata(
-      signerClient.account!.address,
+      signerClient.account.address,
       validatorAddress,
       initialCall,
     );
-    const addressBytes = toBytes(signerClient.account!.address);
+    const addressBytes = toBytes(signerClient.account.address);
     const salt = keccak256(addressBytes);
     const deploymentCalldata = encodeFunctionData({
       abi: AccountFactoryAbi,
@@ -339,8 +339,8 @@ export async function _sendTransaction<
   chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
 >(
   client: Client<Transport, ChainEIP712, Account>,
-  signerClient: WalletClient<Transport, chain, account>,
-  publicClient: PublicClient<Transport, chain>,
+  signerClient: WalletClient<Transport, ChainEIP712, Account>,
+  publicClient: PublicClient<Transport, ChainEIP712>,
   parameters: SendEip712TransactionParameters<
     chain,
     account,
@@ -418,7 +418,6 @@ interface Call {
 
 export async function sendTransactionBatch<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
-  account extends Account | undefined = Account | undefined,
   chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   request extends SendTransactionRequest<
     chain,
@@ -426,8 +425,8 @@ export async function sendTransactionBatch<
   > = SendTransactionRequest<chain, chainOverride>,
 >(
   client: Client<Transport, ChainEIP712, Account>,
-  signerClient: WalletClient<Transport, chain, account>,
-  publicClient: PublicClient<Transport, chain>,
+  signerClient: WalletClient<Transport, ChainEIP712, Account>,
+  publicClient: PublicClient<Transport, ChainEIP712>,
   parameters: SendTransactionBatchParameters<request>,
   validatorAddress: Hex,
 ): Promise<SendTransactionReturnType> {
@@ -435,12 +434,15 @@ export async function sendTransactionBatch<
     throw new Error('No calls provided');
   }
 
-  const calls: Call[] = parameters.calls.map((tx) => ({
-    target: tx.to!,
-    allowFailure: false, // Set to false by default, adjust if needed
-    value: BigInt(tx.value ?? 0),
-    callData: tx.data ?? '0x',
-  }));
+  const calls: Call[] = parameters.calls.map((tx) => {
+    if (!tx.to) throw new Error('Transaction target (to) is required');
+    return {
+      target: tx.to,
+      allowFailure: false,
+      value: BigInt(tx.value ?? 0),
+      callData: tx.data ?? '0x',
+    };
+  });
 
   const batchCallData = encodeFunctionData({
     abi: [
@@ -487,11 +489,11 @@ export async function sendTransactionBatch<
 
     // Create calldata for initializing the proxy account
     const initializerCallData = getInitializerCalldata(
-      signerClient.account!.address,
+      signerClient.account.address,
       validatorAddress,
       initialCall,
     );
-    const addressBytes = toBytes(signerClient.account!.address);
+    const addressBytes = toBytes(signerClient.account.address);
     const salt = keccak256(addressBytes);
     const deploymentCalldata = encodeFunctionData({
       abi: AccountFactoryAbi,
@@ -550,8 +552,8 @@ export async function writeContract<
   chainOverride extends ChainEIP712 | undefined,
 >(
   client: Client<Transport, ChainEIP712, Account>,
-  signerClient: WalletClient<Transport, chain, account>,
-  publicClient: PublicClient<Transport, chain>,
+  signerClient: WalletClient<Transport, ChainEIP712, Account>,
+  publicClient: PublicClient<Transport, ChainEIP712>,
   parameters: WriteContractParameters<
     abi,
     functionName,
@@ -616,8 +618,8 @@ export function deployContract<
   chainOverride extends ChainEIP712 | undefined,
 >(
   walletClient: Client<Transport, ChainEIP712, Account>,
-  signerClient: WalletClient<Transport, chain, account>,
-  publicClient: PublicClient<Transport, chain>,
+  signerClient: WalletClient<Transport, ChainEIP712, Account>,
+  publicClient: PublicClient<Transport, ChainEIP712>,
   parameters: DeployContractParameters<abi, chain, account, chainOverride>,
   validatorAddress: Hex,
 ): Promise<DeployContractReturnType> {
@@ -665,7 +667,10 @@ export type AbstractWalletActions<
   ) => Promise<SendTransactionReturnType>;
 };
 
-export function globalWalletActions(
+export function globalWalletActions<
+  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  account extends Account | undefined = Account | undefined,
+>(
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
 ) {
@@ -678,7 +683,7 @@ export function globalWalletActions(
         client,
         signerClient,
         publicClient,
-        args,
+        args as SendEip712TransactionParameters<chain, account>,
         validatorAddress,
       ),
     sendTransactionBatch: (args) =>
@@ -690,7 +695,12 @@ export function globalWalletActions(
         validatorAddress,
       ),
     signTransaction: (args) =>
-      signTransaction(client, signerClient, args, validatorAddress),
+      signTransaction(
+        client,
+        signerClient,
+        args as SignEip712TransactionParameters<chain, account>,
+        validatorAddress,
+      ),
     deployContract: (args) =>
       deployContract(
         client,
@@ -702,7 +712,9 @@ export function globalWalletActions(
     writeContract: (args) =>
       writeContract(
         Object.assign(client, {
-          sendTransaction: (args: any) =>
+          sendTransaction: (
+            args: SendEip712TransactionParameters<chain, account>,
+          ) =>
             sendTransaction(
               client,
               signerClient,

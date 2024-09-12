@@ -9,8 +9,11 @@ import {
 } from 'viem';
 import { type ChainEIP712 } from 'viem/zksync';
 
-import { type AbstractWalletActions, globalWalletActions } from './actions.js';
 import { getSmartAccountAddressFromInitialSigner } from './utils.js';
+import {
+  type AbstractWalletActions,
+  globalWalletActions,
+} from './walletActions.js';
 
 /**
  * Parameters for creating an AbstractClient instance.

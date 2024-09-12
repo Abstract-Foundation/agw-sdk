@@ -51,7 +51,7 @@ import {
   type EstimateFeeParameters,
 } from 'viem/zksync';
 
-import { CONTRACT_DEPLOYER_ADDRESS } from './constants.js';
+import { CONTRACT_DEPLOYER_ADDRESS } from '../constants.js';
 
 export type IsUndefined<T> = [undefined] extends [T] ? true : false;
 

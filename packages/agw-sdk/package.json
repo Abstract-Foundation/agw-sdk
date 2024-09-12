@@ -27,6 +27,11 @@
       "default": "./dist/esm/exports/index.js"
     }
   },
+  "files": [
+    "dist",
+    "src",
+    "package.json"
+  ],
   "peerDependencies": {
     "abitype": "^1.0.0",
     "typescript": ">=5.0.4",

@@ -1,5 +1,6 @@
 import {
   type Address,
+  encodeFunctionData,
   type Hex,
   keccak256,
   type PublicClient,
@@ -11,8 +12,9 @@ import {
 } from 'viem';
 import { type ChainEIP712 } from 'viem/zksync';
 
-import AccountFactoryAbi from './AccountFactory.js';
+import AccountFactoryAbi from './abis/AccountFactory.js';
 import { SMART_ACCOUNT_FACTORY_ADDRESS } from './constants.js';
+import { type Call } from './types/call.js';
 
 type MessageTypes = Record<string, { name: string; type: string }[]>;
 
@@ -106,4 +108,55 @@ export async function getSmartAccountAddressFromInitialSigner<
   })) as Hex;
 
   return accountAddress;
+}
+
+export async function isSmartAccountDeployed<
+  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+>(
+  publicClient: PublicClient<Transport, chain>,
+  address: Hex,
+): Promise<boolean> {
+  try {
+    const bytecode = await publicClient.getCode({
+      address: address,
+    });
+    return bytecode !== null && bytecode !== '0x' && bytecode !== undefined;
+  } catch (error) {
+    console.error('Error checking address:', error);
+    return false;
+  }
+}
+
+export function getInitializerCalldata(
+  initialOwnerAddress: Address,
+  validatorAddress: Address,
+  initialCall: Call,
+): Hex {
+  return encodeFunctionData({
+    abi: [
+      {
+        name: 'initialize',
+        type: 'function',
+        inputs: [
+          { name: 'initialK1Owner', type: 'address' },
+          { name: 'initialK1Validator', type: 'address' },
+          { name: 'modules', type: 'bytes[]' },
+          {
+            name: 'initCall',
+            type: 'tuple',
+            components: [
+              { name: 'target', type: 'address' },
+              { name: 'allowFailure', type: 'bool' },
+              { name: 'value', type: 'uint256' },
+              { name: 'callData', type: 'bytes' },
+            ],
+          },
+        ],
+        outputs: [],
+        stateMutability: 'nonpayable',
+      },
+    ],
+    functionName: 'initialize',
+    args: [initialOwnerAddress, validatorAddress, [], initialCall],
+  });
 }

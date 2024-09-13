@@ -51,7 +51,7 @@ export async function createAbstractClient({
   transport,
   chain,
 }: CreateAbstractClientParameters): Promise<AbstractClient> {
-  if (!transport) {
+  if (transport === undefined) {
     transport = http();
   }
 

@@ -16,7 +16,8 @@
     "build": "pnpm run clean && pnpm run build:esm+types",
     "build:esm+types": "tsc --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "debug": "tsc-watch --sourceMap true --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types"
   },
   "main": "./dist/esm/exports/index.js",
   "types": "./dist/types/exports/index.d.ts",

@@ -5,6 +5,6 @@
   "compilerOptions": {
     "sourceMap": true,
     "resolveJsonModule": true,
-    "jsx": "react-jsx"
+    "jsx": "preserve"
   }
 }

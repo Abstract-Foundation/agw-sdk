@@ -1,5 +1,5 @@
 export {
   AbstractWalletProvider,
   useAbstractGlobalWallet,
-} from '../AbstractWalletProvider.js';
+} from '../AbstractWalletProvider.jsx';
 export { useLoginWithAbstract } from '../useLoginWithAbstract.js';

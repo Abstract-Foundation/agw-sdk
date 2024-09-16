@@ -4,11 +4,12 @@ import {
   createAbstractClient,
 } from '@abstract-foundation/agw-sdk';
 import { toPrivyWalletProvider } from '@privy-io/cross-app-connect';
-import PrivyAuth from '@privy-io/react-auth'
-const {
+import {
+  type SignTypedDataParams,
   useCrossAppAccounts,
   usePrivy,
-} = PrivyAuth;
+  type User,
+} from '@privy-io/react-auth';
 import React, {
   createContext,
   useContext,
@@ -55,7 +56,7 @@ export const SmartAccountProvider = ({
   const { user, ready, authenticated } = usePrivy();
 
   const account = useMemo(() => {
-    const getAccountFromCrossAppUser = (user: PrivyAuth.User) => {
+    const getAccountFromCrossAppUser = (user: User) => {
       const crossAppAccount = user.linkedAccounts.find(
         (account) => account.type === 'cross_app',
       );
@@ -109,7 +110,7 @@ export const SmartAccountProvider = ({
         data,
       ) => {
         sanitizeMessage(data.message);
-        return signTypedData(data as PrivyAuth.SignTypedDataParams, {
+        return signTypedData(data as SignTypedDataParams, {
           address,
         }) as Promise<`0x${string}`>;
       };
@@ -124,7 +125,7 @@ export const SmartAccountProvider = ({
 
     if (!ready) return;
     if (!authenticated) return;
-    return getAccountFromCrossAppUser(user as PrivyAuth.User);
+    return getAccountFromCrossAppUser(user as User);
   }, [ready, authenticated, user, signMessage, signTypedData]);
 
   // States to store the smart account and its status

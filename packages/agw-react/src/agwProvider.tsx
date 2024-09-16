@@ -1,8 +1,7 @@
 'use client'
-import PrivyAuth from "@privy-io/react-auth";
-const {
+import {
   PrivyProvider
-} = PrivyAuth;
+} from "@privy-io/react-auth";
 import React from "react";
 import {
   type Chain,

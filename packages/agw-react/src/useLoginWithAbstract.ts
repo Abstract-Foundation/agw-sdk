@@ -1,5 +1,4 @@
-import PrivyAuth from '@privy-io/react-auth';
-const { useCrossAppAccounts, usePrivy } = PrivyAuth;
+import { useCrossAppAccounts, usePrivy, type User } from '@privy-io/react-auth';
 import { useCallback } from 'react';
 
 const AGW_APP_ID = 'cm04asygd041fmry9zmcyn5o5';
@@ -10,7 +9,7 @@ interface AbstractGlobalWalletInterface {
   /** Boolean to indicate whether the user is authenticated */
   authenticated: boolean;
   /** Privy user object */
-  user: PrivyAuth.User | undefined;
+  user: User | undefined;
   /** Function to login with the Abstract global wallet */
   login: () => Promise<void>;
   /** Function to logout of the abstract global wallet */

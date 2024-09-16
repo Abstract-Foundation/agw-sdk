@@ -1,0 +1,67 @@
+{
+  "name": "@abstract-foundation/agw-react",
+  "description": "Abstract Global Wallet React Components",
+  "version": "0.0.1-alpha.1",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abstract-foundation/agw-sdk.git",
+    "directory": "packages/agw-react"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "pnpm run clean && pnpm run build:esm+types",
+    "build:esm+types": "tsc --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "debug": "tsc-watch --sourceMap true --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types"
+  },
+  "main": "./dist/esm/exports/index.js",
+  "types": "./dist/types/exports/index.d.ts",
+  "typings": "./dist/types/exports/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/exports/index.d.ts",
+      "default": "./dist/esm/exports/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "package.json"
+  ],
+  "dependencies": {
+    "@privy-io/cross-app-connect": "^0.0.3-beta-20240913012159",
+    "@privy-io/react-auth": "^1.78.1"
+  },
+  "peerDependencies": {
+    "abitype": "^1.0.0",
+    "react": "^18.0.0",
+    "typescript": ">=5.0.4",
+    "viem": "^2.19.0",
+    "@abstract-foundation/agw-sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@abstract-foundation/agw-sdk": "workspace:*",
+    "@types/react": "^18.3.6",
+    "viem": "^2.19.0"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  },
+  "keywords": [
+    "eth",
+    "ethereum",
+    "smart-account",
+    "abstract",
+    "account-abstraction",
+    "global-wallet",
+    "wallet",
+    "web3"
+  ]
+}

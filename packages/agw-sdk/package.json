@@ -39,7 +39,10 @@
     "viem": "^2.19.0"
   },
   "devDependencies": {
-    "viem": "^2.19.0"
+    "@types/node": "^22.5.5",
+    "prool": "^0.0.16",
+    "viem": "^2.19.0",
+    "vitest": "^2.1.1"
   },
   "peerDependenciesMeta": {
     "typescript": {

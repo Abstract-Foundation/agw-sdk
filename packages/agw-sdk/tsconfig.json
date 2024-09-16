@@ -4,6 +4,8 @@
   "exclude": ["src/**/*.test.ts"],
   "compilerOptions": {
     "sourceMap": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["node"],
+    "typeRoots": ["./node_modules/@types"]
   }
 }

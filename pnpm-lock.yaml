@@ -35,12 +35,6 @@ importers:
       '@privy-io/react-auth':
         specifier: ^1.78.1
         version: 1.83.1(@babel/core@7.25.2)(@types/react@18.3.6)(bufferutil@4.0.8)(react-dom@18.3.1(react@18.3.1))(react-is@16.13.1)(react@18.3.1)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8)
-      abitype:
-        specifier: ^1.0.0
-        version: 1.0.5(typescript@5.6.2)(zod@3.23.8)
-      react:
-        specifier: ^18.0.0
-        version: 18.3.1
       typescript:
         specifier: '>=5.0.4'
         version: 5.6.2
@@ -49,8 +43,17 @@ importers:
         specifier: workspace:*
         version: link:../agw-sdk
       '@types/react':
-        specifier: ^18.3.6
+        specifier: '>=18.3.1'
         version: 18.3.6
+      '@types/react-dom':
+        specifier: '>=18.3.0'
+        version: 18.3.0
+      react:
+        specifier: '>=18.3.1'
+        version: 18.3.1
+      react-dom:
+        specifier: '>=18.3.1'
+        version: 18.3.1(react@18.3.1)
       viem:
         specifier: ^2.19.0
         version: 2.21.4(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8)
@@ -675,6 +678,9 @@ packages:
 
   '@types/prop-types@15.7.12':
     resolution: {integrity: sha512-5zvhXYtRNRluoE/jAp4GVsSduVUzNWKkOZrCDBWYtE7biZywwdC2AcEzg+cSMLFRfVgeAFqpfNabiPjxFddV1Q==}
+
+  '@types/react-dom@18.3.0':
+    resolution: {integrity: sha512-EhwApuTmMBmXuFOikhQLIBUn6uFg81SwLMOAUgodJF14SOBOCMdU04gDoYi0WOJJHD144TL32z4yDqCW3dnkQg==}
 
   '@types/react@18.3.6':
     resolution: {integrity: sha512-CnGaRYNu2iZlkGXGrOYtdg5mLK8neySj0woZ4e2wF/eli2E6Sazmq5X+Nrj6OBrrFVQfJWTUFeqAzoRhWQXYvg==}
@@ -3469,6 +3475,10 @@ snapshots:
   '@types/node@12.20.55': {}
 
   '@types/prop-types@15.7.12': {}
+
+  '@types/react-dom@18.3.0':
+    dependencies:
+      '@types/react': 18.3.6
 
   '@types/react@18.3.6':
     dependencies:

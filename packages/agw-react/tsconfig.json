@@ -1,10 +1,10 @@
 {
   "extends": "../../tsconfig.base.json",
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["src/**/*.test.ts"],
   "compilerOptions": {
     "sourceMap": true,
     "resolveJsonModule": true,
-    "jsx": "react-jsx"
+    "jsx": "react"
   }
 }

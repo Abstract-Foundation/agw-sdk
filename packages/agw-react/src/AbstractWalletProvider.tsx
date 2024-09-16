@@ -22,7 +22,7 @@ import {
   toHex,
 } from "viem";
 import { toAccount } from "viem/accounts";
-import { abstractTestnet, ChainEIP712 } from "viem/chains";
+import { abstractTestnet, type ChainEIP712 } from "viem/chains";
 
 /** Interface returned by custom `useSmartAccount` hook */
 interface SmartAccountInterface {
@@ -36,7 +36,7 @@ interface SmartAccountInterface {
   ready: boolean;
 }
 
-const SmartAccountContext = React.createContext<SmartAccountInterface>({
+export const SmartAccountContext = React.createContext<SmartAccountInterface>({
   signer: undefined,
   smartAccountClient: undefined,
   smartAccountAddress: undefined,

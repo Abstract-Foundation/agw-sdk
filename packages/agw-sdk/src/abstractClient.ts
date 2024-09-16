@@ -57,7 +57,7 @@ export async function createAbstractClient({
 
   const publicClient = createPublicClient({
     chain: chain,
-    transport,
+    transport: http(),
   });
 
   const smartAccountAddress = await getSmartAccountAddressFromInitialSigner(

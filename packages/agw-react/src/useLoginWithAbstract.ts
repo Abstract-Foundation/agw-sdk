@@ -1,7 +1,7 @@
 import { useCrossAppAccounts, usePrivy, type User } from '@privy-io/react-auth';
 import { useCallback } from 'react';
 
-const AGW_APP_ID = 'cm04asygd041fmry9zmcyn5o5';
+import { AGW_APP_ID } from './constants';
 
 interface AbstractGlobalWalletInterface {
   /** Boolean to indicate whether the abstract global wallet state has initialized */

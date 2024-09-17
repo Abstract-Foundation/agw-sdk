@@ -29,7 +29,13 @@
       "import": "./dist/esm/exports/index.js",
       "types": "./dist/types/exports/index.d.ts",
       "require": "./dist/cjs/exports/index.js"
-    }
+    },
+    "./connectors": {
+      "import": "./dist/esm/exports/connectors.js",
+      "types": "./dist/types/exports/connectors.d.ts",
+      "require": "./dist/cjs/exports/connectors.js"
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
@@ -43,7 +49,8 @@
   "peerDependencies": {
     "react": ">=18",
     "typescript": ">=5.0.4",
-    "viem": "^2.19.0",
+    "viem": "2.21.3",
+    "@wagmi/core": "^2",
     "@abstract-foundation/agw-sdk": "workspace:*"
   },
   "devDependencies": {
@@ -52,7 +59,9 @@
     "react-dom": ">=18.3.1",
     "@types/react": ">=18.3.1",
     "@types/react-dom": ">=18.3.0",
-    "viem": "^2.19.0"
+    "viem": "2.21.3",
+    "@wagmi/core": "^2",
+    "@rainbow-me/rainbowkit": "^2.1.6"
   },
   "peerDependenciesMeta": {
     "typescript": {

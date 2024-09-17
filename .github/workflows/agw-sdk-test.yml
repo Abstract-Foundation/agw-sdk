@@ -22,6 +22,11 @@ jobs:
         with:
           version: 8
 
+      - name: Set up foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly-143abd6a768eeb52a5785240b763d72a56987b4a
+
       - name: Install dependencies
         run: pnpm install
 

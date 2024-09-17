@@ -259,8 +259,8 @@ export async function prepareTransactionRequest<
   chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
 >(
   client: Client<Transport, ChainEIP712, Account>,
-  signerClient: WalletClient<Transport, chain, account>,
-  publicClient: PublicClient<Transport, chain>,
+  signerClient: WalletClient<Transport, ChainEIP712, Account>,
+  publicClient: PublicClient<Transport, ChainEIP712>,
   args: PrepareTransactionRequestParameters<
     chain,
     account,
@@ -279,16 +279,15 @@ export async function prepareTransactionRequest<
   >
 > {
   const {
-    account: account_ = isInitialTransaction
-      ? signerClient.account
-      : client.account,
     chain,
     gas,
     nonce,
     nonceManager,
     parameters = defaultParameters,
   } = args;
-  const initiatorAccount = parseAccount(account_!);
+  const initiatorAccount = parseAccount(
+    isInitialTransaction ? signerClient.account : client.account,
+  );
   const request = {
     ...args,
     ...(initiatorAccount ? { from: initiatorAccount?.address } : {}),

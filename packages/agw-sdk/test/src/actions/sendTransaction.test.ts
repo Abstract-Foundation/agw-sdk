@@ -15,11 +15,23 @@ import {
   type SignEip712TransactionReturnType,
   ZksyncTransactionRequestEIP712,
 } from 'viem/zksync';
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 
-import { sendTransaction } from '../../../src/actions/sendTransaction.js';
+import {
+  _sendTransaction,
+  sendTransaction,
+} from '../../../src/actions/sendTransaction.js';
 import { anvilAbstractTestnet } from '../anvil.js';
 import { address } from '../constants.js';
+
+// Mock the signTransaction function
+vi.mock('../../../src/actions/signTransaction', () => ({
+  signTransaction: vi.fn().mockResolvedValue('0xmockedSerializedTransaction'),
+}));
+
+import { abstractTestnet } from 'viem/chains';
+
+import { signTransaction } from '../../../src/actions/signTransaction.js';
 
 const MOCK_TRANSACTION_HASH =
   '0x9afe47f3d95eccfc9210851ba5f877f76d372514a26b48bad848a07f77c33b87';
@@ -33,7 +45,7 @@ const baseClient = createClient({
   transport: anvilAbstractTestnet.clientConfig.transport,
 });
 
-baseClient.request = (async ({ method, params }) => {
+const baseClientRequestSpy = vi.fn(async ({ method, params }) => {
   if (method === 'eth_chainId') {
     return anvilAbstractTestnet.chain.id;
   }
@@ -44,7 +56,9 @@ baseClient.request = (async ({ method, params }) => {
     return MOCK_TRANSACTION_HASH;
   }
   return anvilAbstractTestnet.getClient().request({ method, params } as any);
-}) as EIP1193RequestFn;
+});
+
+baseClient.request = baseClientRequestSpy as unknown as EIP1193RequestFn;
 
 const signerClient = createWalletClient({
   account: toAccount(address.signerAddress),
@@ -83,8 +97,8 @@ const transaction: ZksyncTransactionRequestEIP712 = {
   paymasterInput: '0x',
 };
 
-test('without initial code', async () => {
-  const transactionHash = await sendTransaction(
+test('_sendTransaction without initial code', async () => {
+  const transactionHash = await _sendTransaction(
     baseClient,
     signerClient,
     publicClient,
@@ -95,6 +109,33 @@ test('without initial code', async () => {
       chain: anvilAbstractTestnet.chain as ChainEIP712,
     } as any,
     address.validatorAddress,
+    true,
   );
   expect(transactionHash).toBe(MOCK_TRANSACTION_HASH);
+
+  // Validate that signTransaction was called with the correct parameters
+  expect(signTransaction).toHaveBeenCalledWith(
+    baseClient,
+    signerClient,
+    expect.objectContaining({
+      type: 'eip712',
+      to: '0x5432100000000000000000000000000000000000',
+      from: address.signerAddress,
+      paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
+      paymasterInput: '0x',
+      chainId: abstractTestnet.id,
+    }),
+    address.validatorAddress,
+    true,
+  );
+
+  // Validate that the sendRawTransaction call was made with the correct parameters
+  const sendRawTransactionCall = baseClientRequestSpy.mock.calls.find(
+    (call) => call[0].method === 'eth_sendRawTransaction',
+  );
+  expect(sendRawTransactionCall).toBeDefined();
+  if (sendRawTransactionCall) {
+    const [rawTransaction] = sendRawTransactionCall[0].params;
+    expect(rawTransaction).toEqual('0xmockedSerializedTransaction');
+  }
 });

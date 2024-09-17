@@ -290,7 +290,7 @@ export async function prepareTransactionRequest<
   );
   const request = {
     ...args,
-    ...(initiatorAccount ? { from: initiatorAccount?.address } : {}),
+    from: initiatorAccount.address,
   };
 
   let chainId: number | undefined;

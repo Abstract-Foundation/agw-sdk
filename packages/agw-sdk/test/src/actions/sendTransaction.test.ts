@@ -3,19 +3,18 @@ import {
   createPublicClient,
   createWalletClient,
   EIP1193RequestFn,
-  encodeAbiParameters,
   http,
-  parseAbiParameters,
   type SendTransactionRequest,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
+import { abstractTestnet, mainnet } from 'viem/chains';
 import {
   ChainEIP712,
   type SignEip712TransactionParameters,
   type SignEip712TransactionReturnType,
   ZksyncTransactionRequestEIP712,
 } from 'viem/zksync';
-import { expect, test, vi } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
 import {
   _sendTransaction,
@@ -28,8 +27,6 @@ import { address } from '../constants.js';
 vi.mock('../../../src/actions/signTransaction', () => ({
   signTransaction: vi.fn().mockResolvedValue('0xmockedSerializedTransaction'),
 }));
-
-import { abstractTestnet } from 'viem/chains';
 
 import { signTransaction } from '../../../src/actions/signTransaction.js';
 
@@ -97,45 +94,84 @@ const transaction: ZksyncTransactionRequestEIP712 = {
   paymasterInput: '0x',
 };
 
-test('_sendTransaction without initial code', async () => {
-  const transactionHash = await _sendTransaction(
-    baseClient,
-    signerClient,
-    publicClient,
+describe('_sendTransaction', () => {
+  const testCases = [
     {
-      ...transaction,
-      type: 'eip712',
-      account: baseClient.account,
-      chain: anvilAbstractTestnet.chain as ChainEIP712,
-    } as any,
-    address.validatorAddress,
-    true,
-  );
-  expect(transactionHash).toBe(MOCK_TRANSACTION_HASH);
+      name: 'is initial transaction',
+      isInitialTransaction: true,
+      expectedFromAddress: address.signerAddress,
+    },
+    {
+      name: 'is not initial transaction',
+      isInitialTransaction: false,
+      expectedFromAddress: address.smartAccountAddress,
+    },
+  ];
 
-  // Validate that signTransaction was called with the correct parameters
-  expect(signTransaction).toHaveBeenCalledWith(
-    baseClient,
-    signerClient,
-    expect.objectContaining({
-      type: 'eip712',
-      to: '0x5432100000000000000000000000000000000000',
-      from: address.signerAddress,
-      paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
-      paymasterInput: '0x',
-      chainId: abstractTestnet.id,
-    }),
-    address.validatorAddress,
-    true,
-  );
+  test.each(testCases)(
+    '$name',
+    async ({ isInitialTransaction, expectedFromAddress }) => {
+      const transactionHash = await _sendTransaction(
+        baseClient,
+        signerClient,
+        publicClient,
+        {
+          ...transaction,
+          type: 'eip712',
+          account: baseClient.account,
+          chain: anvilAbstractTestnet.chain as ChainEIP712,
+        } as any,
+        address.validatorAddress,
+        isInitialTransaction,
+      );
 
-  // Validate that the sendRawTransaction call was made with the correct parameters
-  const sendRawTransactionCall = baseClientRequestSpy.mock.calls.find(
-    (call) => call[0].method === 'eth_sendRawTransaction',
+      expect(transactionHash).toBe(MOCK_TRANSACTION_HASH);
+
+      // Validate that signTransaction was called with the correct parameters
+      expect(signTransaction).toHaveBeenCalledWith(
+        baseClient,
+        signerClient,
+        expect.objectContaining({
+          type: 'eip712',
+          to: '0x5432100000000000000000000000000000000000',
+          from: expectedFromAddress,
+          paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
+          paymasterInput: '0x',
+          chainId: abstractTestnet.id,
+        }),
+        address.validatorAddress,
+        isInitialTransaction,
+      );
+
+      // Validate that the sendRawTransaction call was made with the correct parameters
+      const sendRawTransactionCall = baseClientRequestSpy.mock.calls.find(
+        (call) => call[0].method === 'eth_sendRawTransaction',
+      );
+      expect(sendRawTransactionCall).toBeDefined();
+      if (sendRawTransactionCall) {
+        const [rawTransaction] = sendRawTransactionCall[0].params;
+        expect(rawTransaction).toEqual('0xmockedSerializedTransaction');
+      }
+    },
   );
-  expect(sendRawTransactionCall).toBeDefined();
-  if (sendRawTransactionCall) {
-    const [rawTransaction] = sendRawTransactionCall[0].params;
-    expect(rawTransaction).toEqual('0xmockedSerializedTransaction');
-  }
+});
+
+test('_sendTransaction with mismatched chain', async () => {
+  const invalidChain = mainnet;
+  expect(
+    async () =>
+      await _sendTransaction(
+        baseClient,
+        signerClient,
+        publicClient,
+        {
+          ...transaction,
+          type: 'eip712',
+          account: baseClient.account,
+          chain: invalidChain,
+        } as any,
+        address.validatorAddress,
+        false,
+      ),
+  ).rejects.toThrowError('Current Chain ID:  11124');
 });

@@ -1,7 +1,7 @@
 {
   "name": "@abstract-foundation/agw-sdk",
   "description": "Abstract Global Wallet SDK",
-  "version": "0.0.1-alpha.9",
+  "version": "0.0.1-alpha.10",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -39,12 +39,12 @@
   "peerDependencies": {
     "abitype": "^1.0.0",
     "typescript": ">=5.0.4",
-    "viem": "^2.19.0"
+    "viem": "^2.21.8"
   },
   "devDependencies": {
     "@types/node": "^22.5.5",
     "prool": "^0.0.16",
-    "viem": "^2.19.0",
+    "viem": "^2.21.8",
     "vitest": "^2.1.1"
   },
   "peerDependenciesMeta": {

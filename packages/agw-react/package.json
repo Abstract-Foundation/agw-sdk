@@ -1,7 +1,7 @@
 {
   "name": "@abstract-foundation/agw-react",
   "description": "Abstract Global Wallet React Components",
-  "version": "0.0.1-alpha.5",
+  "version": "0.0.1-alpha.6",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -49,7 +49,7 @@
   "peerDependencies": {
     "react": ">=18",
     "typescript": ">=5.0.4",
-    "viem": "2.21.3",
+    "viem": "^2.21.8",
     "@wagmi/core": "^2",
     "@abstract-foundation/agw-sdk": "workspace:*"
   },
@@ -59,7 +59,7 @@
     "react-dom": ">=18.3.1",
     "@types/react": ">=18.3.1",
     "@types/react-dom": ">=18.3.0",
-    "viem": "2.21.3",
+    "viem": "^2.21.8",
     "@wagmi/core": "^2",
     "@rainbow-me/rainbowkit": "^2.1.6"
   },

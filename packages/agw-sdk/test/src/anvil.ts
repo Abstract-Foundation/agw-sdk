@@ -16,6 +16,7 @@ import {
 import { abstractTestnet } from 'viem/chains';
 
 import { accounts, poolId } from './constants.js';
+import { ProviderRpcError } from './errors.js';
 
 export const anvilAbstractTestnet = defineAnvil({
   chain: abstractTestnet,
@@ -26,23 +27,6 @@ export const anvilAbstractTestnet = defineAnvil({
   forkBlockNumber: 385120n,
   port: 8745,
 });
-
-//////////////////////////////////////////////////
-// Errors
-
-export type ProviderRpcErrorType = ProviderRpcError & {
-  name: 'ProviderRpcError';
-};
-export class ProviderRpcError extends Error {
-  code: number;
-  details: string;
-
-  constructor(code: number, message: string) {
-    super(message);
-    this.code = code;
-    this.details = message;
-  }
-}
 
 ////////////////////////////////////////////////////////////
 // Utilities
@@ -219,7 +203,6 @@ function defineAnvil<const chain extends Chain>(
         instance: anvil({
           forkUrl,
           forkBlockNumber,
-          hardfork: 'Prague',
           ...options,
         }),
         port,

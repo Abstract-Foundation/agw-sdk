@@ -12,7 +12,7 @@
     "registry": "https://npm.pkg.github.com"
   },
   "scripts": {
-    "test": "vitest -c ./vitest.config.ts --disable-console-intercept",
+    "test": "vitest -c ./test/vitest.config.ts --disable-console-intercept",
     "build": "pnpm run clean && pnpm run build:esm+types && pnpm run build:cjs",
     "build:esm+types": "tsc --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types && printf '{\"type\":\"module\"}' > ./dist/esm/package.json",
     "build:cjs": "tsc -p tsconfig.cjs.json && printf '{\"type\":\"commonjs\"}' > ./dist/cjs/package.json",

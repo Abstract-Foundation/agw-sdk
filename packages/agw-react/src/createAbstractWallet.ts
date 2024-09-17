@@ -21,10 +21,10 @@ import { createAbstractWalletConnector } from './createAbstractWalletConnector.j
 export const abstractWallet = ({ theme }: { theme?: "light" | "dark" }): Wallet => {
 
     const { iconUrl, iconBackground } = theme === "light" ? {
-        iconUrl: "https://amber-historic-moose-153.mypinata.cloud/ipfs/QmSpL14zz76qGCvxD5rd3SLTmQUmruY3DEZAw3a9GebZ4S",
+        iconUrl: "https://ipfs.io/ipfs/QmSpL14zz76qGCvxD5rd3SLTmQUmruY3DEZAw3a9GebZ4S",
         iconBackground: "#ffffff"
     } : {
-        iconUrl: "https://amber-historic-moose-153.mypinata.cloud/ipfs/QmbY72KMVHBdHr13hmZayoWZPg5TYKiuFBtSUVXtGMaeEd",
+        iconUrl: "https://ipfs.io/ipfs/QmbY72KMVHBdHr13hmZayoWZPg5TYKiuFBtSUVXtGMaeEd",
         iconBackground: "#000000"
     }
 

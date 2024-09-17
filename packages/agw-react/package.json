@@ -1,7 +1,7 @@
 {
   "name": "@abstract-foundation/agw-react",
   "description": "Abstract Global Wallet React Components",
-  "version": "0.0.1-alpha.2",
+  "version": "0.0.1-alpha.3",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -13,19 +13,22 @@
   },
   "type": "module",
   "scripts": {
-    "build": "pnpm run clean && pnpm run build:esm+types",
+    "build": "pnpm run clean && pnpm run build:esm+types && pnpm run build:cjs",
     "build:esm+types": "tsc --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "debug": "tsc-watch --sourceMap true --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types"
   },
-  "main": "./dist/esm/exports/index.js",
+  "main": "./dist/cjs/exports/index.js",
+  "module": "./dist/esm/exports/index.js",
   "types": "./dist/types/exports/index.d.ts",
   "typings": "./dist/types/exports/index.d.ts",
   "exports": {
     ".": {
+      "import": "./dist/esm/exports/index.js",
       "types": "./dist/types/exports/index.d.ts",
-      "default": "./dist/esm/exports/index.js"
+      "require": "./dist/cjs/exports/index.js"
     }
   },
   "files": [

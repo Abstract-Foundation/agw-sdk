@@ -6,15 +6,15 @@ import {
   type Chain,
   type Client,
   type ClientConfig,
+  createClient,
   type ExactPartial,
   http,
   type ParseAccount,
   type Transport,
   webSocket,
 } from 'viem';
-import { abstractTestnet, ChainEIP712 } from 'viem/chains';
+import { abstractTestnet } from 'viem/chains';
 
-import { createAbstractClient } from '../../src/abstractClient.js';
 import { accounts, poolId } from './constants.js';
 
 export const anvilAbstractTestnet = defineAnvil({
@@ -73,7 +73,7 @@ interface DefineAnvilReturnType<chain extends Chain> {
   getClient<
     config extends ExactPartial<
       Omit<ClientConfig, 'account' | 'chain'> & {
-        account?: true | Address | Account | undefined;
+        account: true | Address | Account;
         chain?: false | undefined;
       }
     >,
@@ -199,12 +199,12 @@ function defineAnvil<const chain extends Chain>(
     forkUrl,
     getClient(config) {
       return (
-        createAbstractClient({
+        createClient({
           ...clientConfig,
           ...config,
           account:
             config?.account === true ? accounts[0].address : config?.account,
-          chain: abstractTestnet as ChainEIP712,
+          chain: config?.chain === false ? undefined : chain,
           transport: clientConfig.transport,
         }) as any
       ).extend(() => ({ mode: 'anvil' })) as never;

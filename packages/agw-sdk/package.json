@@ -13,6 +13,7 @@
   },
   "type": "module",
   "scripts": {
+    "test": "vitest -c ./vitest.config.ts --disable-console-intercept",
     "build": "pnpm run clean && pnpm run build:esm+types",
     "build:esm+types": "tsc --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",

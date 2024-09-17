@@ -2853,6 +2853,8 @@ packages:
       react:
         optional: true
 
+  viem@2.21.3:
+    resolution: {integrity: sha512-WwOEsoiJ4v1zHf1OeKdtWth+chMyY/yZbHRLidhZEr0yFsOjTXkyfuvFp5ZykjRv9EtzDr2C6K/MU26CjMkSUw==}
     peerDependencies:
       typescript: '>=5.0.4'
     peerDependenciesMeta:
@@ -2893,8 +2895,6 @@ packages:
       sugarss:
         optional: true
       terser:
-  viem@2.21.3:
-    resolution: {integrity: sha512-WwOEsoiJ4v1zHf1OeKdtWth+chMyY/yZbHRLidhZEr0yFsOjTXkyfuvFp5ZykjRv9EtzDr2C6K/MU26CjMkSUw==}
         optional: true
 
   vitest@2.1.1:
@@ -4341,7 +4341,7 @@ snapshots:
       loupe: 3.1.1
       tinyrainbow: 1.2.0
 
-  '@wagmi/core@2.13.5(@types/react@18.3.6)(react@18.3.1)(typescript@5.6.2)(viem@2.21.4(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8))':
+  '@wagmi/core@2.13.5(@types/react@18.3.6)(react@18.3.1)(typescript@5.6.2)(viem@2.21.3(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8))':
     dependencies:
       eventemitter3: 5.0.1
       mipd: 0.0.7(typescript@5.6.2)

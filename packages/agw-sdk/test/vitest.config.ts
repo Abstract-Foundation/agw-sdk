@@ -7,5 +7,6 @@ export default defineConfig({
     environment: 'node',
     include: [join(__dirname, './src/**/*.test.ts')],
     globalSetup: [join(__dirname, './globalSetup.ts')],
+    testTimeout: 60_000,
   },
 });

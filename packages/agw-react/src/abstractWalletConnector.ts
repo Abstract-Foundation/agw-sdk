@@ -1,5 +1,8 @@
 'use client';
-import { createAbstractClient, getSmartAccountAddressFromInitialSigner } from '@abstract-foundation/agw-sdk';
+import {
+  createAbstractClient,
+  getSmartAccountAddressFromInitialSigner,
+} from '@abstract-foundation/agw-sdk';
 import { toPrivyWalletConnector } from '@privy-io/cross-app-connect';
 import type { WalletDetailsParams } from '@rainbow-me/rainbowkit';
 import { type CreateConnectorFn } from '@wagmi/core';
@@ -43,7 +46,9 @@ import { AGW_APP_ID } from './constants.js';
  *   ssr: true,
  * });
  */
-function abstractWalletConnector(rkDetails?: WalletDetailsParams): CreateConnectorFn<
+function abstractWalletConnector(
+  rkDetails?: WalletDetailsParams,
+): CreateConnectorFn<
   {
     on: <event extends keyof EIP1193EventMap>(
       event: event,
@@ -58,7 +63,6 @@ function abstractWalletConnector(rkDetails?: WalletDetailsParams): CreateConnect
   Record<string, unknown>,
   Record<string, unknown>
 > {
-
   return (params) => {
     const connector = toPrivyWalletConnector({
       iconUrl:
@@ -75,60 +79,64 @@ function abstractWalletConnector(rkDetails?: WalletDetailsParams): CreateConnect
       const handler: EIP1193RequestFn<EIP1474Methods> = async (e: any) => {
         const { method, params } = e;
         switch (method) {
-          case 'eth_accounts':
-            {
-              const accounts = await connector.getAccounts();
-              const publicClient = createPublicClient({
-                chain: abstractTestnet,
-                transport: http()
-              });
+          case 'eth_accounts': {
+            const accounts = await connector.getAccounts();
+            const publicClient = createPublicClient({
+              chain: abstractTestnet,
+              transport: http(),
+            });
 
-              if (accounts?.[0] === undefined) {
-                return [];
-              }
-              const smartAccount = await getSmartAccountAddressFromInitialSigner(accounts[0], publicClient);
-              return [smartAccount]
+            if (accounts?.[0] === undefined) {
+              return [];
             }
+            const smartAccount = await getSmartAccountAddressFromInitialSigner(
+              accounts[0],
+              publicClient,
+            );
+            return [smartAccount];
+          }
           case 'eth_signTransaction':
           case 'eth_sendTransaction': {
             const accounts = await connector.getAccounts();
 
             if (accounts[0] == undefined) {
-              throw new Error("Account not found")
+              throw new Error('Account not found');
             }
 
-            const transport = custom(provider)
+            const transport = custom(provider);
 
             const wallet = createWalletClient({
               account: accounts[0],
-              transport
+              transport,
             });
 
             const signer = toAccount({
               address: accounts[0],
               signMessage: wallet.signMessage,
-              signTransaction: wallet.signTransaction as CustomSource["signTransaction"],
-              signTypedData: wallet.signTypedData as CustomSource["signTypedData"]
-            })
+              signTransaction:
+                wallet.signTransaction as CustomSource['signTransaction'],
+              signTypedData:
+                wallet.signTypedData as CustomSource['signTypedData'],
+            });
 
             const abstractClient = await createAbstractClient({
               chain: abstractTestnet,
               signer,
-              transport
-            })
+              transport,
+            });
 
-            if (method === "eth_signTransaction") {
-              console.trace("Signing transaction with abstract client", params)
-              return await abstractClient.signTransaction({
-                ...params[0]
-              }) as any;
-            } else if (method === "eth_sendTransaction") {
-              console.trace("Sending transaction with abstract client", params)
-              return await abstractClient.sendTransaction({
-                ...params[0]
-              }) as any
+            if (method === 'eth_signTransaction') {
+              console.trace('Signing transaction with abstract client', params);
+              return (await abstractClient.signTransaction({
+                ...params[0],
+              })) as any;
+            } else if (method === 'eth_sendTransaction') {
+              console.trace('Sending transaction with abstract client', params);
+              return (await abstractClient.sendTransaction({
+                ...params[0],
+              })) as any;
             }
-            throw new Error("Should not have reached this point");
+            throw new Error('Should not have reached this point');
           }
           default: {
             return await providerHandleRequest(e);
@@ -142,7 +150,7 @@ function abstractWalletConnector(rkDetails?: WalletDetailsParams): CreateConnect
         request: handler,
       };
     };
-    
+
     const abstractConnector = {
       ...connector,
       ...rkDetails,

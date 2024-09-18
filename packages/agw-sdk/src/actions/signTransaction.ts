@@ -43,7 +43,9 @@ export async function signTransaction<
   } = args;
   // TODO: open up typing to allow for eip712 transactions
   transaction.type = 'eip712' as any;
-  transaction.value = transaction.value ? BigInt(transaction.value) : 0n as any;
+  transaction.value = transaction.value
+    ? BigInt(transaction.value)
+    : (0n as any);
 
   if (!account_)
     throw new AccountNotFoundError({

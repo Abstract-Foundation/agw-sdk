@@ -15,6 +15,7 @@ import {
   type EIP1193RequestFn,
   type EIP1474Methods,
   http,
+  toHex,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
 import { abstractTestnet } from 'viem/chains';
@@ -124,16 +125,27 @@ function abstractWalletConnector(
               transport,
             });
 
-            if (method === 'eth_signTransaction') {
-              console.trace('Signing transaction with abstract client', params);
-              return (await abstractClient.signTransaction({
-                ...params[0],
-              })) as any;
-            } else if (method === 'eth_sendTransaction') {
-              console.trace('Sending transaction with abstract client', params);
-              return (await abstractClient.sendTransaction({
-                ...params[0],
-              })) as any;
+            const paymasterParams = params[0].eip712Meta.paymasterParams ? {
+              paymaster: params[0].eip712Meta.paymasterParams.paymaster,
+              paymasterInput: toHex(params[0].eip712Meta.paymasterParams.paymasterInput)
+            } : {}
+
+            const flattenedParams = {
+              ...params[0],
+              ...paymasterParams
+            };
+            
+            if (method === "eth_signTransaction") {
+              console.trace("Signing transaction with abstract client", flattenedParams)
+
+              return await abstractClient.signTransaction({
+                ...flattenedParams
+              }) as any;
+            } else if (method === "eth_sendTransaction") {
+              console.trace("Sending transaction with abstract client", flattenedParams)
+              return await abstractClient.sendTransaction({
+                ...flattenedParams,
+              }) as any
             }
             throw new Error('Should not have reached this point');
           }

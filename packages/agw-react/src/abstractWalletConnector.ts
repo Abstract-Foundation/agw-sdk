@@ -1,10 +1,20 @@
+'use client';
+import { createAbstractClient, getSmartAccountAddressFromInitialSigner } from '@abstract-foundation/agw-sdk';
 import { toPrivyWalletConnector } from '@privy-io/cross-app-connect';
+import type { WalletDetailsParams } from '@rainbow-me/rainbowkit';
 import { type CreateConnectorFn } from '@wagmi/core';
 import {
+  createPublicClient,
+  createWalletClient,
+  custom,
+  type CustomSource,
   type EIP1193EventMap,
   type EIP1193RequestFn,
   type EIP1474Methods,
+  http,
 } from 'viem';
+import { toAccount } from 'viem/accounts';
+import { abstractTestnet } from 'viem/chains';
 
 import { AGW_APP_ID } from './constants.js';
 
@@ -33,7 +43,7 @@ import { AGW_APP_ID } from './constants.js';
  *   ssr: true,
  * });
  */
-function abstractWalletConnector(): CreateConnectorFn<
+function abstractWalletConnector(rkDetails?: WalletDetailsParams): CreateConnectorFn<
   {
     on: <event extends keyof EIP1193EventMap>(
       event: event,
@@ -48,9 +58,8 @@ function abstractWalletConnector(): CreateConnectorFn<
   Record<string, unknown>,
   Record<string, unknown>
 > {
-  return (params) => {
-    console.log('Creating abstract wallet connector');
 
+  return (params) => {
     const connector = toPrivyWalletConnector({
       iconUrl:
         'https://ipfs.io/ipfs/QmSpL14zz76qGCvxD5rd3SLTmQUmruY3DEZAw3a9GebZ4S',
@@ -58,22 +67,68 @@ function abstractWalletConnector(): CreateConnectorFn<
       name: 'Abstract',
     })(params);
 
-    const getProvider = connector.getProvider;
     const getAbstractProvider = async (
       parameters?: { chainId?: number | undefined } | undefined,
     ) => {
-      const provider = await getProvider(parameters);
+      const provider = await connector.getProvider(parameters);
       const providerHandleRequest = provider.request;
       const handler: EIP1193RequestFn<EIP1474Methods> = async (e: any) => {
-        const { method } = e;
-        console.log('Abstract provider processing', method);
+        const { method, params } = e;
         switch (method) {
+          case 'eth_accounts':
+            {
+              const accounts = await connector.getAccounts();
+              const publicClient = createPublicClient({
+                chain: abstractTestnet,
+                transport: http()
+              });
+
+              if (accounts?.[0] === undefined) {
+                return [];
+              }
+              const smartAccount = await getSmartAccountAddressFromInitialSigner(accounts[0], publicClient);
+              return [smartAccount]
+            }
           case 'eth_signTransaction':
           case 'eth_sendTransaction': {
-            console.log('Fetching accounts');
             const accounts = await connector.getAccounts();
-            console.log('Accounts:', accounts);
-            return await providerHandleRequest(e);
+
+            if (accounts[0] == undefined) {
+              throw new Error("Account not found")
+            }
+
+            const transport = custom(provider)
+
+            const wallet = createWalletClient({
+              account: accounts[0],
+              transport
+            });
+
+            const signer = toAccount({
+              address: accounts[0],
+              signMessage: wallet.signMessage,
+              signTransaction: wallet.signTransaction as CustomSource["signTransaction"],
+              signTypedData: wallet.signTypedData as CustomSource["signTypedData"]
+            })
+
+            const abstractClient = await createAbstractClient({
+              chain: abstractTestnet,
+              signer,
+              transport
+            })
+
+            if (method === "eth_signTransaction") {
+              console.trace("Signing transaction with abstract client", params)
+              return await abstractClient.signTransaction({
+                ...params[0]
+              }) as any;
+            } else if (method === "eth_sendTransaction") {
+              console.trace("Sending transaction with abstract client", params)
+              return await abstractClient.sendTransaction({
+                ...params[0]
+              }) as any
+            }
+            throw new Error("Should not have reached this point");
           }
           default: {
             return await providerHandleRequest(e);
@@ -87,13 +142,13 @@ function abstractWalletConnector(): CreateConnectorFn<
         request: handler,
       };
     };
-
+    
     const abstractConnector = {
       ...connector,
+      ...rkDetails,
       getProvider: getAbstractProvider,
       type: 'abstract',
     };
-    console.log('Abstract connector:', abstractConnector);
     return abstractConnector;
   };
 }

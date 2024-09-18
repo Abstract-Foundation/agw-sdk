@@ -20,14 +20,14 @@ import { abstractWalletConnector } from './abstractWalletConnector.js';
  */
 const abstractWallet = (): Wallet => {
   return {
-    id: 'abstract',
+    id: "abstract",
     name: 'Abstract',
     iconUrl:
       'https://ipfs.io/ipfs/QmSpL14zz76qGCvxD5rd3SLTmQUmruY3DEZAw3a9GebZ4S',
     iconBackground: '#ffffff',
     installed: true,
     shortName: 'Abstract',
-    createConnector: () => abstractWalletConnector(),
+    createConnector: (rkDetails) => abstractWalletConnector(rkDetails)
   };
 };
 

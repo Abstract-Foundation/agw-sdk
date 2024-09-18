@@ -11,7 +11,6 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
-  "type": "module",
   "scripts": {
     "build": "pnpm run clean && pnpm run build:esm+types && pnpm run build:cjs",
     "build:esm+types": "tsc --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types && printf '{\"type\":\"module\"}' > ./dist/esm/package.json",
@@ -26,13 +25,13 @@
   "typings": "./dist/types/exports/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/esm/exports/index.js",
       "types": "./dist/types/exports/index.d.ts",
+      "import": "./dist/esm/exports/index.js",
       "require": "./dist/cjs/exports/index.js"
     },
     "./connectors": {
-      "import": "./dist/esm/exports/connectors.js",
       "types": "./dist/types/exports/connectors.d.ts",
+      "import": "./dist/esm/exports/connectors.js",
       "require": "./dist/cjs/exports/connectors.js"
     },
     "./package.json": "./package.json"

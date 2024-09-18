@@ -26,8 +26,8 @@
   "typings": "./dist/types/exports/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/esm/exports/index.js",
       "types": "./dist/types/exports/index.d.ts",
+      "import": "./dist/esm/exports/index.js",
       "require": "./dist/cjs/exports/index.js"
     }
   },

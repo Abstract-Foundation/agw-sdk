@@ -13,15 +13,6 @@ import {
   type Transport,
   type WalletClient,
 } from 'viem';
-import { BaseError } from 'viem';
-import { getChainId, sendRawTransaction } from 'viem/actions';
-import {
-  assertCurrentChain,
-  getAction,
-  getTransactionError,
-  type GetTransactionErrorParameters,
-  parseAccount,
-} from 'viem/utils';
 import {
   type ChainEIP712,
   type SendEip712TransactionParameters,
@@ -33,12 +24,9 @@ import {
   BATCH_CALLER_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
 } from '../constants.js';
-import { AccountNotFoundError } from '../errors/account.js';
 import { type Call } from '../types/call.js';
 import { getInitializerCalldata, isSmartAccountDeployed } from '../utils.js';
-import { prepareTransactionRequest } from './prepareTransaction.js';
-import { signTransaction } from './signTransaction.js';
-
+import { sendTransactionInternal } from './sendTransactionInternal.js';
 export interface SendTransactionBatchParameters<
   request extends SendTransactionRequest<Chain> = SendTransactionRequest<Chain>,
 > {
@@ -142,7 +130,7 @@ export async function sendTransactionBatch<
       type: 'eip712',
     } as any;
 
-    return _sendTransaction(
+    return sendTransactionInternal(
       client,
       signerClient,
       publicClient,
@@ -160,7 +148,7 @@ export async function sendTransactionBatch<
       type: 'eip712',
     } as any;
 
-    return _sendTransaction(
+    return sendTransactionInternal(
       client,
       signerClient,
       publicClient,
@@ -220,100 +208,14 @@ export async function sendTransaction<
     // Override transaction fields
     parameters.to = SMART_ACCOUNT_FACTORY_ADDRESS;
     parameters.data = deploymentCalldata;
-
-    return _sendTransaction(
-      client,
-      signerClient,
-      publicClient,
-      parameters,
-      validatorAddress,
-      true,
-    );
-  } else {
-    return _sendTransaction(
-      client,
-      signerClient,
-      publicClient,
-      parameters,
-      validatorAddress,
-      false,
-    );
   }
-}
 
-export async function _sendTransaction<
-  const request extends SendTransactionRequest<chain, chainOverride>,
-  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
-  account extends Account | undefined = Account | undefined,
-  chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
->(
-  client: Client<Transport, ChainEIP712, Account>,
-  signerClient: WalletClient<Transport, ChainEIP712, Account>,
-  publicClient: PublicClient<Transport, ChainEIP712>,
-  parameters: SendEip712TransactionParameters<
-    chain,
-    account,
-    chainOverride,
-    request
-  >,
-  validatorAddress: Hex,
-  isInitialTransaction: boolean,
-): Promise<SendEip712TransactionReturnType> {
-  const { chain = client.chain } = parameters;
-
-  if (!signerClient.account)
-    throw new AccountNotFoundError({
-      docsPath: '/docs/actions/wallet/sendTransaction',
-    });
-  const account = parseAccount(signerClient.account);
-
-  try {
-    // assertEip712Request(parameters)
-
-    // Prepare the request for signing (assign appropriate fees, etc.)
-    const request = await prepareTransactionRequest(
-      client,
-      signerClient,
-      publicClient,
-      {
-        ...parameters,
-        parameters: ['gas', 'nonce', 'fees'],
-      } as any,
-      isInitialTransaction,
-    );
-
-    let chainId: number | undefined;
-    if (chain !== null) {
-      chainId = await getAction(signerClient, getChainId, 'getChainId')({});
-      assertCurrentChain({
-        currentChainId: chainId,
-        chain,
-      });
-    }
-
-    const serializedTransaction = await signTransaction(
-      client,
-      signerClient,
-      {
-        ...request,
-        chainId,
-      } as any,
-      validatorAddress,
-      isInitialTransaction,
-    );
-
-    return await getAction(
-      client,
-      sendRawTransaction,
-      'sendRawTransaction',
-    )({
-      serializedTransaction,
-    });
-  } catch (err) {
-    throw getTransactionError(err as BaseError, {
-      ...(parameters as GetTransactionErrorParameters),
-      account,
-      chain: chain as Chain,
-    });
-  }
+  return sendTransactionInternal(
+    client,
+    signerClient,
+    publicClient,
+    parameters,
+    validatorAddress,
+    !isDeployed,
+  );
 }

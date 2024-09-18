@@ -4,31 +4,22 @@ import {
   createWalletClient,
   EIP1193RequestFn,
   http,
-  type SendTransactionRequest,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
 import { abstractTestnet, mainnet } from 'viem/chains';
-import {
-  ChainEIP712,
-  type SignEip712TransactionParameters,
-  type SignEip712TransactionReturnType,
-  ZksyncTransactionRequestEIP712,
-} from 'viem/zksync';
+import { ChainEIP712, ZksyncTransactionRequestEIP712 } from 'viem/zksync';
 import { describe, expect, test, vi } from 'vitest';
 
-import {
-  _sendTransaction,
-  sendTransaction,
-} from '../../../src/actions/sendTransaction.js';
-import { anvilAbstractTestnet } from '../anvil.js';
-import { address } from '../constants.js';
+import { sendTransactionInternal } from '../../../../src/actions/sendTransactionInternal.js';
+import { anvilAbstractTestnet } from '../../anvil.js';
+import { address } from '../../constants.js';
 
 // Mock the signTransaction function
-vi.mock('../../../src/actions/signTransaction', () => ({
+vi.mock('../../../../src/actions/signTransaction', () => ({
   signTransaction: vi.fn().mockResolvedValue('0xmockedSerializedTransaction'),
 }));
 
-import { signTransaction } from '../../../src/actions/signTransaction.js';
+import { signTransaction } from '../../../../src/actions/signTransaction.js';
 
 const MOCK_TRANSACTION_HASH =
   '0x9afe47f3d95eccfc9210851ba5f877f76d372514a26b48bad848a07f77c33b87';
@@ -90,11 +81,12 @@ publicClient.request = (async ({ method, params }) => {
 const transaction: ZksyncTransactionRequestEIP712 = {
   to: '0x5432100000000000000000000000000000000000',
   from: '0x0000000000000000000000000000000000000000',
+  data: '0x1234',
   paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
   paymasterInput: '0x',
 };
 
-describe('_sendTransaction', () => {
+describe('sendTransactionInternal', () => {
   const testCases = [
     {
       name: 'is initial transaction',
@@ -111,7 +103,7 @@ describe('_sendTransaction', () => {
   test.each(testCases)(
     '$name',
     async ({ isInitialTransaction, expectedFromAddress }) => {
-      const transactionHash = await _sendTransaction(
+      const transactionHash = await sendTransactionInternal(
         baseClient,
         signerClient,
         publicClient,
@@ -135,6 +127,7 @@ describe('_sendTransaction', () => {
           type: 'eip712',
           to: '0x5432100000000000000000000000000000000000',
           from: expectedFromAddress,
+          data: '0x1234',
           paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
           paymasterInput: '0x',
           chainId: abstractTestnet.id,
@@ -156,11 +149,11 @@ describe('_sendTransaction', () => {
   );
 });
 
-test('_sendTransaction with mismatched chain', async () => {
+test('sendTransactionInternal with mismatched chain', async () => {
   const invalidChain = mainnet;
   expect(
     async () =>
-      await _sendTransaction(
+      await sendTransactionInternal(
         baseClient,
         signerClient,
         publicClient,

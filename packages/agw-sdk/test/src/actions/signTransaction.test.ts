@@ -20,6 +20,9 @@ import { signTransaction } from '../../../src/actions/signTransaction.js';
 import { anvilAbstractTestnet } from '../anvil.js';
 import { address } from '../constants.js';
 
+const RAW_SIGNATURE =
+  '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+
 const baseClient = createClient({
   account: address.smartAccountAddress,
   chain: anvilAbstractTestnet.chain as ChainEIP712,
@@ -33,9 +36,6 @@ baseClient.request = (async ({ method, params }) => {
   return anvilAbstractTestnet.getClient().request({ method, params } as any);
 }) as EIP1193RequestFn;
 
-const rawSignature =
-  '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-
 const signerClient = createWalletClient({
   account: toAccount(address.signerAddress),
   chain: anvilAbstractTestnet.chain as ChainEIP712,
@@ -44,7 +44,7 @@ const signerClient = createWalletClient({
 
 signerClient.request = (async ({ method, params }) => {
   if (method === 'eth_signTypedData_v4') {
-    return rawSignature;
+    return RAW_SIGNATURE;
   }
   return anvilAbstractTestnet.getClient().request({ method, params } as any);
 }) as EIP1193RequestFn;
@@ -58,7 +58,7 @@ const transaction: ZksyncTransactionRequestEIP712 = {
 test('with useSignerAddress false', async () => {
   const signature = encodeAbiParameters(
     parseAbiParameters(['bytes', 'address', 'bytes[]']),
-    [rawSignature, address.validatorAddress, []],
+    [RAW_SIGNATURE, address.validatorAddress, []],
   );
 
   const expectedSignedTransaction =
@@ -89,7 +89,7 @@ test('with useSignerAddress false', async () => {
 });
 
 test('with useSignerAddress true', async () => {
-  const signature = rawSignature;
+  const signature = RAW_SIGNATURE;
 
   const expectedSignedTransaction =
     anvilAbstractTestnet.chain.serializers?.transaction(

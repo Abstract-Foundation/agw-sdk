@@ -15,12 +15,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '22'
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 8
+
+      - name: Set up foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly-143abd6a768eeb52a5785240b763d72a56987b4a
 
       - name: Install dependencies
         run: pnpm install

@@ -129,15 +129,6 @@ export async function sendTransactionBatch<
       paymasterInput: parameters.paymasterInput,
       type: 'eip712',
     } as any;
-
-    return sendTransactionInternal(
-      client,
-      signerClient,
-      publicClient,
-      batchTransaction,
-      validatorAddress,
-      true,
-    );
   } else {
     batchTransaction = {
       to: BATCH_CALLER_ADDRESS as Hex,
@@ -147,16 +138,16 @@ export async function sendTransactionBatch<
       paymasterInput: parameters.paymasterInput,
       type: 'eip712',
     } as any;
-
-    return sendTransactionInternal(
-      client,
-      signerClient,
-      publicClient,
-      batchTransaction,
-      validatorAddress,
-      false,
-    );
   }
+
+  return sendTransactionInternal(
+    client,
+    signerClient,
+    publicClient,
+    batchTransaction,
+    validatorAddress,
+    !isDeployed,
+  );
 }
 
 export async function sendTransaction<

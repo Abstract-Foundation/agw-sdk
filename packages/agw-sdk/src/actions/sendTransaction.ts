@@ -199,6 +199,7 @@ export async function sendTransaction<
     // Override transaction fields
     parameters.to = SMART_ACCOUNT_FACTORY_ADDRESS;
     parameters.data = deploymentCalldata;
+    parameters.value = 0n;
   }
 
   return sendTransactionInternal(

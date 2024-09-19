@@ -2,6 +2,7 @@
 import { type Wallet } from '@rainbow-me/rainbowkit';
 
 import { abstractWalletConnector } from './abstractWalletConnector.js';
+import { ICON_URL } from './constants.js';
 
 /**
  * Create a RainbowKit wallet for Abstract Global Wallet
@@ -22,8 +23,7 @@ const abstractWallet = (): Wallet => {
   return {
     id: 'abstract',
     name: 'Abstract',
-    iconUrl:
-      'https://ipfs.io/ipfs/QmSpL14zz76qGCvxD5rd3SLTmQUmruY3DEZAw3a9GebZ4S',
+    iconUrl: ICON_URL,
     iconBackground: '#ffffff',
     installed: true,
     shortName: 'Abstract',

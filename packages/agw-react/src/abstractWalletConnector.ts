@@ -7,6 +7,7 @@ import { toPrivyWalletConnector } from '@privy-io/cross-app-connect';
 import type { WalletDetailsParams } from '@rainbow-me/rainbowkit';
 import { type CreateConnectorFn } from '@wagmi/core';
 import {
+  type Chain,
   createPublicClient,
   createWalletClient,
   custom,
@@ -21,6 +22,11 @@ import { toAccount } from 'viem/accounts';
 import { abstractTestnet } from 'viem/chains';
 
 import { AGW_APP_ID, ICON_URL } from './constants.js';
+
+// TODO: support Abstract mainnet
+const VALID_CHAINS: Record<number, Chain> = {
+  [abstractTestnet.id]: abstractTestnet,
+};
 
 /**
  * Create a wagmi connector for the Abstract Global Wallet.
@@ -74,6 +80,11 @@ function abstractWalletConnector(
     const getAbstractProvider = async (
       parameters?: { chainId?: number | undefined } | undefined,
     ) => {
+      const chainId = parameters?.chainId ?? abstractTestnet.id;
+      const chain = VALID_CHAINS[chainId];
+      if (!chain) {
+        throw new Error('Unsupported chain');
+      }
       const provider = await connector.getProvider(parameters);
       const providerHandleRequest = provider.request;
       const handler: EIP1193RequestFn<EIP1474Methods> = async (e: any) => {
@@ -98,20 +109,20 @@ function abstractWalletConnector(
           case 'eth_signTransaction':
           case 'eth_sendTransaction': {
             const accounts = await connector.getAccounts();
-
-            if (accounts[0] == undefined) {
+            const account = accounts[0];
+            if (!account) {
               throw new Error('Account not found');
             }
+            const transaction = params[0];
 
             const transport = custom(provider);
-
             const wallet = createWalletClient({
-              account: accounts[0],
+              account,
               transport,
             });
 
             const signer = toAccount({
-              address: accounts[0],
+              address: account,
               signMessage: wallet.signMessage,
               signTransaction:
                 wallet.signTransaction as CustomSource['signTransaction'],
@@ -120,42 +131,25 @@ function abstractWalletConnector(
             });
 
             const abstractClient = await createAbstractClient({
-              chain: abstractTestnet,
+              chain,
               signer,
               transport,
             });
 
-            const paymasterParams = params[0].eip712Meta.paymasterParams
-              ? {
-                  paymaster: params[0].eip712Meta.paymasterParams.paymaster,
-                  paymasterInput: toHex(
-                    params[0].eip712Meta.paymasterParams.paymasterInput,
-                  ),
-                }
-              : {};
-
-            const flattenedParams = {
-              ...params[0],
-              ...paymasterParams,
-            };
+            // Undo the automatic formatting applied by Wagmi's eth_signTransaction
+            // Formatter: https://github.com/wevm/viem/blob/main/src/zksync/formatters.ts#L114
+            if (transaction.eip712Meta) {
+              transaction.paymaster =
+                transaction.eip712Meta.paymasterParams.paymaster;
+              transaction.paymasterInput = toHex(
+                transaction.eip712Meta.paymasterParams.paymasterInput,
+              );
+            }
 
             if (method === 'eth_signTransaction') {
-              console.trace(
-                'Signing transaction with abstract client',
-                flattenedParams,
-              );
-
-              return (await abstractClient.signTransaction({
-                ...flattenedParams,
-              })) as any;
+              return (await abstractClient.signTransaction(transaction)) as any;
             } else if (method === 'eth_sendTransaction') {
-              console.trace(
-                'Sending transaction with abstract client',
-                flattenedParams,
-              );
-              return (await abstractClient.sendTransaction({
-                ...flattenedParams,
-              })) as any;
+              return await abstractClient.sendTransaction(transaction);
             }
             throw new Error('Should not have reached this point');
           }

@@ -19,7 +19,7 @@ import {
 import { toAccount } from 'viem/accounts';
 import { abstractTestnet } from 'viem/chains';
 
-import { AGW_APP_ID } from './constants.js';
+import { AGW_APP_ID, ICON_URL } from './constants.js';
 
 /**
  * Create a wagmi connector for the Abstract Global Wallet.
@@ -65,8 +65,7 @@ function abstractWalletConnector(
 > {
   return (params) => {
     const connector = toPrivyWalletConnector({
-      iconUrl:
-        'https://ipfs.io/ipfs/QmSpL14zz76qGCvxD5rd3SLTmQUmruY3DEZAw3a9GebZ4S',
+      iconUrl: ICON_URL,
       id: AGW_APP_ID,
       name: 'Abstract',
     })(params);

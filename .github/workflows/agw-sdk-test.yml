@@ -1,9 +1,9 @@
-name: AGW-SDK Tests
+name: AGW Client Tests
 
 on:
   pull_request:
     paths:
-      - 'packages/agw-sdk/**'
+      - 'packages/agw-client/**'
 
 jobs:
   test:
@@ -31,4 +31,4 @@ jobs:
         run: pnpm install
 
       - name: Run tests
-        run: pnpm --filter @abstract-foundation/agw-sdk test
+        run: pnpm --filter @abstract-foundation/agw-client test

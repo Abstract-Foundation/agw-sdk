@@ -1,12 +1,12 @@
 {
-  "name": "@abstract-foundation/agw-sdk",
-  "description": "Abstract Global Wallet SDK",
+  "name": "@abstract-foundation/agw-client",
+  "description": "Abstract Global Wallet Client SDK",
   "version": "0.0.1-alpha.11",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/abstract-foundation/agw-sdk.git",
-    "directory": "packages/agw-sdk"
+    "directory": "packages/agw-client"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"

@@ -50,10 +50,10 @@
     "typescript": ">=5.0.4",
     "viem": "^2.21.8",
     "@wagmi/core": "^2",
-    "@abstract-foundation/agw-sdk": "workspace:*"
+    "@abstract-foundation/agw-client": "workspace:*"
   },
   "devDependencies": {
-    "@abstract-foundation/agw-sdk": "workspace:*",
+    "@abstract-foundation/agw-client": "workspace:*",
     "react": ">=18.3.1",
     "react-dom": ">=18.3.1",
     "@types/react": ">=18.3.1",

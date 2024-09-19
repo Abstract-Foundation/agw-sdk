@@ -1,8 +1,8 @@
-'use client'
+'use client';
 import {
   type AbstractClient,
   createAbstractClient,
-} from '@abstract-foundation/agw-sdk';
+} from '@abstract-foundation/agw-client';
 import { toPrivyWalletProvider } from '@privy-io/cross-app-connect';
 import {
   type SignTypedDataParams,

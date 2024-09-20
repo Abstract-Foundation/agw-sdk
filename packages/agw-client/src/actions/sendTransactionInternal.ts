@@ -23,7 +23,9 @@ import {
   type SendEip712TransactionReturnType,
 } from 'viem/zksync';
 
+import { INSUFFICIENT_BALANCE_SELECTOR } from '../constants.js';
 import { AccountNotFoundError } from '../errors/account.js';
+import { InsufficientBalanceError } from '../errors/insufficientBalance.js';
 import { prepareTransactionRequest } from './prepareTransaction.js';
 import { signTransaction } from './signTransaction.js';
 
@@ -96,6 +98,12 @@ export async function sendTransactionInternal<
       serializedTransaction,
     });
   } catch (err) {
+    if (
+      err instanceof Error &&
+      err.message.includes(INSUFFICIENT_BALANCE_SELECTOR)
+    ) {
+      throw new InsufficientBalanceError();
+    }
     throw getTransactionError(err as BaseError, {
       ...(parameters as GetTransactionErrorParameters),
       account,

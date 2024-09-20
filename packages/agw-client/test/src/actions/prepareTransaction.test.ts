@@ -11,6 +11,7 @@ import { ChainEIP712, ZksyncTransactionRequestEIP712 } from 'viem/zksync';
 import { expect, test, vi } from 'vitest';
 
 import { prepareTransactionRequest } from '../../../src/actions/prepareTransaction.js';
+import { CONTRACT_DEPLOYER_ADDRESS } from '../../../src/constants.js';
 import { anvilAbstractTestnet } from '../anvil.js';
 import { address } from '../constants.js';
 
@@ -78,7 +79,7 @@ const transaction: ZksyncTransactionRequestEIP712 = {
   paymasterInput: '0x',
 };
 
-test('basic', async () => {
+test('minimum', async () => {
   const request = await prepareTransactionRequest(
     baseClient,
     signerClient,
@@ -97,6 +98,79 @@ test('basic', async () => {
     gas: MOCK_GAS_LIMIT,
     nonce: MOCK_NONCE,
     maxFeePerGas: MOCK_FEE_PER_GAS,
+    maxPriorityFeePerGas: 0n,
+  });
+});
+
+test('is initial transaction', async () => {
+  const request = await prepareTransactionRequest(
+    baseClient,
+    signerClient,
+    publicClient,
+    {
+      ...transaction,
+      chain: anvilAbstractTestnet.chain,
+    },
+    true,
+  );
+  expect(request).toEqual({
+    ...transaction,
+    from: address.signerAddress,
+    chain: anvilAbstractTestnet.chain,
+    chainId: anvilAbstractTestnet.chain.id,
+    gas: MOCK_GAS_LIMIT,
+    nonce: MOCK_NONCE,
+    maxFeePerGas: MOCK_FEE_PER_GAS,
+    maxPriorityFeePerGas: 0n,
+  });
+});
+
+test('with fees', async () => {
+  const request = await prepareTransactionRequest(
+    baseClient,
+    signerClient,
+    publicClient,
+    {
+      ...transaction,
+      maxFeePerGas: 10000n,
+      maxPriorityFeePerGas: 0n,
+      chain: anvilAbstractTestnet.chain,
+    },
+    false,
+  );
+  expect(request).toEqual({
+    ...transaction,
+    chain: anvilAbstractTestnet.chain,
+    from: address.smartAccountAddress,
+    chainId: anvilAbstractTestnet.chain.id,
+    gas: MOCK_GAS_LIMIT,
+    nonce: MOCK_NONCE,
+    maxFeePerGas: 10000n,
+    maxPriorityFeePerGas: 0n,
+  });
+});
+
+test('to contract deployer', async () => {
+  const request = await prepareTransactionRequest(
+    baseClient,
+    signerClient,
+    publicClient,
+    {
+      ...transaction,
+      to: CONTRACT_DEPLOYER_ADDRESS,
+      chain: anvilAbstractTestnet.chain,
+    },
+    false,
+  );
+  expect(request).toEqual({
+    ...transaction,
+    to: CONTRACT_DEPLOYER_ADDRESS,
+    chain: anvilAbstractTestnet.chain,
+    from: address.smartAccountAddress,
+    chainId: anvilAbstractTestnet.chain.id,
+    gas: MOCK_GAS_LIMIT,
+    nonce: MOCK_NONCE,
+    maxFeePerGas: 25000000n, // Default fee for contract deployments
     maxPriorityFeePerGas: 0n,
   });
 });

@@ -2,6 +2,7 @@ import {
   type Abi,
   type Account,
   type Client,
+  type ContractConstructorArgs,
   type Hex,
   type PublicClient,
   type Transport,
@@ -20,14 +21,21 @@ import { sendTransaction } from './sendTransaction.js';
 
 export function deployContract<
   const abi extends Abi | readonly unknown[],
-  chain extends ChainEIP712 | undefined,
-  account extends Account | undefined,
-  chainOverride extends ChainEIP712 | undefined,
+  chain extends ChainEIP712 | undefined = ChainEIP712,
+  account extends Account | undefined = Account,
+  chainOverride extends ChainEIP712 | undefined = ChainEIP712,
+  allArgs = ContractConstructorArgs<abi>,
 >(
   walletClient: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
-  parameters: DeployContractParameters<abi, chain, account, chainOverride>,
+  parameters: DeployContractParameters<
+    abi,
+    chain,
+    account,
+    chainOverride,
+    allArgs
+  >,
   validatorAddress: Hex,
 ): Promise<DeployContractReturnType> {
   const { abi, args, bytecode, deploymentType, salt, ...request } =

@@ -103,3 +103,45 @@ test('create2 with factoryDeps', async () => {
     address.validatorAddress,
   );
 });
+
+test('create2 with no chain and no account', async () => {
+  vi.mocked(sendTransaction).mockResolvedValue('0xmockedTransactionHash');
+
+  const expectedData = encodeDeployData({
+    abi: TestTokenABI,
+    args: [],
+    bytecode: contractBytecode,
+    deploymentType: 'create2',
+    salt: MOCK_SALT,
+  });
+
+  const transactionHash = await deployContract(
+    baseClient,
+    signerClient,
+    publicClient,
+    {
+      abi: TestTokenABI,
+      bytecode: contractBytecode,
+      args: [],
+      deploymentType: 'create2',
+      salt: MOCK_SALT,
+    },
+    address.validatorAddress,
+  );
+
+  expect(transactionHash).toBe('0xmockedTransactionHash');
+
+  expect(sendTransaction).toHaveBeenCalledWith(
+    baseClient,
+    signerClient,
+    publicClient,
+    {
+      account: baseClient.account,
+      chain: anvilAbstractTestnet.chain as ChainEIP712,
+      data: expectedData,
+      factoryDeps: [contractBytecode],
+      to: CONTRACT_DEPLOYER_ADDRESS,
+    },
+    address.validatorAddress,
+  );
+});

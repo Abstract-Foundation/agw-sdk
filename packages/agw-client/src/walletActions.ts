@@ -17,7 +17,7 @@ import {
   type SignEip712TransactionParameters,
 } from 'viem/zksync';
 
-import { deployContract } from './actions/deployTransaction.js';
+import { deployContract } from './actions/deployContract.js';
 import {
   sendTransaction,
   sendTransactionBatch,

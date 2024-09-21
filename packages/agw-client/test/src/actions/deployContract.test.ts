@@ -2,9 +2,7 @@ import {
   createClient,
   createPublicClient,
   createWalletClient,
-  EIP1193RequestFn,
   http,
-  toHex,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
 import { ChainEIP712, encodeDeployData } from 'viem/zksync';

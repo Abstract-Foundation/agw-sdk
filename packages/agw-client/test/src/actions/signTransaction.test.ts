@@ -17,6 +17,7 @@ import {
 import { expect, test } from 'vitest';
 
 import { signTransaction } from '../../../src/actions/signTransaction.js';
+import { VALIDATOR_ADDRESS } from '../../../src/constants.js';
 import { anvilAbstractTestnet } from '../anvil.js';
 import { address } from '../constants.js';
 
@@ -58,7 +59,7 @@ const transaction: ZksyncTransactionRequestEIP712 = {
 test('with useSignerAddress false', async () => {
   const signature = encodeAbiParameters(
     parseAbiParameters(['bytes', 'address', 'bytes[]']),
-    [RAW_SIGNATURE, address.validatorAddress, []],
+    [RAW_SIGNATURE, VALIDATOR_ADDRESS, []],
   );
 
   const expectedSignedTransaction =
@@ -82,7 +83,6 @@ test('with useSignerAddress false', async () => {
       account: baseClient.account,
       chain: anvilAbstractTestnet.chain as ChainEIP712,
     } as SignEip712TransactionParameters,
-    address.validatorAddress,
     false,
   );
   expect(signedTransaction).toBe(expectedSignedTransaction);
@@ -112,7 +112,6 @@ test('with useSignerAddress true', async () => {
       account: baseClient.account,
       chain: anvilAbstractTestnet.chain as ChainEIP712,
     } as SignEip712TransactionParameters,
-    address.validatorAddress,
     true,
   );
   expect(signedTransaction).toBe(expectedSignedTransaction);
@@ -131,7 +130,6 @@ test('invalid chain', async () => {
           account: baseClient.account,
           chain: invalidChain,
         } as SignEip712TransactionParameters,
-        address.validatorAddress,
         true,
       ),
   ).rejects.toThrowError('Invalid chain specified');
@@ -149,7 +147,6 @@ test('no account provided', async () => {
           type: 'eip712',
           chain: anvilAbstractTestnet.chain as ChainEIP712,
         } as any,
-        address.validatorAddress,
         false,
       ),
   ).rejects.toThrowError(

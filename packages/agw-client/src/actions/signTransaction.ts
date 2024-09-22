@@ -3,7 +3,6 @@ import {
   BaseError,
   type Client,
   encodeAbiParameters,
-  type Hex,
   parseAbiParameters,
   type Transport,
   type WalletClient,
@@ -17,6 +16,7 @@ import {
   type SignEip712TransactionReturnType,
 } from 'viem/zksync';
 
+import { VALIDATOR_ADDRESS } from '../constants.js';
 import {
   assertEip712Request,
   type AssertEip712RequestParameters,
@@ -33,7 +33,6 @@ export async function signTransaction<
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   args: SignEip712TransactionParameters<chain, account, chainOverride>,
-  validatorAddress: Hex,
   useSignerAddress = false,
 ): Promise<SignEip712TransactionReturnType> {
   const {
@@ -95,7 +94,7 @@ export async function signTransaction<
     // Match the expect signature format of the AGW smart account
     signature = encodeAbiParameters(
       parseAbiParameters(['bytes', 'address', 'bytes[]']),
-      [rawSignature, validatorAddress, []],
+      [rawSignature, VALIDATOR_ADDRESS, []],
     );
   }
 

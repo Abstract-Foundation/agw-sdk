@@ -7,7 +7,6 @@ import {
   type ContractFunctionName,
   encodeFunctionData,
   type EncodeFunctionDataParameters,
-  type Hex,
   type PublicClient,
   type Transport,
   type WalletClient,
@@ -43,7 +42,6 @@ export async function writeContract<
     account,
     chainOverride
   >,
-  validatorAddress: Hex,
 ): Promise<WriteContractReturnType> {
   const {
     abi,
@@ -68,18 +66,12 @@ export async function writeContract<
   } as EncodeFunctionDataParameters);
 
   try {
-    return await sendTransaction(
-      client,
-      signerClient,
-      publicClient,
-      {
-        data: `${data}${dataSuffix ? dataSuffix.replace('0x', '') : ''}`,
-        to: address,
-        account,
-        ...request,
-      },
-      validatorAddress,
-    );
+    return await sendTransaction(client, signerClient, publicClient, {
+      data: `${data}${dataSuffix ? dataSuffix.replace('0x', '') : ''}`,
+      to: address,
+      account,
+      ...request,
+    });
   } catch (error) {
     throw getContractError(error as BaseError, {
       abi,

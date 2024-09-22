@@ -96,7 +96,6 @@ test('basic', async () => {
       functionName: 'mint',
       args: [address.signerAddress, 1n],
     },
-    address.validatorAddress,
   );
 
   expect(transactionHash).toBe('0xmockedTransactionHash');
@@ -111,7 +110,6 @@ test('basic', async () => {
       data: expectedData,
       to: MOCK_CONTRACT_ADDRESS,
     },
-    address.validatorAddress,
   );
 });
 
@@ -127,20 +125,14 @@ test('getContractError', async () => {
   });
 
   await expect(
-    writeContract(
-      baseClient,
-      signerClient,
-      publicClient,
-      {
-        abi: TestTokenABI,
-        account: baseClient.account,
-        address: MOCK_CONTRACT_ADDRESS,
-        chain: anvilAbstractTestnet.chain as ChainEIP712,
-        functionName: 'mint',
-        args: [address.signerAddress, 1n],
-      },
-      address.validatorAddress,
-    ),
+    writeContract(baseClient, signerClient, publicClient, {
+      abi: TestTokenABI,
+      account: baseClient.account,
+      address: MOCK_CONTRACT_ADDRESS,
+      chain: anvilAbstractTestnet.chain as ChainEIP712,
+      functionName: 'mint',
+      args: [address.signerAddress, 1n],
+    }),
   ).rejects.toThrowError('Mocked getContractError');
 
   expect(sendTransaction).toHaveBeenCalledWith(
@@ -153,7 +145,6 @@ test('getContractError', async () => {
       data: expectedData,
       to: MOCK_CONTRACT_ADDRESS,
     },
-    address.validatorAddress,
   );
 
   expect(getContractError).toHaveBeenCalledWith(
@@ -174,20 +165,14 @@ test('account not found', async () => {
   (baseClient as any).account = undefined;
 
   await expect(
-    writeContract(
-      baseClient,
-      signerClient,
-      publicClient,
-      {
-        abi: TestTokenABI,
-        account: baseClient.account,
-        address: MOCK_CONTRACT_ADDRESS,
-        chain: anvilAbstractTestnet.chain as ChainEIP712,
-        functionName: 'mint',
-        args: [address.signerAddress, 1n],
-      },
-      address.validatorAddress,
-    ),
+    writeContract(baseClient, signerClient, publicClient, {
+      abi: TestTokenABI,
+      account: baseClient.account,
+      address: MOCK_CONTRACT_ADDRESS,
+      chain: anvilAbstractTestnet.chain as ChainEIP712,
+      functionName: 'mint',
+      args: [address.signerAddress, 1n],
+    }),
   ).rejects.toThrowError(
     'Could not find an Account to execute with this Action',
   );

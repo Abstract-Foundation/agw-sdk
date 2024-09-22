@@ -18,6 +18,7 @@ import {
 import {
   BATCH_CALLER_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
+  VALIDATOR_ADDRESS,
 } from '../../../../src/constants.js';
 import {
   getInitializerCalldata,
@@ -123,7 +124,6 @@ describe('sendTransaction', () => {
           account: baseClient.account,
           chain: anvilAbstractTestnet.chain as ChainEIP712,
         } as any,
-        address.validatorAddress,
       );
 
       if (shouldCallEncodeFunctionData) {
@@ -150,7 +150,6 @@ describe('sendTransaction', () => {
           account: baseClient.account,
           chain: anvilAbstractTestnet.chain as ChainEIP712,
         }),
-        address.validatorAddress,
         !isDeployed,
       );
       expect(transactionHash).toBe('0xmockedTransactionHash');
@@ -243,7 +242,6 @@ describe('sendTransactionBatch', () => {
           paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
           paymasterInput: '0xabc',
         } as any,
-        address.validatorAddress,
       );
 
       expect(encodeFunctionData).toHaveBeenCalledTimes(
@@ -262,7 +260,7 @@ describe('sendTransactionBatch', () => {
         // Verify that getInitializerCalldata is called with the correct arguments
         expect(getInitializerCalldata).toHaveBeenCalledWith(
           address.signerAddress,
-          address.validatorAddress,
+          VALIDATOR_ADDRESS,
           {
             target: BATCH_CALLER_ADDRESS,
             allowFailure: false,
@@ -300,7 +298,6 @@ describe('sendTransactionBatch', () => {
           paymasterInput: '0xabc',
           value: BigInt(1000),
         }),
-        address.validatorAddress,
         !isDeployed,
       );
       expect(transactionHash).toBe('0xmockedTransactionHash');

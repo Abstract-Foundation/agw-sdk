@@ -25,7 +25,6 @@ import {
 } from './actions/sendTransaction.js';
 import { signTransaction } from './actions/signTransaction.js';
 import { writeContract } from './actions/writeContract.js';
-import { VALIDATOR_ADDRESS } from './constants.js';
 
 export type AbstractWalletActions<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
@@ -45,7 +44,6 @@ export function globalWalletActions<
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
 ) {
-  const validatorAddress = VALIDATOR_ADDRESS;
   return (
     client: Client<Transport, ChainEIP712, Account>,
   ): AbstractWalletActions<Chain, Account> => ({
@@ -55,44 +53,23 @@ export function globalWalletActions<
         signerClient,
         publicClient,
         args as SendEip712TransactionParameters<chain, account>,
-        validatorAddress,
       ),
     sendTransactionBatch: (args) =>
-      sendTransactionBatch(
-        client,
-        signerClient,
-        publicClient,
-        args,
-        validatorAddress,
-      ),
+      sendTransactionBatch(client, signerClient, publicClient, args),
     signTransaction: (args) =>
       signTransaction(
         client,
         signerClient,
         args as SignEip712TransactionParameters<chain, account>,
-        validatorAddress,
       ),
     deployContract: (args) =>
-      deployContract(
-        client,
-        signerClient,
-        publicClient,
-        args,
-        validatorAddress,
-      ),
+      deployContract(client, signerClient, publicClient, args),
     writeContract: (args) =>
       writeContract(
         Object.assign(client, {
           sendTransaction: (
             args: SendEip712TransactionParameters<chain, account>,
-          ) =>
-            sendTransaction(
-              client,
-              signerClient,
-              publicClient,
-              args,
-              validatorAddress,
-            ),
+          ) => sendTransaction(client, signerClient, publicClient, args),
         }),
         signerClient,
         publicClient,
@@ -103,7 +80,6 @@ export function globalWalletActions<
           ChainEIP712,
           Account
         >,
-        validatorAddress,
       ),
   });
 }

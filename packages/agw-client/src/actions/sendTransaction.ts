@@ -23,6 +23,7 @@ import AccountFactoryAbi from '../abis/AccountFactory.js';
 import {
   BATCH_CALLER_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
+  VALIDATOR_ADDRESS,
 } from '../constants.js';
 import { type Call } from '../types/call.js';
 import { getInitializerCalldata, isSmartAccountDeployed } from '../utils.js';
@@ -48,7 +49,6 @@ export async function sendTransactionBatch<
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
   parameters: SendTransactionBatchParameters<request>,
-  validatorAddress: Hex,
 ): Promise<SendTransactionReturnType> {
   if (parameters.calls.length === 0) {
     throw new Error('No calls provided');
@@ -110,7 +110,7 @@ export async function sendTransactionBatch<
     // Create calldata for initializing the proxy account
     const initializerCallData = getInitializerCalldata(
       signerClient.account.address,
-      validatorAddress,
+      VALIDATOR_ADDRESS,
       initialCall,
     );
     const addressBytes = toBytes(signerClient.account.address);
@@ -145,7 +145,6 @@ export async function sendTransactionBatch<
     signerClient,
     publicClient,
     batchTransaction,
-    validatorAddress,
     !isDeployed,
   );
 }
@@ -168,7 +167,6 @@ export async function sendTransaction<
     chainOverride,
     request
   >,
-  validatorAddress: Hex,
 ): Promise<SendEip712TransactionReturnType> {
   const isDeployed = await isSmartAccountDeployed(
     publicClient,
@@ -185,7 +183,7 @@ export async function sendTransaction<
     // Create calldata for initializing the proxy account
     const initializerCallData = getInitializerCalldata(
       signerClient.account.address,
-      validatorAddress,
+      VALIDATOR_ADDRESS,
       initialCall,
     );
     const addressBytes = toBytes(signerClient.account.address);
@@ -207,7 +205,6 @@ export async function sendTransaction<
     signerClient,
     publicClient,
     parameters,
-    validatorAddress,
     !isDeployed,
   );
 }

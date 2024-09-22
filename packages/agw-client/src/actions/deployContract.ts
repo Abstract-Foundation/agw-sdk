@@ -3,7 +3,6 @@ import {
   type Account,
   type Client,
   type ContractConstructorArgs,
-  type Hex,
   type PublicClient,
   type Transport,
   type WalletClient,
@@ -36,7 +35,6 @@ export function deployContract<
     chainOverride,
     allArgs
   >,
-  validatorAddress: Hex,
 ): Promise<DeployContractReturnType> {
   const { abi, args, bytecode, deploymentType, salt, ...request } =
     parameters as DeployContractParameters;
@@ -54,19 +52,13 @@ export function deployContract<
   if (!request.factoryDeps.includes(bytecode))
     request.factoryDeps.push(bytecode);
 
-  return sendTransaction(
-    walletClient,
-    signerClient,
-    publicClient,
-    {
-      ...request,
-      data,
-      to: CONTRACT_DEPLOYER_ADDRESS,
-    } as unknown as SendEip712TransactionParameters<
-      chain,
-      account,
-      chainOverride
-    >,
-    validatorAddress,
-  );
+  return sendTransaction(walletClient, signerClient, publicClient, {
+    ...request,
+    data,
+    to: CONTRACT_DEPLOYER_ADDRESS,
+  } as unknown as SendEip712TransactionParameters<
+    chain,
+    account,
+    chainOverride
+  >);
 }

@@ -50,7 +50,6 @@ export const accounts = [
 export const address = {
   smartAccountAddress: '0x0000000000000000000000000000000000012345',
   signerAddress: '0x8888888888888888888888888888888888888888',
-  validatorAddress: '0x8d9A95c8Dc4736d76a8418A282274f94410D3933',
 } as const;
 
 export const poolId =

@@ -82,7 +82,6 @@ test('create2 with factoryDeps', async () => {
       deploymentType: 'create2',
       salt: MOCK_SALT,
     },
-    address.validatorAddress,
   );
 
   expect(transactionHash).toBe('0xmockedTransactionHash');
@@ -98,7 +97,6 @@ test('create2 with factoryDeps', async () => {
       factoryDeps: [contractBytecode],
       to: CONTRACT_DEPLOYER_ADDRESS,
     },
-    address.validatorAddress,
   );
 });
 
@@ -124,7 +122,6 @@ test('create2 with no chain and no account', async () => {
       deploymentType: 'create2',
       salt: MOCK_SALT,
     },
-    address.validatorAddress,
   );
 
   expect(transactionHash).toBe('0xmockedTransactionHash');
@@ -140,6 +137,5 @@ test('create2 with no chain and no account', async () => {
       factoryDeps: [contractBytecode],
       to: CONTRACT_DEPLOYER_ADDRESS,
     },
-    address.validatorAddress,
   );
 });

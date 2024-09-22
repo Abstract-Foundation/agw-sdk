@@ -113,7 +113,6 @@ describe('sendTransactionInternal', () => {
           account: baseClient.account,
           chain: anvilAbstractTestnet.chain as ChainEIP712,
         } as any,
-        address.validatorAddress,
         isInitialTransaction,
       );
 
@@ -132,7 +131,6 @@ describe('sendTransactionInternal', () => {
           paymasterInput: '0x',
           chainId: abstractTestnet.id,
         }),
-        address.validatorAddress,
         isInitialTransaction,
       );
 
@@ -163,7 +161,6 @@ test('sendTransactionInternal with mismatched chain', async () => {
           account: baseClient.account,
           chain: invalidChain,
         } as any,
-        address.validatorAddress,
         false,
       ),
   ).rejects.toThrowError('Current Chain ID:  11124');

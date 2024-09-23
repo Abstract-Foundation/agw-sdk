@@ -13,6 +13,7 @@
   },
   "scripts": {
     "test": "vitest -c ./test/vitest.config.ts --disable-console-intercept",
+    "coverage": "vitest run --coverage -c ./test/vitest.config.ts",
     "build": "pnpm run clean && pnpm run build:esm+types && pnpm run build:cjs",
     "build:esm+types": "tsc --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types && printf '{\"type\":\"module\"}' > ./dist/esm/package.json",
     "build:cjs": "tsc -p tsconfig.cjs.json && printf '{\"type\":\"commonjs\"}' > ./dist/cjs/package.json",
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.5.5",
+    "@vitest/coverage-v8": "^2.1.1",
     "prool": "^0.0.16",
     "viem": "^2.21.8",
     "vitest": "^2.1.1"

@@ -1,0 +1,43 @@
+name: AGW Client Coverage
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/agw-client/**'
+  pull_request:
+    paths:
+      - 'packages/agw-client/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Set up foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly-143abd6a768eeb52a5785240b763d72a56987b4a
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run coverage
+        run: pnpm --filter @abstract-foundation/agw-client coverage
+
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

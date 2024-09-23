@@ -1,39 +1,37 @@
-'use client'
-import {
-  PrivyProvider
-} from "@privy-io/react-auth";
-import React from "react";
-import {
-  type Chain,
-} from "viem";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React from 'react';
+import { http } from 'viem';
+import { abstractTestnet } from 'viem/chains';
+import { createConfig, WagmiProvider } from 'wagmi';
 
-import { SmartAccountProvider } from "./smartAccountContext.js";
+import { abstractWalletConnector } from './abstractWalletConnector.js';
 
 interface AbstractWalletProviderProps {
-  appId: string;
-  defaultChain: Chain;
-  supportedChains: Chain[];
+  testnet: boolean;
 }
 
 export const AbstractWalletProvider = ({
-  appId,
-  defaultChain,
-  supportedChains,
+  testnet,
   children,
 }: React.PropsWithChildren<AbstractWalletProviderProps>) => {
+  const chain = testnet ? abstractTestnet : abstractTestnet;
+
+  const config = createConfig({
+    chains: [chain],
+    ssr: true,
+    connectors: [abstractWalletConnector()],
+    transports: {
+      [chain.id]: http(),
+    },
+    multiInjectedProviderDiscovery: false,
+  });
+
+  const queryClient = new QueryClient();
   return (
-    <PrivyProvider
-      appId={appId}
-      config={{
-        embeddedWallets: {
-          createOnLogin: "off",
-          noPromptOnSignature: true,
-        },
-        defaultChain: defaultChain,
-        supportedChains: supportedChains,
-      }}
-    >
-      <SmartAccountProvider appId={appId}>{children}</SmartAccountProvider>
-    </PrivyProvider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        {children}
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 };

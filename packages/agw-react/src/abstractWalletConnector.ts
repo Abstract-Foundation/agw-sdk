@@ -1,4 +1,3 @@
-'use client';
 import {
   createAbstractClient,
   getSmartAccountAddressFromInitialSigner,
@@ -37,19 +36,14 @@ const VALID_CHAINS: Record<number, Chain> = {
  * @example
  * import { createConfig, http } from "wagmi";
  * import { abstract } from "wagmi/chains";
- *
- * const privyWalletConnector = toPrivyWalletConnector({
- *   providerAppId: <your-app-id>,
- *   providerName: 'Your app',
- *   providerIconUrl: 'https://example.com/image.png',
- * })
+ * import { abstractWalletConnector } from "@abstract-foundation/agw-react/connectors"
  *
  * export const wagmiConfig = createConfig({
- *   chains: [mainnet],
+ *   chains: [abstract],
  *   transports: {
- *     [mainnet.id]: http(),
+ *     [abstract.id]: http(),
  *   },
- *   connectors: [abstractWalletConnector],
+ *   connectors: [abstractWalletConnector()],
  *   ssr: true,
  * });
  */

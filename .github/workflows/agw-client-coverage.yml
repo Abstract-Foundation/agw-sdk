@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run tests
+      - name: Run coverage
         run: pnpm --filter @abstract-foundation/agw-client coverage
 
       - name: Upload results to Codecov

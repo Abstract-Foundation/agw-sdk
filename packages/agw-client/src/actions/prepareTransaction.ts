@@ -68,14 +68,6 @@ export type AssertRequestParameters = ExactPartial<
   SendTransactionParameters<Chain>
 >;
 
-export class Eip1559FeesNotSupportedError extends BaseError {
-  constructor() {
-    super('Chain does not support EIP-1559 fees.', {
-      name: 'Eip1559FeesNotSupportedError',
-    });
-  }
-}
-
 export class MaxFeePerGasTooLowError extends BaseError {
   constructor({ maxPriorityFeePerGas }: { maxPriorityFeePerGas: bigint }) {
     super(

@@ -178,8 +178,54 @@ test('to contract deployer', async () => {
   });
 });
 
+test('with chainId but not chain', async () => {
+  const request = await prepareTransactionRequest(
+    baseClient,
+    signerClient,
+    publicClient,
+    {
+      chainId: anvilAbstractTestnet.chain.id,
+      ...transaction,
+    } as any,
+    false,
+  );
+  expect(request).toEqual({
+    ...transaction,
+    from: address.smartAccountAddress,
+    chainId: anvilAbstractTestnet.chain.id,
+    gas: MOCK_GAS_LIMIT,
+    nonce: MOCK_NONCE,
+    maxFeePerGas: MOCK_FEE_PER_GAS,
+    maxPriorityFeePerGas: 0n,
+  });
+});
+
+test('with no chainId or chain', async () => {
+  const request = await prepareTransactionRequest(
+    baseClient,
+    signerClient,
+    publicClient,
+    transaction as any,
+    false,
+  );
+  expect(request).toEqual({
+    ...transaction,
+    from: address.smartAccountAddress,
+    chainId: anvilAbstractTestnet.chain.id,
+    gas: MOCK_GAS_LIMIT,
+    nonce: MOCK_NONCE,
+    maxFeePerGas: MOCK_FEE_PER_GAS,
+    maxPriorityFeePerGas: 0n,
+  });
+});
+
 test('throws if maxFeePerGas is too low', async () => {
-  publicClient.request = (async ({ method, params }) => {
+  const publicClientModified = createPublicClient({
+    chain: anvilAbstractTestnet.chain as ChainEIP712,
+    transport: anvilAbstractTestnet.clientConfig.transport,
+  });
+
+  publicClientModified.request = (async ({ method, params }) => {
     if (method === 'zks_estimateFee') {
       return {
         gas_limit: '0x156c00',
@@ -195,7 +241,7 @@ test('throws if maxFeePerGas is too low', async () => {
     prepareTransactionRequest(
       baseClient,
       signerClient,
-      publicClient,
+      publicClientModified,
       {
         ...transaction,
         chain: anvilAbstractTestnet.chain,

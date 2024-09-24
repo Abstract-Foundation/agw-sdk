@@ -270,13 +270,7 @@ export async function prepareTransactionRequest<
     request
   >
 > {
-  const {
-    chain,
-    gas,
-    nonce,
-    nonceManager,
-    parameters = defaultParameters,
-  } = args;
+  const { chain, gas, nonce, parameters = defaultParameters } = args;
   const initiatorAccount = parseAccount(
     isInitialTransaction ? signerClient.account : client.account,
   );
@@ -302,23 +296,14 @@ export async function prepareTransactionRequest<
     typeof nonce === 'undefined' &&
     initiatorAccount
   ) {
-    if (nonceManager) {
-      const chainId = await getChainId();
-      request.nonce = await nonceManager.consume({
-        address: initiatorAccount.address,
-        chainId,
-        client,
-      });
-    } else {
-      request.nonce = await getAction(
-        publicClient, // The public client is more reliable for fetching the latest nonce
-        getTransactionCount,
-        'getTransactionCount',
-      )({
-        address: initiatorAccount.address,
-        blockTag: 'pending',
-      });
-    }
+    request.nonce = await getAction(
+      publicClient, // The public client is more reliable for fetching the latest nonce
+      getTransactionCount,
+      'getTransactionCount',
+    )({
+      address: initiatorAccount.address,
+      blockTag: 'pending',
+    });
   }
 
   if (parameters.includes('fees')) {

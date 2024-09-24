@@ -98,7 +98,7 @@ function abstractWalletConnector(
               accounts[0],
               publicClient,
             );
-            return [smartAccount];
+            return [smartAccount, accounts[0]];
           }
           case 'eth_signTransaction':
           case 'eth_sendTransaction': {
@@ -108,6 +108,10 @@ function abstractWalletConnector(
               throw new Error('Account not found');
             }
             const transaction = params[0];
+
+            if (transaction.from === account) {
+              return await providerHandleRequest(e);
+            }
 
             const transport = custom(provider);
             const wallet = createWalletClient({

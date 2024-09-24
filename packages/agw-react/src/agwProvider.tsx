@@ -44,7 +44,10 @@ interface AbstractWalletConfig {
  * @param {AbstractWalletConfig} config - The configuration for the AbstractWalletProvider.
  */
 export const AbstractWalletProvider = ({
-  config = {},
+  config = {
+    testnet: false,
+    transport: http(),
+  },
   children,
 }: React.PropsWithChildren<{ config: AbstractWalletConfig }>) => {
   const { testnet = false, transport } = config;

@@ -10,7 +10,10 @@ import { toAccount } from 'viem/accounts';
 import { ChainEIP712, ZksyncTransactionRequestEIP712 } from 'viem/zksync';
 import { expect, test, vi } from 'vitest';
 
-import { prepareTransactionRequest } from '../../../src/actions/prepareTransaction.js';
+import {
+  MaxFeePerGasTooLowError,
+  prepareTransactionRequest,
+} from '../../../src/actions/prepareTransaction.js';
 import { CONTRACT_DEPLOYER_ADDRESS } from '../../../src/constants.js';
 import { anvilAbstractTestnet } from '../../anvil.js';
 import { address } from '../../constants.js';
@@ -173,4 +176,78 @@ test('to contract deployer', async () => {
     maxFeePerGas: 25000000n, // Default fee for contract deployments
     maxPriorityFeePerGas: 0n,
   });
+});
+
+test('with chainId but not chain', async () => {
+  const request = await prepareTransactionRequest(
+    baseClient,
+    signerClient,
+    publicClient,
+    {
+      chainId: anvilAbstractTestnet.chain.id,
+      ...transaction,
+    } as any,
+    false,
+  );
+  expect(request).toEqual({
+    ...transaction,
+    from: address.smartAccountAddress,
+    chainId: anvilAbstractTestnet.chain.id,
+    gas: MOCK_GAS_LIMIT,
+    nonce: MOCK_NONCE,
+    maxFeePerGas: MOCK_FEE_PER_GAS,
+    maxPriorityFeePerGas: 0n,
+  });
+});
+
+test('with no chainId or chain', async () => {
+  const request = await prepareTransactionRequest(
+    baseClient,
+    signerClient,
+    publicClient,
+    transaction as any,
+    false,
+  );
+  expect(request).toEqual({
+    ...transaction,
+    from: address.smartAccountAddress,
+    chainId: anvilAbstractTestnet.chain.id,
+    gas: MOCK_GAS_LIMIT,
+    nonce: MOCK_NONCE,
+    maxFeePerGas: MOCK_FEE_PER_GAS,
+    maxPriorityFeePerGas: 0n,
+  });
+});
+
+test('throws if maxFeePerGas is too low', async () => {
+  const publicClientModified = createPublicClient({
+    chain: anvilAbstractTestnet.chain as ChainEIP712,
+    transport: anvilAbstractTestnet.clientConfig.transport,
+  });
+
+  publicClientModified.request = (async ({ method, params }) => {
+    if (method === 'zks_estimateFee') {
+      return {
+        gas_limit: '0x156c00',
+        gas_per_pubdata_limit: '0x143b',
+        max_fee_per_gas: toHex(MOCK_FEE_PER_GAS),
+        max_priority_fee_per_gas: '0xffffff', // this shouldn't happen in production
+      };
+    }
+    return anvilAbstractTestnet.getClient().request({ method, params } as any);
+  }) as EIP1193RequestFn;
+
+  await expect(
+    prepareTransactionRequest(
+      baseClient,
+      signerClient,
+      publicClientModified,
+      {
+        ...transaction,
+        chain: anvilAbstractTestnet.chain,
+        maxFeePerGas: 10000n,
+      },
+      false,
+    ),
+  ).rejects.toThrow(MaxFeePerGasTooLowError);
 });

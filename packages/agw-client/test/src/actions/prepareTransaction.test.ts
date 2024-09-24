@@ -12,8 +12,8 @@ import { expect, test, vi } from 'vitest';
 
 import { prepareTransactionRequest } from '../../../src/actions/prepareTransaction.js';
 import { CONTRACT_DEPLOYER_ADDRESS } from '../../../src/constants.js';
-import { anvilAbstractTestnet } from '../anvil.js';
-import { address } from '../constants.js';
+import { anvilAbstractTestnet } from '../../anvil.js';
+import { address } from '../../constants.js';
 
 const RAW_SIGNATURE =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';

@@ -10,8 +10,8 @@ import { ChainEIP712 } from 'viem/zksync';
 import { beforeEach, expect, test, vi } from 'vitest';
 
 import { writeContract } from '../../../src/actions/writeContract.js';
-import { anvilAbstractTestnet } from '../anvil.js';
-import { address } from '../constants.js';
+import { anvilAbstractTestnet } from '../../anvil.js';
+import { address } from '../../constants.js';
 
 vi.mock('../../../src/actions/sendTransaction', () => ({
   sendTransaction: vi.fn().mockResolvedValue('0xmockedTransactionHash'),

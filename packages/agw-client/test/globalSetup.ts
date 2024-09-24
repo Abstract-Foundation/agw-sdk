@@ -1,4 +1,4 @@
-import * as executionInstances from './src/anvil.js';
+import * as executionInstances from './anvil.js';
 
 export default async function () {
   if (process.env.SKIP_GLOBAL_SETUP) return;

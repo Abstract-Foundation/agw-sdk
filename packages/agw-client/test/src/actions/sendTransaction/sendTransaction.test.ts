@@ -24,8 +24,8 @@ import {
   getInitializerCalldata,
   isSmartAccountDeployed,
 } from '../../../../src/utils.js';
-import { anvilAbstractTestnet } from '../../anvil.js';
-import { address } from '../../constants.js';
+import { anvilAbstractTestnet } from '../../../anvil.js';
+import { address } from '../../../constants.js';
 
 vi.mock('../../../../src/utils.js');
 vi.mock('../../../../src/actions/sendTransactionInternal', () => ({

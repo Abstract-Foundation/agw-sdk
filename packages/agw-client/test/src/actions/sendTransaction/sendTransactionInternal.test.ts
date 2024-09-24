@@ -11,8 +11,8 @@ import { ChainEIP712, ZksyncTransactionRequestEIP712 } from 'viem/zksync';
 import { describe, expect, test, vi } from 'vitest';
 
 import { sendTransactionInternal } from '../../../../src/actions/sendTransactionInternal.js';
-import { anvilAbstractTestnet } from '../../anvil.js';
-import { address } from '../../constants.js';
+import { anvilAbstractTestnet } from '../../../anvil.js';
+import { address } from '../../../constants.js';
 
 // Mock the signTransaction function
 vi.mock('../../../../src/actions/signTransaction', () => ({

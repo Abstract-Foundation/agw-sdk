@@ -18,8 +18,8 @@ import { expect, test } from 'vitest';
 
 import { signTransaction } from '../../../src/actions/signTransaction.js';
 import { VALIDATOR_ADDRESS } from '../../../src/constants.js';
-import { anvilAbstractTestnet } from '../anvil.js';
-import { address } from '../constants.js';
+import { anvilAbstractTestnet } from '../../anvil.js';
+import { address } from '../../constants.js';
 
 const RAW_SIGNATURE =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';

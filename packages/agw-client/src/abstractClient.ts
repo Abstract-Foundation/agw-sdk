@@ -48,8 +48,8 @@ export type AbstractClient = Client<Transport, ChainEIP712, Account> &
 
 export async function createAbstractClient({
   signer,
-  transport,
   chain,
+  transport,
 }: CreateAbstractClientParameters): Promise<AbstractClient> {
   if (!transport) {
     transport = http();

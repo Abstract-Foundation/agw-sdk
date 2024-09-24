@@ -10,8 +10,8 @@ import { expect, test, vi } from 'vitest';
 
 import { deployContract } from '../../../src/actions/deployContract.js';
 import { CONTRACT_DEPLOYER_ADDRESS } from '../../../src/constants.js';
-import { anvilAbstractTestnet } from '../anvil.js';
-import { address } from '../constants.js';
+import { anvilAbstractTestnet } from '../../anvil.js';
+import { address } from '../../constants.js';
 
 vi.mock('../../../src/actions/sendTransaction', () => ({
   sendTransaction: vi.fn().mockResolvedValue('0xmockedTransactionHash'),

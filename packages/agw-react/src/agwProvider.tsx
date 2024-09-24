@@ -7,13 +7,14 @@ import { createConfig, WagmiProvider } from 'wagmi';
 import { abstractWalletConnector } from './abstractWalletConnector.js';
 
 interface AbstractWalletProviderProps {
-  testnet: boolean;
+  testnet?: boolean;
 }
 
 export const AbstractWalletProvider = ({
-  testnet,
+  testnet = false,
   children,
 }: React.PropsWithChildren<AbstractWalletProviderProps>) => {
+  // TODO: replace with mainnet when we have the configuration
   const chain = testnet ? abstractTestnet : abstractTestnet;
 
   const config = createConfig({

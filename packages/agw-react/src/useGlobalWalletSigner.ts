@@ -32,7 +32,7 @@ export function useGlobalWalletSignerAccount<
 
   return {
     ...account,
-    address: account.addresses?.[1],
+    address: account.addresses[1],
   };
 }
 

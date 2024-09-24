@@ -1,41 +1,28 @@
-import { useCrossAppAccounts, usePrivy, type User } from '@privy-io/react-auth';
 import { useCallback } from 'react';
+import { useConnect, useDisconnect } from 'wagmi';
 
-import { AGW_APP_ID } from './constants.js';
-
-interface AbstractGlobalWalletInterface {
-  /** Boolean to indicate whether the abstract global wallet state has initialized */
-  ready: boolean;
-  /** Boolean to indicate whether the user is authenticated */
-  authenticated: boolean;
-  /** Privy user object */
-  user: User | undefined;
-  /** Function to login with the Abstract global wallet */
-  login: () => Promise<void>;
-  /** Function to logout of the abstract global wallet */
-  logout: () => Promise<void>;
+interface AbstractLogin {
+  login: () => void;
+  logout: () => void;
 }
 
-export const useLoginWithAbstract = (): AbstractGlobalWalletInterface => {
-  const { loginWithCrossAppAccount } = useCrossAppAccounts();
-  const { user, ready, authenticated, logout } = usePrivy();
+export const useLoginWithAbstract = (): AbstractLogin => {
+  const { connect, connectors } = useConnect();
+  const { disconnect } = useDisconnect();
 
-  const login = useCallback(async () => {
-    if (!ready) return;
-    if (!authenticated) {
-      try {
-        await loginWithCrossAppAccount({ appId: AGW_APP_ID });
-      } catch (error) {
-        console.error(error);
-        return;
-      }
+  const login = useCallback(() => {
+    const connector = connectors.find((c) => c.type === 'abstract');
+    if (!connector) {
+      throw new Error('Abstract connector not found');
     }
-  }, [ready, authenticated, loginWithCrossAppAccount]);
+    connect({ connector });
+  }, [connect, connectors]);
+
+  const logout = useCallback(() => {
+    disconnect();
+  }, [disconnect]);
 
   return {
-    ready,
-    authenticated,
-    user: user ?? undefined,
     login,
     logout,
   };

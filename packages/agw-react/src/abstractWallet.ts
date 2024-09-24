@@ -1,4 +1,3 @@
-'use client';
 import { type Wallet } from '@rainbow-me/rainbowkit';
 
 import { abstractWalletConnector } from './abstractWalletConnector.js';

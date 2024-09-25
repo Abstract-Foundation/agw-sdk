@@ -1,23 +1,13 @@
-import {
-  createAbstractClient,
-  getSmartAccountAddressFromInitialSigner,
-} from '@abstract-foundation/agw-client';
+import { transformEIP1193Provider } from '@abstract-foundation/agw-client';
 import { toPrivyWalletConnector } from '@privy-io/cross-app-connect';
 import type { WalletDetailsParams } from '@rainbow-me/rainbowkit';
 import { type CreateConnectorFn } from '@wagmi/core';
 import {
   type Chain,
-  createPublicClient,
-  createWalletClient,
-  custom,
-  type CustomSource,
   type EIP1193EventMap,
   type EIP1193RequestFn,
   type EIP1474Methods,
-  http,
-  toHex,
 } from 'viem';
-import { toAccount } from 'viem/accounts';
 import { abstractTestnet } from 'viem/chains';
 
 import { AGW_APP_ID, ICON_URL } from './constants.js';
@@ -80,91 +70,11 @@ function abstractWalletConnector(
         throw new Error('Unsupported chain');
       }
       const provider = await connector.getProvider(parameters);
-      const providerHandleRequest = provider.request;
-      const handler: EIP1193RequestFn<EIP1474Methods> = async (e: any) => {
-        const { method, params } = e;
-        switch (method) {
-          case 'eth_accounts': {
-            const accounts = await connector.getAccounts();
-            const publicClient = createPublicClient({
-              chain: abstractTestnet,
-              transport: http(),
-            });
 
-            if (accounts?.[0] === undefined) {
-              return [];
-            }
-            const smartAccount = await getSmartAccountAddressFromInitialSigner(
-              accounts[0],
-              publicClient,
-            );
-            return [smartAccount, accounts[0]];
-          }
-          case 'eth_signTransaction':
-          case 'eth_sendTransaction': {
-            const accounts = await connector.getAccounts();
-            const account = accounts[0];
-            if (!account) {
-              throw new Error('Account not found');
-            }
-            const transaction = params[0];
-
-            if (transaction.from === account) {
-              return await providerHandleRequest(e);
-            }
-
-            const transport = custom(provider);
-            const wallet = createWalletClient({
-              account,
-              transport,
-            });
-
-            const signer = toAccount({
-              address: account,
-              signMessage: wallet.signMessage,
-              signTransaction:
-                wallet.signTransaction as CustomSource['signTransaction'],
-              signTypedData:
-                wallet.signTypedData as CustomSource['signTypedData'],
-            });
-
-            const abstractClient = await createAbstractClient({
-              chain,
-              signer,
-              transport,
-            });
-
-            // Undo the automatic formatting applied by Wagmi's eth_signTransaction
-            // Formatter: https://github.com/wevm/viem/blob/main/src/zksync/formatters.ts#L114
-            if (
-              transaction.eip712Meta &&
-              transaction.eip712Meta.paymasterParams
-            ) {
-              transaction.paymaster =
-                transaction.eip712Meta.paymasterParams.paymaster;
-              transaction.paymasterInput = toHex(
-                transaction.eip712Meta.paymasterParams.paymasterInput,
-              );
-            }
-
-            if (method === 'eth_signTransaction') {
-              return (await abstractClient.signTransaction(transaction)) as any;
-            } else if (method === 'eth_sendTransaction') {
-              return await abstractClient.sendTransaction(transaction);
-            }
-            throw new Error('Should not have reached this point');
-          }
-          default: {
-            return await providerHandleRequest(e);
-          }
-        }
-      };
-
-      return {
-        on: provider.on,
-        removeListener: provider.removeListener,
-        request: handler,
-      };
+      return transformEIP1193Provider({
+        provider,
+        chain,
+      });
     };
 
     const abstractConnector = {

@@ -1,35 +1,61 @@
-import type { MutationOptions } from '@tanstack/query-core';
-import { writeContract } from '@wagmi/core';
 import type { Abi, WriteContractErrorType } from 'viem';
 import { type Config, type ResolvedRegister, useConfig } from 'wagmi';
-import { useMutation, type WriteContractData } from 'wagmi/query';
+import type { ConfigParameter } from 'wagmi/dist/types/types/properties';
+import {
+  useMutation,
+  type UseMutationParameters,
+  type UseMutationReturnType,
+  type WriteContractData,
+} from 'wagmi/query';
 
-import type {
-  UseWriteContractSponsoredParameters,
-  UseWriteContractSponsoredReturnType,
-  WriteContractSponsoredVariables,
-} from '../actions/writeContractSponsored.js';
+import {
+  type WriteContractSponsoredMutate,
+  type WriteContractSponsoredMutateAsync,
+  writeContractSponsoredMutationOptions,
+  type WriteContractSponsoredVariables,
+} from '../query/writeContractSponsored.js';
 
-export function writeContractSponsoredMutationOptions<config extends Config>(
-  config: config,
-) {
-  return {
-    mutationFn(variables) {
-      return writeContract(config, variables);
-    },
-    mutationKey: ['writeContract'],
-  } as const satisfies MutationOptions<
-    WriteContractData,
-    WriteContractErrorType,
-    WriteContractSponsoredVariables<
-      Abi,
-      string,
-      readonly unknown[],
-      config,
-      config['chains'][number]['id']
-    >
+export type UseWriteContractSponsoredParameters<
+  config extends Config = Config,
+  context = unknown,
+> = ConfigParameter<config> & {
+  mutation?:
+    | UseMutationParameters<
+        WriteContractData,
+        WriteContractErrorType,
+        WriteContractSponsoredVariables<
+          Abi,
+          string,
+          readonly unknown[],
+          config,
+          config['chains'][number]['id']
+        >,
+        context
+      >
+    | undefined;
+};
+
+export type UseWriteContractSponsoredReturnType<
+  config extends Config = Config,
+  context = unknown,
+> = UseMutationReturnType<
+  WriteContractData,
+  WriteContractErrorType,
+  WriteContractSponsoredVariables<
+    Abi,
+    string,
+    readonly unknown[],
+    config,
+    config['chains'][number]['id']
+  >,
+  context
+> & {
+  writeContractSponsored: WriteContractSponsoredMutate<config, context>;
+  writeContractSponsoredAsync: WriteContractSponsoredMutateAsync<
+    config,
+    context
   >;
-}
+};
 
 export function useWriteContractSponsored<
   config extends Config = ResolvedRegister['config'],

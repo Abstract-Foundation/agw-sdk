@@ -9,13 +9,31 @@ import type {
   WriteContractErrorType,
 } from 'viem';
 import { type Config } from 'wagmi';
-import type { ConfigParameter } from 'wagmi/dist/types/types/properties';
 import {
-  type UseMutationParameters,
-  type UseMutationReturnType,
   type WriteContractData,
   type WriteContractVariables,
 } from 'wagmi/query';
+
+export function writeContractSponsoredMutationOptions<config extends Config>(
+  config: config,
+) {
+  return {
+    mutationFn(variables) {
+      return writeContract(config, variables);
+    },
+    mutationKey: ['writeContract'],
+  } as const satisfies MutationOptions<
+    WriteContractData,
+    WriteContractErrorType,
+    WriteContractSponsoredVariables<
+      Abi,
+      string,
+      readonly unknown[],
+      config,
+      config['chains'][number]['id']
+    >
+  >;
+}
 
 export type WriteContractSponsoredVariables<
   abi extends Abi | readonly unknown[],
@@ -40,27 +58,6 @@ export type WriteContractSponsoredVariables<
   paymaster: Address;
   paymasterInput: Hex;
 };
-
-export function writeContractSponsoredMutationOptions<config extends Config>(
-  config: config,
-) {
-  return {
-    mutationFn(variables) {
-      return writeContract(config, variables);
-    },
-    mutationKey: ['writeContract'],
-  } as const satisfies MutationOptions<
-    WriteContractData,
-    WriteContractErrorType,
-    WriteContractSponsoredVariables<
-      Abi,
-      string,
-      readonly unknown[],
-      config,
-      config['chains'][number]['id']
-    >
-  >;
-}
 
 export type WriteContractSponsoredMutate<
   config extends Config,
@@ -138,45 +135,3 @@ export type WriteContractSponsoredMutateAsync<
       >
     | undefined,
 ) => Promise<WriteContractData>;
-
-export type UseWriteContractSponsoredParameters<
-  config extends Config = Config,
-  context = unknown,
-> = ConfigParameter<config> & {
-  mutation?:
-    | UseMutationParameters<
-        WriteContractData,
-        WriteContractErrorType,
-        WriteContractSponsoredVariables<
-          Abi,
-          string,
-          readonly unknown[],
-          config,
-          config['chains'][number]['id']
-        >,
-        context
-      >
-    | undefined;
-};
-
-export type UseWriteContractSponsoredReturnType<
-  config extends Config = Config,
-  context = unknown,
-> = UseMutationReturnType<
-  WriteContractData,
-  WriteContractErrorType,
-  WriteContractSponsoredVariables<
-    Abi,
-    string,
-    readonly unknown[],
-    config,
-    config['chains'][number]['id']
-  >,
-  context
-> & {
-  writeContractSponsored: WriteContractSponsoredMutate<config, context>;
-  writeContractSponsoredAsync: WriteContractSponsoredMutateAsync<
-    config,
-    context
-  >;
-};

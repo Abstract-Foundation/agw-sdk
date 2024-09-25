@@ -23,7 +23,7 @@ interface TransformEIP1193ProviderOptions {
 
 export function transformEIP1193Provider(
   options: TransformEIP1193ProviderOptions,
-) {
+): EIP1193Provider {
   const { provider, chain, transport: overrideTransport } = options;
 
   const providerHandleRequest = provider.request;

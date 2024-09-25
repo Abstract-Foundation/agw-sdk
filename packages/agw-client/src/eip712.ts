@@ -13,7 +13,7 @@ export type AssertEip712RequestParameters = ExactPartial<
   SendEip712TransactionParameters<ChainEIP712>
 >;
 
-function isEIP712Transaction(
+export function isEIP712Transaction(
   transaction: ExactPartial<
     OneOf<ZksyncTransactionRequest | ZksyncTransactionSerializable>
   >,

@@ -105,6 +105,7 @@ export function transformEIP1193Provider(
   };
 
   return {
+    ...provider,
     on: provider.on,
     removeListener: provider.removeListener,
     request: handler,

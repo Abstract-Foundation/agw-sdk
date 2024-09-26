@@ -76,6 +76,35 @@ describe('transformEIP1193Provider', () => {
       });
     });
 
+    it('should return empty array if accounts are not found', async () => {
+      (mockProvider.request as Mock).mockResolvedValueOnce(null);
+      const result = await transformedProvider.request({
+        method: 'eth_accounts',
+      });
+      expect(result).toEqual([]);
+      expect(mockProvider.request).toHaveBeenCalledWith({
+        method: 'eth_accounts',
+      });
+    });
+
+    it('throws an error if accounts are not found', async () => {
+      const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
+      const mockTransaction = {
+        from: mockSmartAccount,
+        to: '0xabcd',
+        value: '0x1',
+      };
+
+      (mockProvider.request as Mock).mockResolvedValueOnce([]);
+
+      await expect(
+        transformedProvider.request({
+          method: 'eth_signTransaction',
+          params: [mockTransaction as any],
+        }),
+      ).rejects.toThrowError('Account not found');
+    });
+
     it('should handle eth_signTransaction method for smart account', async () => {
       const mockAccounts = ['0x742d35Cc6634C0532925a3b844Bc454e4438f44e'];
       const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
@@ -103,6 +132,26 @@ describe('transformEIP1193Provider', () => {
       expect(mockProvider.request).toHaveBeenCalledWith({
         method: 'eth_accounts',
       });
+    });
+
+    it('should default to using providerHandleRequest for eth_sendTransaction', async () => {
+      const mockAccounts = ['0x742d35Cc6634C0532925a3b844Bc454e4438f44e'];
+      const mockTransaction = {
+        from: mockAccounts[0],
+        to: '0xabcd',
+        value: '0x1',
+      };
+      const mockTxHash = '0xtxHashFromProvider';
+
+      (mockProvider.request as Mock)
+        .mockResolvedValueOnce(mockAccounts)
+        .mockResolvedValueOnce(mockTxHash);
+
+      const result = await transformedProvider.request({
+        method: 'eth_sendTransaction',
+        params: [mockTransaction as any],
+      });
+      expect(result).toBe(mockTxHash);
     });
 
     it('should handle eth_sendTransaction method for smart account', async () => {

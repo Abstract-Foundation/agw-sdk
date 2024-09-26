@@ -1,5 +1,6 @@
-import { type EIP1193EventMap, type EIP1193Provider } from 'viem';
+import { type EIP1193EventMap, type EIP1193Provider, hexToBytes } from 'viem';
 import { abstractTestnet } from 'viem/chains';
+import { getGeneralPaymasterInput } from 'viem/zksync';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
 import * as abstractClientModule from '../../src/abstractClient.js';
@@ -130,6 +131,50 @@ describe('transformEIP1193Provider', () => {
       expect(result).toBe(mockTxHash);
       expect(mockProvider.request).toHaveBeenCalledWith({
         method: 'eth_accounts',
+      });
+    });
+
+    it('handles paymaster params correctly', async () => {
+      const mockAccounts = ['0x742d35Cc6634C0532925a3b844Bc454e4438f44e'];
+      const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
+      const paymasterInput = getGeneralPaymasterInput({
+        innerInput: '0x1234',
+      });
+      const mockTransaction = {
+        from: mockSmartAccount,
+        to: '0xabcd',
+        value: '0x1',
+        eip712Meta: {
+          paymasterParams: {
+            paymaster: '0x7A3f9E34C8F2E7c4d0F6d5e9B2B4E3B1C9D0A1B2',
+            paymasterInput: Array.from(hexToBytes(paymasterInput)),
+          },
+        },
+      };
+      const mockTxHash = '0xtxhash';
+
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
+      const mockSendTransaction = vi.fn().mockResolvedValueOnce(mockTxHash);
+      vi.spyOn(
+        abstractClientModule,
+        'createAbstractClient',
+      ).mockResolvedValueOnce({
+        sendTransaction: mockSendTransaction,
+      } as any);
+
+      const result = await transformedProvider.request({
+        method: 'eth_sendTransaction',
+        params: [mockTransaction as any],
+      });
+
+      expect(result).toBe(mockTxHash);
+      expect(mockProvider.request).toHaveBeenCalledWith({
+        method: 'eth_accounts',
+      });
+      expect(mockSendTransaction).toHaveBeenCalledWith({
+        ...mockTransaction,
+        paymaster: '0x7A3f9E34C8F2E7c4d0F6d5e9B2B4E3B1C9D0A1B2',
+        paymasterInput: paymasterInput,
       });
     });
 

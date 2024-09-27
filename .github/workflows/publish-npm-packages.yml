@@ -24,7 +24,6 @@ jobs:
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org/
-          token: ${{ secrets.NPM_TOKEN }}
           cache: 'pnpm'
           scope: '@abstract-foundation'
 
@@ -36,3 +35,5 @@ jobs:
 
       - name: Publish packages
         run: pnpm -r publish --no-git-checks --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

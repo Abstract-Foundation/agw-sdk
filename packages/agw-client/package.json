@@ -8,9 +8,6 @@
     "url": "https://github.com/abstract-foundation/agw-sdk.git",
     "directory": "packages/agw-client"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  },
   "scripts": {
     "test": "vitest -c ./test/vitest.config.ts --disable-console-intercept",
     "coverage": "vitest run --coverage -c ./test/vitest.config.ts",

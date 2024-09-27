@@ -26,6 +26,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
           token: ${{ secrets.NPM_TOKEN }}
           cache: 'pnpm'
+          scope: '@abstract-foundation'
 
       - name: Install dependencies
         run: pnpm install

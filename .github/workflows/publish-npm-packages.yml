@@ -33,10 +33,5 @@ jobs:
       - name: Build packages
         run: pnpm build
 
-      - name: Publish agw-client
-        working-directory: packages/agw-client
-        run: pnpm publish --no-git-checks
-
-      - name: Publish agw-react
-        working-directory: packages/agw-react
-        run: pnpm publish --no-git-checks
+      - name: Publish packages
+        run: pnpm -r publish --no-git-checks --access public

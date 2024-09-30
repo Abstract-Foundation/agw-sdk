@@ -415,7 +415,7 @@ describe('transformEIP1193Provider', () => {
         method: 'eth_signTypedData_v4',
         params: [
           mockAccounts[0],
-          `{"domain":{"name":"Ether Mail","version":"1","chainId":"11124","verifyingContract":"0xcccccccccccccccccccccccccccccccccccccccc"},"message":{"contents":"Hello Bob","from":{"name":"Alice","wallet":"0x1234"},"to":{"name":"Bob","wallet":"0x5678"}},"primaryType":"Mail","types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"},{"name":"verifyingContract","type":"address"}],"Mail":[{"name":"from","type":"Person"},{"name":"to","type":"Person"},{"name":"contents","type":"string"}],"Person":[{"name":"name","type":"string"},{"name":"wallet","type":"address"}]}}`
+          `{"domain":{"name":"Ether Mail","version":"1","chainId":"11124","verifyingContract":"0xcccccccccccccccccccccccccccccccccccccccc"},"message":{"contents":"Hello Bob","from":{"name":"Alice","wallet":"0x1234"},"to":{"name":"Bob","wallet":"0x5678"}},"primaryType":"Mail","types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"},{"name":"verifyingContract","type":"address"}],"Mail":[{"name":"from","type":"Person"},{"name":"to","type":"Person"},{"name":"contents","type":"string"}],"Person":[{"name":"name","type":"string"},{"name":"wallet","type":"address"}]}}`,
         ],
       });
 

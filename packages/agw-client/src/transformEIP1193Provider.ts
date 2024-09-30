@@ -30,10 +30,23 @@ interface TransformEIP1193ProviderOptions {
   transport?: Transport;
 }
 
+async function getAgwAddressFromInitialSigner(chain: Chain, transport: Transport, signer: Address) {
+  const publicClient = createPublicClient({
+    chain,
+    transport,
+  });
+
+  return await getSmartAccountAddressFromInitialSigner(
+    signer,
+    publicClient,
+  );
+}
+
 async function getAgwSigner(
   provider: EIP1193Provider,
+  method: 'eth_requestAccounts' | 'eth_accounts' = 'eth_accounts'
 ): Promise<Address | undefined> {
-  const accounts = await provider.request({ method: 'eth_accounts' });
+  const accounts = await provider.request({ method });
   return accounts?.[0];
 }
 
@@ -92,23 +105,12 @@ export function transformEIP1193Provider(
 
     switch (method) {
       case 'eth_requestAccounts': {
-        const result = await provider.request({
-          method: 'eth_requestAccounts',
-        });
-        const signer = result?.[0];
+        const signer = await getAgwSigner(provider, method);
         if (!signer) {
           return [];
         }
 
-        const publicClient = createPublicClient({
-          chain,
-          transport,
-        });
-
-        const smartAccount = await getSmartAccountAddressFromInitialSigner(
-          signer,
-          publicClient,
-        );
+        const smartAccount = await getAgwAddressFromInitialSigner(chain, transport, signer);
 
         return [smartAccount, signer];
       }
@@ -117,16 +119,9 @@ export function transformEIP1193Provider(
         if (!signer) {
           return [];
         }
+        
+        const smartAccount = await getAgwAddressFromInitialSigner(chain, transport, signer);
 
-        const publicClient = createPublicClient({
-          chain,
-          transport,
-        });
-
-        const smartAccount = await getSmartAccountAddressFromInitialSigner(
-          signer,
-          publicClient,
-        );
         return [smartAccount, signer];
       }
       case 'eth_signTypedData_v4': {

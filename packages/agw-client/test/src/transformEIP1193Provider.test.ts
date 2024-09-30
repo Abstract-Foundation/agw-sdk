@@ -125,6 +125,25 @@ describe('transformEIP1193Provider', () => {
       });
     });
 
+    it('should handle eth_requestAccounts method', async () => {
+      const mockAccounts = ['0x742d35Cc6634C0532925a3b844Bc454e4438f44e'];
+      const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
+      vi.spyOn(
+        utilsModule,
+        'getSmartAccountAddressFromInitialSigner',
+      ).mockResolvedValueOnce(mockSmartAccount);
+
+      const result = await transformedProvider.request({
+        method: 'eth_requestAccounts',
+      });
+
+      expect(result).toEqual([mockSmartAccount, mockAccounts[0]]);
+      expect(mockProvider.request).toHaveBeenCalledWith({
+        method: 'eth_requestAccounts',
+      });
+    });
+
     it('should return empty array if accounts are not found', async () => {
       (mockProvider.request as Mock).mockResolvedValueOnce(null);
       const result = await transformedProvider.request({
@@ -133,6 +152,17 @@ describe('transformEIP1193Provider', () => {
       expect(result).toEqual([]);
       expect(mockProvider.request).toHaveBeenCalledWith({
         method: 'eth_accounts',
+      });
+    });
+
+    it('should return empty array if accounts are not found', async () => {
+      (mockProvider.request as Mock).mockResolvedValueOnce(null);
+      const result = await transformedProvider.request({
+        method: 'eth_requestAccounts',
+      });
+      expect(result).toEqual([]);
+      expect(mockProvider.request).toHaveBeenCalledWith({
+        method: 'eth_requestAccounts',
       });
     });
 

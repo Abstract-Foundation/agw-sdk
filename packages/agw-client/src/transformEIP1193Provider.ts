@@ -30,7 +30,9 @@ interface TransformEIP1193ProviderOptions {
   transport?: Transport;
 }
 
-async function getAgwSigner(provider: EIP1193Provider): Promise<Address | undefined> {
+async function getAgwSigner(
+  provider: EIP1193Provider,
+): Promise<Address | undefined> {
   const accounts = await provider.request({ method: 'eth_accounts' });
   const signer = accounts[0];
   return signer;

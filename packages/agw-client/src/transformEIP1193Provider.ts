@@ -47,7 +47,7 @@ async function getAgwTypedSignature(
 
   const typedData = serializeTypedData({
     domain: {
-      name: 'Clave1271',
+      name: 'AbstractGlobalWallet',
       version: '1.0.0',
       chainId: fromHex(chainId, 'bigint'),
       verifyingContract: account,
@@ -91,7 +91,6 @@ export function transformEIP1193Provider(
     const { method, params } = e;
 
     switch (method) {
-      case 'eth_requestAccounts':
       case 'eth_accounts': {
         const signer = await getAgwSigner(provider);
         if (!signer) {

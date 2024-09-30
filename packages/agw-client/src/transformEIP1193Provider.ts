@@ -1,4 +1,5 @@
 import {
+  type Address,
   type Chain,
   createPublicClient,
   createWalletClient,
@@ -7,12 +8,20 @@ import {
   type EIP1193Provider,
   type EIP1193RequestFn,
   type EIP1474Methods,
+  encodeAbiParameters,
+  fromHex,
+  type Hash,
+  hashMessage,
+  type Hex,
+  parseAbiParameters,
+  serializeTypedData,
   toHex,
   type Transport,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
 
 import { createAbstractClient } from './abstractClient.js';
+import { VALIDATOR_ADDRESS } from './constants.js';
 import { getSmartAccountAddressFromInitialSigner } from './utils.js';
 
 interface TransformEIP1193ProviderOptions {
@@ -21,45 +30,126 @@ interface TransformEIP1193ProviderOptions {
   transport?: Transport;
 }
 
+async function getAgwSigner(provider: EIP1193Provider): Promise<Address | undefined> {
+  const accounts = await provider.request({ method: 'eth_accounts' });
+  const signer = accounts[0];
+  return signer;
+}
+
+async function getAgwTypedSignature(
+  provider: EIP1193Provider,
+  account: Address,
+  signer: Address,
+  messageHash: Hash,
+): Promise<Hex> {
+  const chainId = await provider.request({ method: 'eth_chainId' });
+
+  const typedData = serializeTypedData({
+    domain: {
+      name: 'Clave1271',
+      version: '1.0.0',
+      chainId: fromHex(chainId, 'bigint'),
+      verifyingContract: account,
+    },
+    types: {
+      EIP712Domain: [
+        { name: 'name', type: 'string' },
+        { name: 'version', type: 'string' },
+        { name: 'chainId', type: 'uint256' },
+        { name: 'verifyingContract', type: 'address' },
+      ],
+      ClaveMessage: [{ name: 'signedHash', type: 'bytes32' }],
+    },
+    message: {
+      signedHash: messageHash,
+    },
+    primaryType: 'ClaveMessage',
+  });
+
+  const rawSignature = await provider.request({
+    method: 'eth_signTypedData_v4',
+    params: [signer, typedData],
+  });
+
+  const signature = encodeAbiParameters(
+    parseAbiParameters(['bytes', 'address']),
+    [rawSignature, VALIDATOR_ADDRESS],
+  );
+
+  return signature;
+}
+
 export function transformEIP1193Provider(
   options: TransformEIP1193ProviderOptions,
 ): EIP1193Provider {
   const { provider, chain, transport: overrideTransport } = options;
 
-  const providerHandleRequest = provider.request;
   const transport = overrideTransport ?? custom(provider);
 
   const handler: EIP1193RequestFn<EIP1474Methods> = async (e: any) => {
     const { method, params } = e;
 
     switch (method) {
+      case 'eth_requestAccounts':
       case 'eth_accounts': {
-        const accounts = await provider.request({ method: 'eth_accounts' });
+        const signer = await getAgwSigner(provider);
+        if (!signer) {
+          return [];
+        }
+
         const publicClient = createPublicClient({
           chain,
           transport,
         });
 
-        if (accounts?.[0] === undefined) {
-          return [];
-        }
         const smartAccount = await getSmartAccountAddressFromInitialSigner(
-          accounts[0],
+          signer,
           publicClient,
         );
-        return [smartAccount, accounts[0]];
+        return [smartAccount, signer];
+      }
+      case 'eth_signTypedData_v4': {
+        const signer = await getAgwSigner(provider);
+        if (!signer) {
+          throw new Error('Signer not found');
+        }
+        if (params[0] === signer) {
+          return provider.request(e);
+        }
+        return await getAgwTypedSignature(
+          provider,
+          params[0],
+          signer,
+          hashMessage(params[1]),
+        );
+      }
+      case 'personal_sign': {
+        const signer = await getAgwSigner(provider);
+        if (!signer) {
+          throw new Error('Signer not found');
+        }
+        if (params[1] === signer) {
+          return provider.request(e);
+        }
+        return await getAgwTypedSignature(
+          provider,
+          params[1],
+          signer,
+          hashMessage({
+            raw: params[0],
+          }),
+        );
       }
       case 'eth_signTransaction':
       case 'eth_sendTransaction': {
-        const accounts = await provider.request({ method: 'eth_accounts' });
-        const account = accounts[0];
+        const account = await getAgwSigner(provider);
         if (!account) {
-          throw new Error('Account not found');
+          throw new Error('Signer not found');
         }
         const transaction = params[0];
 
         if (transaction.from === account) {
-          return await providerHandleRequest(e);
+          return await provider.request(e);
         }
 
         const wallet = createWalletClient({
@@ -99,7 +189,7 @@ export function transformEIP1193Provider(
         throw new Error('Should not have reached this point');
       }
       default: {
-        return await providerHandleRequest(e);
+        return await provider.request(e);
       }
     }
   };

@@ -113,7 +113,7 @@ export function transformEIP1193Provider(
       case 'eth_signTypedData_v4': {
         const signer = await getAgwSigner(provider);
         if (!signer) {
-          throw new Error('Signer not found');
+          throw new Error('Account not found');
         }
         if (params[0] === signer) {
           return provider.request(e);
@@ -128,7 +128,7 @@ export function transformEIP1193Provider(
       case 'personal_sign': {
         const signer = await getAgwSigner(provider);
         if (!signer) {
-          throw new Error('Signer not found');
+          throw new Error('Account not found');
         }
         if (params[1] === signer) {
           return provider.request(e);

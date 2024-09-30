@@ -30,21 +30,22 @@ interface TransformEIP1193ProviderOptions {
   transport?: Transport;
 }
 
-async function getAgwAddressFromInitialSigner(chain: Chain, transport: Transport, signer: Address) {
+async function getAgwAddressFromInitialSigner(
+  chain: Chain,
+  transport: Transport,
+  signer: Address,
+) {
   const publicClient = createPublicClient({
     chain,
     transport,
   });
 
-  return await getSmartAccountAddressFromInitialSigner(
-    signer,
-    publicClient,
-  );
+  return await getSmartAccountAddressFromInitialSigner(signer, publicClient);
 }
 
 async function getAgwSigner(
   provider: EIP1193Provider,
-  method: 'eth_requestAccounts' | 'eth_accounts' = 'eth_accounts'
+  method: 'eth_requestAccounts' | 'eth_accounts' = 'eth_accounts',
 ): Promise<Address | undefined> {
   const accounts = await provider.request({ method });
   return accounts?.[0];
@@ -110,7 +111,11 @@ export function transformEIP1193Provider(
           return [];
         }
 
-        const smartAccount = await getAgwAddressFromInitialSigner(chain, transport, signer);
+        const smartAccount = await getAgwAddressFromInitialSigner(
+          chain,
+          transport,
+          signer,
+        );
 
         return [smartAccount, signer];
       }
@@ -119,8 +124,12 @@ export function transformEIP1193Provider(
         if (!signer) {
           return [];
         }
-        
-        const smartAccount = await getAgwAddressFromInitialSigner(chain, transport, signer);
+
+        const smartAccount = await getAgwAddressFromInitialSigner(
+          chain,
+          transport,
+          signer,
+        );
 
         return [smartAccount, signer];
       }

@@ -270,7 +270,7 @@ describe('transformEIP1193Provider', () => {
       expect(result).toBe(expectedSignature);
     });
 
-    it('personal_sign should pass through signature to original provider for signer wallet', async () => {
+    it('should pass through personal_sign signature to original provider for signer wallet', async () => {
       const mockAccounts = ['0x742d35Cc6634C0532925a3b844Bc454e4438f44e'];
       const mockMessage = 'Please sign this message to verify your account';
 
@@ -359,6 +359,67 @@ describe('transformEIP1193Provider', () => {
       });
 
       expect(result).toBe(expectedSignature);
+    });
+
+    it('should pass through eth_signTypedData_v4 to original provider for signer wallet', async () => {
+      const mockAccounts = ['0x742d35Cc6634C0532925a3b844Bc454e4438f44e'];
+      const mockMessage = serializeTypedData({
+        domain: {
+          name: 'Ether Mail',
+          version: '1',
+          chainId: 11124n,
+          verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+        },
+        primaryType: 'Mail',
+        types: {
+          EIP712Domain: [
+            { name: 'name', type: 'string' },
+            { name: 'version', type: 'string' },
+            { name: 'chainId', type: 'uint256' },
+            { name: 'verifyingContract', type: 'address' },
+          ],
+          Mail: [
+            { name: 'from', type: 'Person' },
+            { name: 'to', type: 'Person' },
+            { name: 'contents', type: 'string' },
+          ],
+          Person: [
+            { name: 'name', type: 'string' },
+            { name: 'wallet', type: 'address' },
+          ],
+        },
+        message: {
+          contents: 'Hello Bob',
+          from: {
+            name: 'Alice',
+            wallet: '0x1234',
+          },
+          to: {
+            name: 'Bob',
+            wallet: '0x5678',
+          },
+        },
+      });
+
+      const mockHexSignature = '0xababcd';
+
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockHexSignature);
+
+      const result = await transformedProvider.request({
+        method: 'eth_signTypedData_v4',
+        params: [mockAccounts[0] as any, mockMessage],
+      });
+
+      expect(mockProvider.request).toHaveBeenNthCalledWith(2, {
+        method: 'eth_signTypedData_v4',
+        params: [
+          mockAccounts[0],
+          `{"domain":{"name":"Ether Mail","version":"1","chainId":"11124","verifyingContract":"0xcccccccccccccccccccccccccccccccccccccccc"},"message":{"contents":"Hello Bob","from":{"name":"Alice","wallet":"0x1234"},"to":{"name":"Bob","wallet":"0x5678"}},"primaryType":"Mail","types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"},{"name":"verifyingContract","type":"address"}],"Mail":[{"name":"from","type":"Person"},{"name":"to","type":"Person"},{"name":"contents","type":"string"}],"Person":[{"name":"name","type":"string"},{"name":"wallet","type":"address"}]}}`
+        ],
+      });
+
+      expect(result).toBe(mockHexSignature);
     });
 
     it('should pass through other methods to the original provider', async () => {

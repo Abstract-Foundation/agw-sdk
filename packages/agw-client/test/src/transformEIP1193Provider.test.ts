@@ -1,5 +1,4 @@
 import {
-  concatHex,
   type EIP1193EventMap,
   type EIP1193Provider,
   encodeAbiParameters,
@@ -287,54 +286,51 @@ describe('transformEIP1193Provider', () => {
 
       expect(mockProvider.request).toHaveBeenNthCalledWith(2, {
         method: 'personal_sign',
-        params: [
-          toHex(mockMessage),
-          mockAccounts[0],
-        ],
+        params: [toHex(mockMessage), mockAccounts[0]],
       });
 
       expect(result).toBe(mockHexSignature);
-    })
+    });
 
     it('should transform eth_signTypedData_v4 to typed signature for smart account', async () => {
       const mockAccounts = ['0x742d35Cc6634C0532925a3b844Bc454e4438f44e'];
       const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
       const mockMessage = serializeTypedData({
         domain: {
-          name: "Ether Mail",
-          version: "1",
+          name: 'Ether Mail',
+          version: '1',
           chainId: 11124n,
-          verifyingContract: "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC"
+          verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
         },
-        primaryType: "Mail",
+        primaryType: 'Mail',
         types: {
           EIP712Domain: [
-            { name: "name", type: "string" },
-            { name: "version", type: "string" },
-            { name: "chainId", type: "uint256" },
-            { name: "verifyingContract", type: "address" }
+            { name: 'name', type: 'string' },
+            { name: 'version', type: 'string' },
+            { name: 'chainId', type: 'uint256' },
+            { name: 'verifyingContract', type: 'address' },
           ],
           Mail: [
-            { name: "from", type: "Person" },
-            { name: "to", type: "Person" },
-            { name: "contents", type: "string" }
+            { name: 'from', type: 'Person' },
+            { name: 'to', type: 'Person' },
+            { name: 'contents', type: 'string' },
           ],
           Person: [
-            { name: "name", type: "string" },
-            { name: "wallet", type: "address" }
-          ]
+            { name: 'name', type: 'string' },
+            { name: 'wallet', type: 'address' },
+          ],
         },
         message: {
-          contents: "Hello Bob",
+          contents: 'Hello Bob',
           from: {
-            name: "Alice",
-            wallet: "0x1234"
+            name: 'Alice',
+            wallet: '0x1234',
           },
           to: {
-            name: "Bob",
-            wallet: "0x5678"
-          }
-        }
+            name: 'Bob',
+            wallet: '0x5678',
+          },
+        },
       });
 
       const mockHexSignature = '0xababcd';

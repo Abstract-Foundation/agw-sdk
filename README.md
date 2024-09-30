@@ -20,7 +20,7 @@ The SDK consists of two main packages:
 
 ## Documentation
 
-For detailed documentation, please refer to the [Abstract Global Wallet Documentation](https://docs.abs.xyz/overview).
+For detailed documentation, please refer to the [Abstract Global Wallet Documentation](https://docs.abs.xyz/how-abstract-works/abstract-global-wallet/overview).
 
 ## Contributing
 

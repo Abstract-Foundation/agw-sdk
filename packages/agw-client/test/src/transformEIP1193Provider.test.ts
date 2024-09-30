@@ -6,6 +6,7 @@ import {
   hashMessage,
   hexToBytes,
   parseAbiParameters,
+  serializeTypedData,
   toHex,
 } from 'viem';
 import { abstractTestnet } from 'viem/chains';
@@ -257,6 +258,100 @@ describe('transformEIP1193Provider', () => {
       const result = await transformedProvider.request({
         method: 'personal_sign',
         params: [toHex(mockMessage), mockSmartAccount as any],
+      });
+
+      expect(mockProvider.request).toHaveBeenNthCalledWith(3, {
+        method: 'eth_signTypedData_v4',
+        params: [
+          mockAccounts[0],
+          `{"domain":{"name":"Clave1271","version":"1.0.0","chainId":"11124","verifyingContract":"${mockSmartAccount.toLowerCase()}"},"message":{"signedHash":"${messageHash}"},"primaryType":"ClaveMessage","types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"},{"name":"verifyingContract","type":"address"}],"ClaveMessage":[{"name":"signedHash","type":"bytes32"}]}}`,
+        ],
+      });
+
+      expect(result).toBe(expectedSignature);
+    });
+
+    it('personal_sign should pass through signature to original provider for signer wallet', async () => {
+      const mockAccounts = ['0x742d35Cc6634C0532925a3b844Bc454e4438f44e'];
+      const mockMessage = 'Please sign this message to verify your account';
+
+      const mockHexSignature = '0xababcd';
+
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockHexSignature);
+
+      const result = await transformedProvider.request({
+        method: 'personal_sign',
+        params: [toHex(mockMessage), mockAccounts[0] as any],
+      });
+
+      expect(mockProvider.request).toHaveBeenNthCalledWith(2, {
+        method: 'personal_sign',
+        params: [
+          toHex(mockMessage),
+          mockAccounts[0],
+        ],
+      });
+
+      expect(result).toBe(mockHexSignature);
+    })
+
+    it('should transform eth_signTypedData_v4 to typed signature for smart account', async () => {
+      const mockAccounts = ['0x742d35Cc6634C0532925a3b844Bc454e4438f44e'];
+      const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
+      const mockMessage = serializeTypedData({
+        domain: {
+          name: "Ether Mail",
+          version: "1",
+          chainId: 11124n,
+          verifyingContract: "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC"
+        },
+        primaryType: "Mail",
+        types: {
+          EIP712Domain: [
+            { name: "name", type: "string" },
+            { name: "version", type: "string" },
+            { name: "chainId", type: "uint256" },
+            { name: "verifyingContract", type: "address" }
+          ],
+          Mail: [
+            { name: "from", type: "Person" },
+            { name: "to", type: "Person" },
+            { name: "contents", type: "string" }
+          ],
+          Person: [
+            { name: "name", type: "string" },
+            { name: "wallet", type: "address" }
+          ]
+        },
+        message: {
+          contents: "Hello Bob",
+          from: {
+            name: "Alice",
+            wallet: "0x1234"
+          },
+          to: {
+            name: "Bob",
+            wallet: "0x5678"
+          }
+        }
+      });
+
+      const mockHexSignature = '0xababcd';
+
+      const expectedSignature = encodeAbiParameters(
+        parseAbiParameters(['bytes', 'address']),
+        [mockHexSignature, VALIDATOR_ADDRESS],
+      );
+
+      const messageHash = hashMessage(mockMessage);
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
+      (mockProvider.request as Mock).mockResolvedValueOnce('0x2b74');
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockHexSignature);
+
+      const result = await transformedProvider.request({
+        method: 'eth_signTypedData_v4',
+        params: [mockSmartAccount as any, mockMessage],
       });
 
       expect(mockProvider.request).toHaveBeenNthCalledWith(3, {

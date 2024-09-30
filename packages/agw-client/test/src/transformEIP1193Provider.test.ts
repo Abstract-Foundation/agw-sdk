@@ -7,6 +7,7 @@ import {
   parseAbiParameters,
   serializeTypedData,
   toHex,
+  TypedDataDefinition,
 } from 'viem';
 import { abstractTestnet } from 'viem/chains';
 import { getGeneralPaymasterInput } from 'viem/zksync';
@@ -20,6 +21,44 @@ import * as utilsModule from '../../src/utils.js';
 const listeners: Partial<{
   [K in keyof EIP1193EventMap]: Set<EIP1193EventMap[K]>;
 }> = {};
+
+const exampleTypedData: TypedDataDefinition = {
+  domain: {
+    name: 'Ether Mail',
+    version: '1',
+    chainId: 11124,
+    verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+  },
+  primaryType: 'Mail',
+  types: {
+    EIP712Domain: [
+      { name: 'name', type: 'string' },
+      { name: 'version', type: 'string' },
+      { name: 'chainId', type: 'uint256' },
+      { name: 'verifyingContract', type: 'address' },
+    ],
+    Mail: [
+      { name: 'from', type: 'Person' },
+      { name: 'to', type: 'Person' },
+      { name: 'contents', type: 'string' },
+    ],
+    Person: [
+      { name: 'name', type: 'string' },
+      { name: 'wallet', type: 'address' },
+    ],
+  },
+  message: {
+    contents: 'Hello Bob',
+    from: {
+      name: 'Alice',
+      wallet: '0x1234',
+    },
+    to: {
+      name: 'Bob',
+      wallet: '0x5678',
+    },
+  },
+};
 
 const mockProvider: EIP1193Provider & { randomParam: string } = {
   request: vi.fn(),
@@ -292,46 +331,25 @@ describe('transformEIP1193Provider', () => {
       expect(result).toBe(mockHexSignature);
     });
 
+    it('should throw an error on personal_sign if there are not accounts', async () => {
+      const mockAccounts = [];
+      const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
+      const mockMessage = 'Please sign this message to verify your account';
+
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
+
+      await expect(
+        transformedProvider.request({
+          method: 'personal_sign',
+          params: [toHex(mockMessage), mockSmartAccount as any],
+        }),
+      ).rejects.toThrowError('Account not found');
+    });
+
     it('should transform eth_signTypedData_v4 to typed signature for smart account', async () => {
       const mockAccounts = ['0x742d35Cc6634C0532925a3b844Bc454e4438f44e'];
       const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
-      const mockMessage = serializeTypedData({
-        domain: {
-          name: 'Ether Mail',
-          version: '1',
-          chainId: 11124n,
-          verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-        },
-        primaryType: 'Mail',
-        types: {
-          EIP712Domain: [
-            { name: 'name', type: 'string' },
-            { name: 'version', type: 'string' },
-            { name: 'chainId', type: 'uint256' },
-            { name: 'verifyingContract', type: 'address' },
-          ],
-          Mail: [
-            { name: 'from', type: 'Person' },
-            { name: 'to', type: 'Person' },
-            { name: 'contents', type: 'string' },
-          ],
-          Person: [
-            { name: 'name', type: 'string' },
-            { name: 'wallet', type: 'address' },
-          ],
-        },
-        message: {
-          contents: 'Hello Bob',
-          from: {
-            name: 'Alice',
-            wallet: '0x1234',
-          },
-          to: {
-            name: 'Bob',
-            wallet: '0x5678',
-          },
-        },
-      });
+      const mockMessage = serializeTypedData(exampleTypedData);
 
       const mockHexSignature = '0xababcd';
 
@@ -363,43 +381,7 @@ describe('transformEIP1193Provider', () => {
 
     it('should pass through eth_signTypedData_v4 to original provider for signer wallet', async () => {
       const mockAccounts = ['0x742d35Cc6634C0532925a3b844Bc454e4438f44e'];
-      const mockMessage = serializeTypedData({
-        domain: {
-          name: 'Ether Mail',
-          version: '1',
-          chainId: 11124n,
-          verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-        },
-        primaryType: 'Mail',
-        types: {
-          EIP712Domain: [
-            { name: 'name', type: 'string' },
-            { name: 'version', type: 'string' },
-            { name: 'chainId', type: 'uint256' },
-            { name: 'verifyingContract', type: 'address' },
-          ],
-          Mail: [
-            { name: 'from', type: 'Person' },
-            { name: 'to', type: 'Person' },
-            { name: 'contents', type: 'string' },
-          ],
-          Person: [
-            { name: 'name', type: 'string' },
-            { name: 'wallet', type: 'address' },
-          ],
-        },
-        message: {
-          contents: 'Hello Bob',
-          from: {
-            name: 'Alice',
-            wallet: '0x1234',
-          },
-          to: {
-            name: 'Bob',
-            wallet: '0x5678',
-          },
-        },
-      });
+      const mockMessage = serializeTypedData(exampleTypedData);
 
       const mockHexSignature = '0xababcd';
 
@@ -415,11 +397,26 @@ describe('transformEIP1193Provider', () => {
         method: 'eth_signTypedData_v4',
         params: [
           mockAccounts[0],
-          `{"domain":{"name":"Ether Mail","version":"1","chainId":"11124","verifyingContract":"0xcccccccccccccccccccccccccccccccccccccccc"},"message":{"contents":"Hello Bob","from":{"name":"Alice","wallet":"0x1234"},"to":{"name":"Bob","wallet":"0x5678"}},"primaryType":"Mail","types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"},{"name":"verifyingContract","type":"address"}],"Mail":[{"name":"from","type":"Person"},{"name":"to","type":"Person"},{"name":"contents","type":"string"}],"Person":[{"name":"name","type":"string"},{"name":"wallet","type":"address"}]}}`,
+          `{"domain":{"name":"Ether Mail","version":"1","chainId":11124,"verifyingContract":"0xcccccccccccccccccccccccccccccccccccccccc"},"message":{"contents":"Hello Bob","from":{"name":"Alice","wallet":"0x1234"},"to":{"name":"Bob","wallet":"0x5678"}},"primaryType":"Mail","types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"},{"name":"verifyingContract","type":"address"}],"Mail":[{"name":"from","type":"Person"},{"name":"to","type":"Person"},{"name":"contents","type":"string"}],"Person":[{"name":"name","type":"string"},{"name":"wallet","type":"address"}]}}`,
         ],
       });
 
       expect(result).toBe(mockHexSignature);
+    });
+
+    it('should throw an error on eth_signTypedData_v4 if there are not accounts', async () => {
+      const mockAccounts = [];
+      const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
+      const mockMessage = serializeTypedData(exampleTypedData);
+
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
+
+      await expect(
+        transformedProvider.request({
+          method: 'eth_signTypedData_v4',
+          params: [mockSmartAccount as any, mockMessage],
+        }),
+      ).rejects.toThrowError('Account not found');
     });
 
     it('should pass through other methods to the original provider', async () => {

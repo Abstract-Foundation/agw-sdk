@@ -34,8 +34,7 @@ async function getAgwSigner(
   provider: EIP1193Provider,
 ): Promise<Address | undefined> {
   const accounts = await provider.request({ method: 'eth_accounts' });
-  const signer = accounts[0];
-  return signer;
+  return accounts?.[0];
 }
 
 async function getAgwTypedSignature(
@@ -146,7 +145,7 @@ export function transformEIP1193Provider(
       case 'eth_sendTransaction': {
         const account = await getAgwSigner(provider);
         if (!account) {
-          throw new Error('Signer not found');
+          throw new Error('Account not found');
         }
         const transaction = params[0];
 

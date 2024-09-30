@@ -1,4 +1,4 @@
-import { type EIP1193EventMap, type EIP1193Provider, hexToBytes } from 'viem';
+import { concatHex, type EIP1193EventMap, type EIP1193Provider, encodeAbiParameters, hashMessage, hexToBytes, parseAbiParameters, toHex } from 'viem';
 import { abstractTestnet } from 'viem/chains';
 import { getGeneralPaymasterInput } from 'viem/zksync';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import * as abstractClientModule from '../../src/abstractClient.js';
 import { transformEIP1193Provider } from '../../src/transformEIP1193Provider.js';
 import * as utilsModule from '../../src/utils.js';
+import { VALIDATOR_ADDRESS } from '../../src/constants.js';
 
 const listeners: Partial<{
   [K in keyof EIP1193EventMap]: Set<EIP1193EventMap[K]>;
@@ -225,6 +226,40 @@ describe('transformEIP1193Provider', () => {
         paymaster: '0x7A3f9E34C8F2E7c4d0F6d5e9B2B4E3B1C9D0A1B2',
         paymasterInput: paymasterInput,
       });
+    });
+
+    it('should transform personal_sign to typed signature for smart account', async () => {
+      const mockAccounts = ['0x742d35Cc6634C0532925a3b844Bc454e4438f44e'];
+      const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
+      const mockMessage = 'Please sign this message to verify your account';
+
+      const mockHexSignature = "0xababcd";
+
+      const expectedSignature = encodeAbiParameters(
+        parseAbiParameters(['bytes', 'address']),
+        [mockHexSignature, VALIDATOR_ADDRESS],
+      );
+
+      const messageHash = hashMessage(mockMessage);
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
+      (mockProvider.request as Mock).mockResolvedValueOnce("0x2b74");
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockHexSignature);
+
+      const result = await transformedProvider.request({
+        method: 'personal_sign',
+        params: [toHex(mockMessage), mockSmartAccount as any],
+      });
+
+      expect(mockProvider.request).toHaveBeenNthCalledWith(3, {
+        method: 'eth_signTypedData_v4',
+        params: 
+        [  
+          mockAccounts[0],
+          `{"domain":{"name":"Clave1271","version":"1.0.0","chainId":"11124","verifyingContract":"${mockSmartAccount.toLowerCase()}"},"message":{"signedHash":"${messageHash}"},"primaryType":"ClaveMessage","types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"},{"name":"verifyingContract","type":"address"}],"ClaveMessage":[{"name":"signedHash","type":"bytes32"}]}}`
+        ]
+      });
+
+      expect(result).toBe(expectedSignature);
     });
 
     it('should pass through other methods to the original provider', async () => {

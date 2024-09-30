@@ -91,6 +91,27 @@ export function transformEIP1193Provider(
     const { method, params } = e;
 
     switch (method) {
+      case 'eth_requestAccounts': {
+        const result = await provider.request({
+          method: 'eth_requestAccounts',
+        });
+        const signer = result?.[0];
+        if (!signer) {
+          return [];
+        }
+
+        const publicClient = createPublicClient({
+          chain,
+          transport,
+        });
+
+        const smartAccount = await getSmartAccountAddressFromInitialSigner(
+          signer,
+          publicClient,
+        );
+
+        return [smartAccount, signer];
+      }
       case 'eth_accounts': {
         const signer = await getAgwSigner(provider);
         if (!signer) {

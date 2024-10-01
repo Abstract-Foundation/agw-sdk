@@ -27,6 +27,11 @@
       "types": "./dist/types/exports/index.d.ts",
       "import": "./dist/esm/exports/index.js",
       "require": "./dist/cjs/exports/index.js"
+    },
+    "./actions": {
+      "types": "./dist/types/exports/actions.d.ts",
+      "import": "./dist/esm/exports/actions.js",
+      "require": "./dist/cjs/exports/actions.js"
     }
   },
   "files": [

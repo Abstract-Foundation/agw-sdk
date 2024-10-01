@@ -27,7 +27,9 @@ import { getAction } from 'viem/utils';
 import UniversalSignatureValidatorAbi from '../abis/UniversalSigValidator.js';
 import { UNIVERSAL_SIGNATURE_VALIDATOR_ADDRESS } from '../constants.js';
 
-const supportedChains: (number | undefined)[] = [abstractTestnet.id];
+const supportedChains: Record<number, Chain> = {
+  [abstractTestnet.id]: abstractTestnet,
+};
 
 /**
  * Verifies a message hash onchain using ERC-6492.
@@ -43,7 +45,7 @@ export async function verifyHash<chain extends Chain>(
   const { address, factory, factoryData, hash, signature, ...rest } =
     parameters;
 
-  if (!supportedChains.includes(client.chain.id)) {
+  if (!supportedChains[client.chain.id]) {
     return await viemVerifyHash(client, parameters);
   }
 

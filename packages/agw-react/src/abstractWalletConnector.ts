@@ -82,6 +82,7 @@ function abstractWalletConnector(
       ...rkDetails,
       getProvider: getAbstractProvider,
       type: 'abstract',
+      id: 'xyz.abs.privy',
     };
     return abstractConnector;
   };

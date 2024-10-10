@@ -7,7 +7,7 @@ import {
   type User,
 } from '@privy-io/react-auth';
 import { randomBytes } from 'crypto';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   type Address,
   createPublicClient,
@@ -112,27 +112,26 @@ export const usePrivyCrossAppProvider = ({
     return address ? (address as Address) : undefined;
   };
 
-  const getAccounts = useCallback(async () => {
-    if (!ready) {
-      return [];
-    }
-    let contextUser = user;
-    if (!contextUser && !authenticated) {
-      contextUser = await loginWithCrossAppAccount({
-        appId: AGW_APP_ID,
-      });
-    } else if (!contextUser && authenticated) {
-      contextUser = await linkCrossAppAccount({ appId: AGW_APP_ID });
-    }
-    const address = getAddressFromUser(contextUser);
-    return address ? [address] : [];
-  }, [
-    user,
-    authenticated,
-    ready,
-    loginWithCrossAppAccount,
-    linkCrossAppAccount,
-  ]);
+  const getAccounts = useCallback(
+    async (promptLogin: boolean) => {
+      if (!ready) {
+        return [];
+      }
+      let contextUser = user;
+      if (promptLogin) {
+        if (!contextUser && !authenticated) {
+          contextUser = await loginWithCrossAppAccount({
+            appId: AGW_APP_ID,
+          });
+        } else if (!contextUser && authenticated) {
+          contextUser = await linkCrossAppAccount({ appId: AGW_APP_ID });
+        }
+      }
+      const address = getAddressFromUser(contextUser);
+      return address ? [address] : [];
+    },
+    [user, authenticated, ready, loginWithCrossAppAccount, linkCrossAppAccount],
+  );
 
   const eventListeners = new Map<string, ((...args: any[]) => void)[]>();
 
@@ -143,14 +142,12 @@ export const usePrivyCrossAppProvider = ({
         return publicClient.request(request);
       }
 
-      if (!ready) {
-        return;
-      }
-
       switch (method) {
-        case 'eth_requestAccounts':
+        case 'eth_requestAccounts': {
+          return await getAccounts(true);
+        }
         case 'eth_accounts': {
-          return await getAccounts();
+          return await getAccounts(false);
         }
         case 'wallet_switchEthereumChain':
           // TODO: do we need to do anything here?
@@ -179,31 +176,35 @@ export const usePrivyCrossAppProvider = ({
           throw new Error(`Unsupported request: ${method}`);
       }
     },
-    [ready, passthrough, publicClient, getAccounts, signMessage],
+    [passthrough, publicClient, getAccounts, signMessage],
   );
 
-  const provider: EIP1193Provider = {
-    on: (event, listener) => {
-      eventListeners.set(event, [
-        ...(eventListeners.get(event) ?? []),
-        listener,
-      ]);
-    },
-    removeListener: (event, listener) => {
-      eventListeners.set(
-        event,
-        (eventListeners.get(event) ?? []).filter((l) => l !== listener),
-      );
-    },
-    request: handleRequest as EIP1193RequestFn<EIP1474Methods>,
-  };
+  const provider: EIP1193Provider = useMemo(() => {
+    return {
+      on: (event, listener) => {
+        eventListeners.set(event, [
+          ...(eventListeners.get(event) ?? []),
+          listener,
+        ]);
+      },
+      removeListener: (event, listener) => {
+        eventListeners.set(
+          event,
+          (eventListeners.get(event) ?? []).filter((l) => l !== listener),
+        );
+      },
+      request: handleRequest as EIP1193RequestFn<EIP1474Methods>,
+    };
+  }, [handleRequest]);
+
+  const wrappedProvider = transformEIP1193Provider({
+    chain,
+    provider,
+    transport,
+  });
 
   return {
     ready,
-    provider: transformEIP1193Provider({
-      chain,
-      provider,
-      transport,
-    }),
+    provider: wrappedProvider,
   };
 };

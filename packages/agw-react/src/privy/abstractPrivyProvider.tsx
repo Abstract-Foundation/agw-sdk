@@ -1,8 +1,8 @@
 import { PrivyProvider, type PrivyProviderProps } from '@privy-io/react-auth';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { injected } from '@wagmi/core';
-import React, { Fragment, useEffect } from 'react';
-import { type Transport } from 'viem';
+import React, { Fragment, useEffect, useState } from 'react';
+import { type EIP1193Provider, type Transport } from 'viem';
 import { abstractTestnet } from 'viem/chains';
 import {
   createConfig,
@@ -30,9 +30,10 @@ export const InjectWagmiConnector = (props: InjectWagmiConnectorProps) => {
   const config = useConfig();
   const { reconnect } = useReconnect();
   const { provider, ready } = usePrivyCrossAppProvider({ testnet, transport });
+  const [isSetup, setIsSetup] = useState(false);
 
   useEffect(() => {
-    const setup = async () => {
+    const setup = async (provider: EIP1193Provider) => {
       const wagmiConnector = injected({
         target: {
           provider,
@@ -43,18 +44,17 @@ export const InjectWagmiConnector = (props: InjectWagmiConnectorProps) => {
       });
 
       const connector = config._internal.connectors.setup(wagmiConnector);
-
       await config.storage?.setItem('recentConnectorId', 'xyz.abs.privy');
-
       config._internal.connectors.setState([connector]);
 
       return connector;
     };
 
-    if (ready) {
-      setup().then((connector) => {
+    if (ready && !isSetup) {
+      setup(provider).then((connector) => {
         if (connector) {
           reconnect({ connectors: [connector] });
+          setIsSetup(true);
         }
       });
     }
@@ -63,7 +63,7 @@ export const InjectWagmiConnector = (props: InjectWagmiConnectorProps) => {
   return <Fragment>{children}</Fragment>;
 };
 
-export const AgwPrivyProvider = ({
+export const AbstractPrivyProvider = ({
   testnet = false,
   transport,
   ...props

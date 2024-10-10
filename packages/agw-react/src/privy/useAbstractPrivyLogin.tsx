@@ -2,7 +2,7 @@ import { useCrossAppAccounts } from '@privy-io/react-auth';
 
 import { AGW_APP_ID } from '../constants.js';
 
-export const useAgwPrivyLogin = () => {
+export const useAbstractPrivyLogin = () => {
   const { loginWithCrossAppAccount, linkCrossAppAccount } =
     useCrossAppAccounts();
 

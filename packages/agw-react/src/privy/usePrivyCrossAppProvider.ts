@@ -167,7 +167,6 @@ export const usePrivyCrossAppProvider = ({
         case 'eth_sign':
           throw new Error('eth_sign is unsafe and not supported');
         case 'personal_sign': {
-          console.log(params);
           return await signMessage(fromHex(params[0], 'string'), {
             address: params[1],
           });

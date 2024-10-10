@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useState } from 'react';
+import React from 'react';
 import type { EIP1193Provider, Transport } from 'viem';
 import { useConfig, useReconnect } from 'wagmi';
 import { injected } from 'wagmi/connectors';

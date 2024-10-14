@@ -14,15 +14,20 @@ import {
   hashMessage,
   type Hex,
   parseAbiParameters,
+  serializeErc6492Signature,
   serializeTypedData,
   toHex,
   type Transport,
+  zeroAddress,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
 
 import { createAbstractClient } from './abstractClient.js';
 import { VALIDATOR_ADDRESS } from './constants.js';
-import { getSmartAccountAddressFromInitialSigner } from './utils.js';
+import {
+  getInitializerCalldata,
+  getSmartAccountAddressFromInitialSigner,
+} from './utils.js';
 
 interface TransformEIP1193ProviderOptions {
   provider: EIP1193Provider;
@@ -90,6 +95,17 @@ async function getAgwTypedSignature(
     parseAbiParameters(['bytes', 'address']),
     [rawSignature, VALIDATOR_ADDRESS],
   );
+
+  return serializeErc6492Signature({
+    address: account,
+    data: getInitializerCalldata(signer, VALIDATOR_ADDRESS, {
+      target: zeroAddress,
+      allowFailure: false,
+      callData: '0x',
+      value: 0n,
+    }),
+    signature,
+  });
 
   return signature;
 }

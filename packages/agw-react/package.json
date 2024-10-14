@@ -1,7 +1,7 @@
 {
   "name": "@abstract-foundation/agw-react",
   "description": "Abstract Global Wallet React Components",
-  "version": "0.0.1-beta.2",
+  "version": "0.0.1-beta.3",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -31,6 +31,11 @@
       "import": "./dist/esm/exports/connectors.js",
       "require": "./dist/cjs/exports/connectors.js"
     },
+    "./privy": {
+      "types": "./dist/types/exports/privy.d.ts",
+      "import": "./dist/esm/exports/privy.js",
+      "require": "./dist/cjs/exports/privy.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -40,7 +45,8 @@
   ],
   "peerDependencies": {
     "@abstract-foundation/agw-client": "workspace:*",
-    "@privy-io/cross-app-connect": "^0.0.3-beta-20240913012159",
+    "@privy-io/cross-app-connect": "^0.0.5",
+    "@privy-io/react-auth": "^1.88.3",
     "@tanstack/react-query": "^5",
     "react": ">=18",
     "typescript": ">=5.0.4",
@@ -49,7 +55,8 @@
   },
   "devDependencies": {
     "@abstract-foundation/agw-client": "workspace:*",
-    "@privy-io/cross-app-connect": "^0.0.3-beta-20240913012159",
+    "@privy-io/cross-app-connect": "^0.0.5",
+    "@privy-io/react-auth": "^1.88.3",
     "@rainbow-me/rainbowkit": "^2.1.6",
     "@tanstack/query-core": "^5.56.2",
     "@types/react": ">=18.3.1",

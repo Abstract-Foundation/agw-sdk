@@ -74,10 +74,12 @@ export async function sendPrivyTransaction<
       chain: chain,
     });
 
-  return client.request({
-    method: 'privy_sendSmartWalletTx',
-    params: [fromAccount, transaction, calls],
-    retries: 0,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+  return client.request(
+    {
+      method: 'privy_sendSmartWalletTx',
+      params: [fromAccount, transaction, calls],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any,
+    { retryCount: 0 },
+  );
 }

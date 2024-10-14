@@ -11,7 +11,7 @@ export const useLoginWithAbstract = (): AbstractLogin => {
   const { disconnect } = useDisconnect();
 
   const login = useCallback(() => {
-    const connector = connectors.find((c) => c.type === 'abstract');
+    const connector = connectors.find((c) => c.id === 'xyz.abs.privy');
     if (!connector) {
       throw new Error('Abstract connector not found');
     }

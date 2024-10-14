@@ -1,13 +1,16 @@
 import {
+  Address,
   type EIP1193EventMap,
   type EIP1193Provider,
   encodeAbiParameters,
   hashMessage,
   hexToBytes,
   parseAbiParameters,
+  serializeErc6492Signature,
   serializeTypedData,
   toHex,
   TypedDataDefinition,
+  zeroAddress,
 } from 'viem';
 import { abstractTestnet } from 'viem/chains';
 import { getGeneralPaymasterInput } from 'viem/zksync';
@@ -17,6 +20,7 @@ import * as abstractClientModule from '../../src/abstractClient.js';
 import { VALIDATOR_ADDRESS } from '../../src/constants.js';
 import { transformEIP1193Provider } from '../../src/transformEIP1193Provider.js';
 import * as utilsModule from '../../src/utils.js';
+import { getInitializerCalldata } from '../../src/utils.js';
 
 const listeners: Partial<{
   [K in keyof EIP1193EventMap]: Set<EIP1193EventMap[K]>;
@@ -307,16 +311,27 @@ describe('transformEIP1193Provider', () => {
     });
 
     it('should transform personal_sign to typed signature for smart account', async () => {
-      const mockAccounts = ['0x742d35Cc6634C0532925a3b844Bc454e4438f44e'];
+      const mockAccounts: Address[] = [
+        '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+      ];
       const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
       const mockMessage = 'Please sign this message to verify your account';
 
       const mockHexSignature = '0xababcd';
 
-      const expectedSignature = encodeAbiParameters(
-        parseAbiParameters(['bytes', 'address']),
-        [mockHexSignature, VALIDATOR_ADDRESS],
-      );
+      const expectedSignature = serializeErc6492Signature({
+        address: mockSmartAccount,
+        signature: encodeAbiParameters(
+          parseAbiParameters(['bytes', 'address']),
+          [mockHexSignature, VALIDATOR_ADDRESS],
+        ),
+        data: getInitializerCalldata(mockAccounts[0], VALIDATOR_ADDRESS, {
+          target: zeroAddress,
+          allowFailure: false,
+          callData: '0x',
+          value: 0n,
+        }),
+      });
 
       const messageHash = hashMessage(mockMessage);
       (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
@@ -377,16 +392,27 @@ describe('transformEIP1193Provider', () => {
     });
 
     it('should transform eth_signTypedData_v4 to typed signature for smart account', async () => {
-      const mockAccounts = ['0x742d35Cc6634C0532925a3b844Bc454e4438f44e'];
+      const mockAccounts: Address[] = [
+        '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+      ];
       const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
       const mockMessage = serializeTypedData(exampleTypedData);
 
       const mockHexSignature = '0xababcd';
 
-      const expectedSignature = encodeAbiParameters(
-        parseAbiParameters(['bytes', 'address']),
-        [mockHexSignature, VALIDATOR_ADDRESS],
-      );
+      const expectedSignature = serializeErc6492Signature({
+        address: mockSmartAccount,
+        signature: encodeAbiParameters(
+          parseAbiParameters(['bytes', 'address']),
+          [mockHexSignature, VALIDATOR_ADDRESS],
+        ),
+        data: getInitializerCalldata(mockAccounts[0], VALIDATOR_ADDRESS, {
+          target: zeroAddress,
+          allowFailure: false,
+          callData: '0x',
+          value: 0n,
+        }),
+      });
 
       const messageHash = hashMessage(mockMessage);
       (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);

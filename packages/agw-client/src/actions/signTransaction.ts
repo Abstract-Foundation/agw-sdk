@@ -22,7 +22,6 @@ import {
   type AssertEip712RequestParameters,
 } from '../eip712.js';
 import { AccountNotFoundError } from '../errors/account.js';
-import type { Call } from '../types/call.js';
 
 const ALLOWED_CHAINS: number[] = [abstractTestnet.id];
 
@@ -35,7 +34,6 @@ export async function signTransaction<
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   args: SignEip712TransactionParameters<chain, account, chainOverride>,
   useSignerAddress = false,
-  calls: Call[] | undefined,
 ): Promise<SignEip712TransactionReturnType> {
   const {
     account: account_ = client.account,
@@ -77,8 +75,37 @@ export async function signTransaction<
       chain: chain,
     });
 
-  return client.request({
-    method: 'privy_sendSmartWalletTx',
-    params: [fromAccount, transaction, calls],
+  const eip712Domain = chain?.custom.getEip712Domain({
+    ...transaction,
+    chainId,
+    from: fromAccount.address,
+    type: 'eip712',
   });
+
+  const rawSignature = await signTypedData(signerClient, {
+    ...eip712Domain,
+    account: signerClient.account,
+  });
+
+  let signature;
+  if (useSignerAddress) {
+    signature = rawSignature;
+  } else {
+    // Match the expect signature format of the AGW smart account
+    signature = encodeAbiParameters(
+      parseAbiParameters(['bytes', 'address', 'bytes[]']),
+      [rawSignature, VALIDATOR_ADDRESS, []],
+    );
+  }
+
+  return chain?.serializers?.transaction(
+    {
+      chainId,
+      ...transaction,
+      from: fromAccount.address,
+      customSignature: signature,
+      type: 'eip712' as any,
+    },
+    { r: '0x0', s: '0x0', v: 0n },
+  ) as SignEip712TransactionReturnType;
 }

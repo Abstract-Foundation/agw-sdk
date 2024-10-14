@@ -1,5 +1,6 @@
 import {
   type Account,
+  BaseError,
   type Chain,
   type Client,
   type PublicClient,
@@ -7,7 +8,6 @@ import {
   type Transport,
   type WalletClient,
 } from 'viem';
-import { BaseError } from 'viem';
 import { getChainId } from 'viem/actions';
 import {
   assertCurrentChain,
@@ -27,7 +27,7 @@ import { AccountNotFoundError } from '../errors/account.js';
 import { InsufficientBalanceError } from '../errors/insufficientBalance.js';
 import type { Call } from '../types/call.js';
 import { prepareTransactionRequest } from './prepareTransaction.js';
-import { signTransaction } from './signTransaction.js';
+import { sendPrivyTransaction } from './sendPrivyTransaction.js';
 
 export async function sendTransactionInternal<
   const request extends SendTransactionRequest<chain, chainOverride>,
@@ -79,7 +79,7 @@ export async function sendTransactionInternal<
       });
     }
 
-    return await signTransaction(
+    return await sendPrivyTransaction(
       client,
       signerClient,
       {

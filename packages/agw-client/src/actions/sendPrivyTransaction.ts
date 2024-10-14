@@ -23,6 +23,25 @@ import type { Call } from '../types/call.js';
 
 const ALLOWED_CHAINS: number[] = [abstractTestnet.id];
 
+interface PermissionlessCall {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  readonly to?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  readonly value?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  readonly data?: any;
+}
+
+function convertCallsToPermissionlessCalls(
+  calls?: Call[],
+): PermissionlessCall[] {
+  return (calls || []).map((call) => ({
+    to: call.target,
+    value: call.value,
+    data: call.callData,
+  }));
+}
+
 export async function sendPrivyTransaction<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
@@ -77,7 +96,11 @@ export async function sendPrivyTransaction<
   return client.request(
     {
       method: 'privy_sendSmartWalletTx',
-      params: [fromAccount, transaction, calls],
+      params: [
+        fromAccount,
+        transaction,
+        convertCallsToPermissionlessCalls(calls),
+      ],
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any,
     { retryCount: 0 },

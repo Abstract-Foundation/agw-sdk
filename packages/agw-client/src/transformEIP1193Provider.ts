@@ -12,6 +12,7 @@ import {
   fromHex,
   type Hash,
   hashMessage,
+  hashTypedData,
   type Hex,
   parseAbiParameters,
   serializeErc6492Signature,
@@ -161,7 +162,7 @@ export function transformEIP1193Provider(
           provider,
           params[0],
           signer,
-          hashMessage(params[1]),
+          hashTypedData(JSON.parse(params[1])),
         );
       }
       case 'personal_sign': {

@@ -146,6 +146,7 @@ export async function sendTransactionBatch<
     publicClient,
     batchTransaction,
     !isDeployed,
+    calls,
   );
 }
 
@@ -200,11 +201,22 @@ export async function sendTransaction<
     parameters.value = 0n;
   }
 
+  const calls: Call[] = [
+    {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      target: parameters.to! as `0x${string}`,
+      allowFailure: false,
+      value: BigInt(parameters.value ?? 0),
+      callData: parameters.data ?? '0x',
+    },
+  ];
+
   return sendTransactionInternal(
     client,
     signerClient,
     publicClient,
     parameters,
     !isDeployed,
+    calls,
   );
 }

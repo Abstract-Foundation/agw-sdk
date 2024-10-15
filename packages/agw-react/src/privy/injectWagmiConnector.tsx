@@ -4,7 +4,7 @@ import type { EIP1193Provider, Transport } from 'viem';
 import { useConfig, useReconnect } from 'wagmi';
 import { injected } from 'wagmi/connectors';
 
-import { usePrivyCrossAppProvider } from './usePrivyCrossAppProvider';
+import { usePrivyCrossAppProvider } from './usePrivyCrossAppProvider.js';
 
 interface InjectWagmiConnectorProps extends React.PropsWithChildren {
   testnet: boolean;

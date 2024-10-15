@@ -21,7 +21,7 @@ import {
 } from 'viem';
 import { abstractTestnet } from 'viem/chains';
 
-const AGW_APP_ID = 'cm04asygd041fmry9zmcyn5o5';
+import { AGW_APP_ID } from '../constants.js';
 
 type RpcMethodNames<rpcSchema extends RpcSchema> =
   rpcSchema[keyof rpcSchema] extends { Method: string }

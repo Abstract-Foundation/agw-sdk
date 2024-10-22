@@ -9,20 +9,24 @@ import {
   type EIP1193RequestFn,
   type EIP1474Methods,
   encodeAbiParameters,
+  encodeFunctionData,
   fromHex,
   type Hash,
   hashMessage,
   hashTypedData,
   type Hex,
+  keccak256,
   parseAbiParameters,
   serializeErc6492Signature,
   serializeTypedData,
+  toBytes,
   toHex,
   type Transport,
   zeroAddress,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
 
+import AccountFactoryAbi from './abis/AccountFactory.js';
 import { createAbstractClient } from './abstractClient.js';
 import {
   SMART_ACCOUNT_FACTORY_ADDRESS,
@@ -100,13 +104,22 @@ async function getAgwTypedSignature(
     [rawSignature, VALIDATOR_ADDRESS],
   );
 
+  const addressBytes = toBytes(signer);
+  const salt = keccak256(addressBytes);
   return serializeErc6492Signature({
     address: SMART_ACCOUNT_FACTORY_ADDRESS,
-    data: getInitializerCalldata(signer, VALIDATOR_ADDRESS, {
-      target: zeroAddress,
-      allowFailure: false,
-      callData: '0x',
-      value: 0n,
+    data: encodeFunctionData({
+      abi: AccountFactoryAbi,
+      functionName: 'deployAccount',
+      args: [
+        salt,
+        getInitializerCalldata(signer, VALIDATOR_ADDRESS, {
+          target: zeroAddress,
+          allowFailure: false,
+          callData: '0x',
+          value: 0n,
+        }),
+      ],
     }),
     signature,
   });

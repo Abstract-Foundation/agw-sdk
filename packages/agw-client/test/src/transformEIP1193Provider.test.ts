@@ -1,14 +1,19 @@
 import {
   Address,
+  createPublicClient,
   type EIP1193EventMap,
   type EIP1193Provider,
   encodeAbiParameters,
+  encodeFunctionData,
   hashMessage,
   hashTypedData,
   hexToBytes,
+  http,
+  keccak256,
   parseAbiParameters,
   serializeErc6492Signature,
   serializeTypedData,
+  toBytes,
   toHex,
   TypedDataDefinition,
   zeroAddress,
@@ -17,6 +22,7 @@ import { abstractTestnet } from 'viem/chains';
 import { getGeneralPaymasterInput } from 'viem/zksync';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
+import AccountFactoryAbi from '../../src/abis/AccountFactory.js';
 import * as abstractClientModule from '../../src/abstractClient.js';
 import {
   SMART_ACCOUNT_FACTORY_ADDRESS,
@@ -329,11 +335,18 @@ describe('transformEIP1193Provider', () => {
           parseAbiParameters(['bytes', 'address']),
           [mockHexSignature, VALIDATOR_ADDRESS],
         ),
-        data: getInitializerCalldata(mockAccounts[0], VALIDATOR_ADDRESS, {
-          target: zeroAddress,
-          allowFailure: false,
-          callData: '0x',
-          value: 0n,
+        data: encodeFunctionData({
+          abi: AccountFactoryAbi,
+          functionName: 'deployAccount',
+          args: [
+            keccak256(toBytes(mockAccounts[0])),
+            getInitializerCalldata(mockAccounts[0], VALIDATOR_ADDRESS, {
+              target: zeroAddress,
+              allowFailure: false,
+              callData: '0x',
+              value: 0n,
+            }),
+          ],
         }),
       });
 
@@ -410,11 +423,18 @@ describe('transformEIP1193Provider', () => {
           parseAbiParameters(['bytes', 'address']),
           [mockHexSignature, VALIDATOR_ADDRESS],
         ),
-        data: getInitializerCalldata(mockAccounts[0], VALIDATOR_ADDRESS, {
-          target: zeroAddress,
-          allowFailure: false,
-          callData: '0x',
-          value: 0n,
+        data: encodeFunctionData({
+          abi: AccountFactoryAbi,
+          functionName: 'deployAccount',
+          args: [
+            keccak256(toBytes(mockAccounts[0])),
+            getInitializerCalldata(mockAccounts[0], VALIDATOR_ADDRESS, {
+              target: zeroAddress,
+              allowFailure: false,
+              callData: '0x',
+              value: 0n,
+            }),
+          ],
         }),
       });
 

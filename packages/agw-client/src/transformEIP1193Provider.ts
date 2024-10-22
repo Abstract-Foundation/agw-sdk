@@ -24,7 +24,10 @@ import {
 import { toAccount } from 'viem/accounts';
 
 import { createAbstractClient } from './abstractClient.js';
-import { VALIDATOR_ADDRESS } from './constants.js';
+import {
+  SMART_ACCOUNT_FACTORY_ADDRESS,
+  VALIDATOR_ADDRESS,
+} from './constants.js';
 import {
   getInitializerCalldata,
   getSmartAccountAddressFromInitialSigner,
@@ -98,7 +101,7 @@ async function getAgwTypedSignature(
   );
 
   return serializeErc6492Signature({
-    address: account,
+    address: SMART_ACCOUNT_FACTORY_ADDRESS,
     data: getInitializerCalldata(signer, VALIDATOR_ADDRESS, {
       target: zeroAddress,
       allowFailure: false,
@@ -107,8 +110,6 @@ async function getAgwTypedSignature(
     }),
     signature,
   });
-
-  return signature;
 }
 
 export function transformEIP1193Provider(

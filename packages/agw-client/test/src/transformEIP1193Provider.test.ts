@@ -18,7 +18,10 @@ import { getGeneralPaymasterInput } from 'viem/zksync';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
 import * as abstractClientModule from '../../src/abstractClient.js';
-import { VALIDATOR_ADDRESS } from '../../src/constants.js';
+import {
+  SMART_ACCOUNT_FACTORY_ADDRESS,
+  VALIDATOR_ADDRESS,
+} from '../../src/constants.js';
 import { transformEIP1193Provider } from '../../src/transformEIP1193Provider.js';
 import * as utilsModule from '../../src/utils.js';
 import { getInitializerCalldata } from '../../src/utils.js';
@@ -321,7 +324,7 @@ describe('transformEIP1193Provider', () => {
       const mockHexSignature = '0xababcd';
 
       const expectedSignature = serializeErc6492Signature({
-        address: mockSmartAccount,
+        address: SMART_ACCOUNT_FACTORY_ADDRESS,
         signature: encodeAbiParameters(
           parseAbiParameters(['bytes', 'address']),
           [mockHexSignature, VALIDATOR_ADDRESS],
@@ -402,7 +405,7 @@ describe('transformEIP1193Provider', () => {
       const mockHexSignature = '0xababcd';
 
       const expectedSignature = serializeErc6492Signature({
-        address: mockSmartAccount,
+        address: SMART_ACCOUNT_FACTORY_ADDRESS,
         signature: encodeAbiParameters(
           parseAbiParameters(['bytes', 'address']),
           [mockHexSignature, VALIDATOR_ADDRESS],

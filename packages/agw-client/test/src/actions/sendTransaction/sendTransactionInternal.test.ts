@@ -15,11 +15,15 @@ import { anvilAbstractTestnet } from '../../../anvil.js';
 import { address } from '../../../constants.js';
 
 // Mock the signTransaction function
-vi.mock('../../../../src/actions/signTransaction', () => ({
-  signTransaction: vi.fn().mockResolvedValue('0xmockedSerializedTransaction'),
+vi.mock('../../../../src/actions/sendPrivyTransaction', () => ({
+  sendPrivyTransaction: vi
+    .fn()
+    .mockResolvedValue(
+      '0x9afe47f3d95eccfc9210851ba5f877f76d372514a26b48bad848a07f77c33b87',
+    ),
 }));
 
-import { signTransaction } from '../../../../src/actions/signTransaction.js';
+import { sendPrivyTransaction } from '../../../../src/actions/sendPrivyTransaction.js';
 
 const MOCK_TRANSACTION_HASH =
   '0x9afe47f3d95eccfc9210851ba5f877f76d372514a26b48bad848a07f77c33b87';
@@ -119,7 +123,7 @@ describe('sendTransactionInternal', () => {
       expect(transactionHash).toBe(MOCK_TRANSACTION_HASH);
 
       // Validate that signTransaction was called with the correct parameters
-      expect(signTransaction).toHaveBeenCalledWith(
+      expect(sendPrivyTransaction).toHaveBeenCalledWith(
         baseClient,
         signerClient,
         expect.objectContaining({
@@ -132,17 +136,15 @@ describe('sendTransactionInternal', () => {
           chainId: abstractTestnet.id,
         }),
         isInitialTransaction,
+        [
+          {
+            target: transaction.to,
+            allowFailure: false,
+            value: BigInt(transaction.value ?? 0),
+            callData: transaction.data ?? '0x',
+          },
+        ],
       );
-
-      // Validate that the sendRawTransaction call was made with the correct parameters
-      const sendRawTransactionCall = baseClientRequestSpy.mock.calls.find(
-        (call) => call[0].method === 'eth_sendRawTransaction',
-      );
-      expect(sendRawTransactionCall).toBeDefined();
-      if (sendRawTransactionCall) {
-        const [rawTransaction] = sendRawTransactionCall[0].params;
-        expect(rawTransaction).toEqual('0xmockedSerializedTransaction');
-      }
     },
   );
 });

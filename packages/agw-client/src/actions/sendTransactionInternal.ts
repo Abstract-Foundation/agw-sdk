@@ -1,5 +1,6 @@
 import {
   type Account,
+  type Address,
   BaseError,
   type Chain,
   type Client,
@@ -45,7 +46,6 @@ export async function sendTransactionInternal<
     request
   >,
   isInitialTransaction: boolean,
-  calls: Call[] | undefined,
 ): Promise<SendEip712TransactionReturnType> {
   const { chain = client.chain } = parameters;
 
@@ -78,6 +78,33 @@ export async function sendTransactionInternal<
         chain,
       });
     }
+
+    // const serializedTransaction = await signTransaction(
+    //   client,
+    //   signerClient,
+    //   {
+    //     ...request,
+    //     chainId,
+    //   } as any,
+    //   isInitialTransaction,
+    // );
+    // return await getAction(
+    //   client,
+    //   sendRawTransaction,
+    //   'sendRawTransaction',
+    // )({
+    //   serializedTransaction,
+    // });
+
+    // TODO: Allow for non-privy transactions
+    const calls: Call[] = [
+      {
+        target: parameters.to as Address,
+        allowFailure: false,
+        value: BigInt(parameters.value ?? 0),
+        callData: parameters.data ?? '0x',
+      },
+    ];
 
     return await sendPrivyTransaction(
       client,

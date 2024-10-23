@@ -1,10 +1,8 @@
 import {
-  Address,
   createClient,
   createPublicClient,
   createWalletClient,
   EIP1193RequestFn,
-  Hex,
   http,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
@@ -52,6 +50,8 @@ const transaction = {
   paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
   paymasterInput: '0x',
   value: 10000,
+  gasLimit: 700n,
+  maxFeePerGas: 900n,
 };
 
 publicClient.request = (async ({ method, params }) => {
@@ -89,13 +89,15 @@ describe('sendPrivyTransaction', () => {
           parseAccount(baseClient.account),
           {
             ...transaction,
-            value: BigInt(transaction.value),
+            value: transaction.value.toString(),
             type: 'eip712',
+            gasLimit: transaction.gasLimit.toString(),
+            maxFeePerGas: transaction.maxFeePerGas.toString(),
           },
           [
             {
               to: transaction.to,
-              value: BigInt(transaction.value),
+              value: transaction.value.toString(),
               data: transaction.data,
             },
           ],

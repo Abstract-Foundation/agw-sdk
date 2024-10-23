@@ -45,8 +45,8 @@
   ],
   "peerDependencies": {
     "@abstract-foundation/agw-client": "workspace:*",
-    "@privy-io/cross-app-connect": "^0.0.5",
-    "@privy-io/react-auth": "^1.88.3",
+    "@privy-io/cross-app-connect": "^0.0.6",
+    "@privy-io/react-auth": "^1.92.2",
     "@tanstack/react-query": "^5",
     "react": ">=18",
     "typescript": ">=5.0.4",
@@ -55,8 +55,8 @@
   },
   "devDependencies": {
     "@abstract-foundation/agw-client": "workspace:*",
-    "@privy-io/cross-app-connect": "^0.0.5",
-    "@privy-io/react-auth": "^1.88.3",
+    "@privy-io/cross-app-connect": "^0.0.6",
+    "@privy-io/react-auth": "^1.92.2",
     "@rainbow-me/rainbowkit": "^2.1.6",
     "@tanstack/query-core": "^5.56.2",
     "@types/react": ">=18.3.1",
@@ -64,7 +64,7 @@
     "@wagmi/core": "^2",
     "react": ">=18.3.1",
     "react-dom": ">=18.3.1",
-    "viem": "^2.21.8"
+    "viem": "^2.21.26"
   },
   "peerDependenciesMeta": {
     "typescript": {

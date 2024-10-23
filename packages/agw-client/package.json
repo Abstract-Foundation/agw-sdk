@@ -43,7 +43,7 @@
     "@types/node": "^22.5.5",
     "@vitest/coverage-v8": "^2.1.1",
     "prool": "^0.0.16",
-    "viem": "^2.21.8",
+    "viem": "^2.21.26",
     "vitest": "^2.1.1"
   },
   "peerDependenciesMeta": {

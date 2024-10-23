@@ -38,9 +38,27 @@ function convertCallsToPermissionlessCalls(
 ): PermissionlessCall[] {
   return (calls || []).map((call) => ({
     to: call.target,
-    value: call.value,
+    value: call.value.toString(),
     data: call.callData,
   }));
+}
+
+function convertBigIntToString(obj: any): any {
+  if (typeof obj === 'bigint') {
+    return obj.toString();
+  }
+  if (typeof obj !== 'object' || obj === null) {
+    return obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(convertBigIntToString);
+  }
+  return Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => [
+      key,
+      convertBigIntToString(value),
+    ]),
+  );
 }
 
 export async function sendPrivyTransaction<
@@ -102,16 +120,20 @@ export async function sendPrivyTransaction<
     },
   ];
 
-  return client.request(
+  const serializedTransaction = convertBigIntToString(transaction);
+
+  const result = (await client.request(
     {
       method: 'privy_sendSmartWalletTx',
       params: [
         fromAccount,
-        transaction,
+        serializedTransaction,
         convertCallsToPermissionlessCalls(calls),
       ],
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any,
     { retryCount: 0 },
-  );
+  )) as any;
+
+  return result;
 }

@@ -1,5 +1,6 @@
 import {
   type Account,
+  BaseError,
   type Chain,
   type Client,
   type PublicClient,
@@ -7,8 +8,7 @@ import {
   type Transport,
   type WalletClient,
 } from 'viem';
-import { BaseError } from 'viem';
-import { getChainId, sendRawTransaction } from 'viem/actions';
+import { getChainId } from 'viem/actions';
 import {
   assertCurrentChain,
   getAction,
@@ -26,7 +26,7 @@ import { INSUFFICIENT_BALANCE_SELECTOR } from '../constants.js';
 import { AccountNotFoundError } from '../errors/account.js';
 import { InsufficientBalanceError } from '../errors/insufficientBalance.js';
 import { prepareTransactionRequest } from './prepareTransaction.js';
-import { signTransaction } from './signTransaction.js';
+import { sendPrivyTransaction } from './sendPrivyTransaction.js';
 
 export async function sendTransactionInternal<
   const request extends SendTransactionRequest<chain, chainOverride>,
@@ -77,7 +77,25 @@ export async function sendTransactionInternal<
       });
     }
 
-    const serializedTransaction = await signTransaction(
+    // const serializedTransaction = await signTransaction(
+    //   client,
+    //   signerClient,
+    //   {
+    //     ...request,
+    //     chainId,
+    //   } as any,
+    //   isInitialTransaction,
+    // );
+    // return await getAction(
+    //   client,
+    //   sendRawTransaction,
+    //   'sendRawTransaction',
+    // )({
+    //   serializedTransaction,
+    // });
+
+    // TODO: Allow for non-privy transactions
+    return await sendPrivyTransaction(
       client,
       signerClient,
       {
@@ -86,14 +104,6 @@ export async function sendTransactionInternal<
       } as any,
       isInitialTransaction,
     );
-
-    return await getAction(
-      client,
-      sendRawTransaction,
-      'sendRawTransaction',
-    )({
-      serializedTransaction,
-    });
   } catch (err) {
     if (
       err instanceof Error &&

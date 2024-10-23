@@ -1,5 +1,6 @@
 import {
   type Account,
+  type Address,
   BaseError,
   type Client,
   type Transport,
@@ -51,7 +52,6 @@ export async function sendPrivyTransaction<
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   args: SignEip712TransactionParameters<chain, account, chainOverride>,
   useSignerAddress = false,
-  calls: Call[] | undefined,
 ): Promise<SignEip712TransactionReturnType> {
   const {
     account: account_ = client.account,
@@ -92,6 +92,15 @@ export async function sendPrivyTransaction<
       currentChainId: chainId,
       chain: chain,
     });
+
+  const calls: Call[] = [
+    {
+      target: transaction.to as Address,
+      allowFailure: false,
+      value: BigInt(transaction.value ?? 0),
+      callData: transaction.data ?? '0x',
+    },
+  ];
 
   return client.request(
     {

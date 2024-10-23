@@ -136,14 +136,6 @@ describe('sendTransactionInternal', () => {
           chainId: abstractTestnet.id,
         }),
         isInitialTransaction,
-        [
-          {
-            target: transaction.to,
-            allowFailure: false,
-            value: BigInt(transaction.value ?? 0),
-            callData: transaction.data ?? '0x',
-          },
-        ],
       );
     },
   );

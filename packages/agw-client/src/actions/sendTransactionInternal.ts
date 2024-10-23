@@ -1,6 +1,5 @@
 import {
   type Account,
-  type Address,
   BaseError,
   type Chain,
   type Client,
@@ -26,7 +25,6 @@ import {
 import { INSUFFICIENT_BALANCE_SELECTOR } from '../constants.js';
 import { AccountNotFoundError } from '../errors/account.js';
 import { InsufficientBalanceError } from '../errors/insufficientBalance.js';
-import type { Call } from '../types/call.js';
 import { prepareTransactionRequest } from './prepareTransaction.js';
 import { sendPrivyTransaction } from './sendPrivyTransaction.js';
 
@@ -97,15 +95,6 @@ export async function sendTransactionInternal<
     // });
 
     // TODO: Allow for non-privy transactions
-    const calls: Call[] = [
-      {
-        target: parameters.to as Address,
-        allowFailure: false,
-        value: BigInt(parameters.value ?? 0),
-        callData: parameters.data ?? '0x',
-      },
-    ];
-
     return await sendPrivyTransaction(
       client,
       signerClient,
@@ -114,7 +103,6 @@ export async function sendTransactionInternal<
         chainId,
       } as any,
       isInitialTransaction,
-      calls,
     );
   } catch (err) {
     if (

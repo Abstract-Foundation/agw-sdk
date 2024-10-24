@@ -22,9 +22,9 @@ import {
 } from '../utils';
 
 export interface DeployAccountParameters {
-  initialSignerAddress: Address;
   walletClient: WalletClient<Transport, ChainEIP712, Account>;
   publicClient: PublicClient<Transport, ChainEIP712>;
+  initialSignerAddress?: Address;
   paymaster?: Account;
   paymasterInput?: Hex;
 }
@@ -45,8 +45,10 @@ export async function deployAccount(
     paymasterInput,
   } = params;
 
+  const initialSigner = initialSignerAddress ?? walletClient.account.address;
+
   const address = await getSmartAccountAddressFromInitialSigner(
-    initialSignerAddress,
+    initialSigner,
     publicClient,
   );
 
@@ -55,7 +57,7 @@ export async function deployAccount(
   const isDeployed = await isSmartAccountDeployed(publicClient, address);
   if (!isDeployed) {
     const initializerCallData = getInitializerCalldata(
-      initialSignerAddress,
+      initialSigner,
       VALIDATOR_ADDRESS,
       {
         allowFailure: false,
@@ -64,7 +66,7 @@ export async function deployAccount(
         target: zeroAddress,
       },
     );
-    const addressBytes = toBytes(initialSignerAddress);
+    const addressBytes = toBytes(initialSigner);
     const salt = keccak256(addressBytes);
     const deploymentCalldata = encodeFunctionData({
       abi: AccountFactoryAbi,

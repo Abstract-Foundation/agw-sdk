@@ -21,13 +21,30 @@ import {
   isSmartAccountDeployed,
 } from '../utils';
 
+export interface DeployAccountParameters {
+  initialSignerAddress: Address;
+  walletClient: WalletClient<Transport, ChainEIP712, Account>;
+  publicClient: PublicClient<Transport, ChainEIP712>;
+  paymaster?: Account;
+  paymasterInput?: Hex;
+}
+
+export interface DeployAccountReturnType {
+  smartAccountAddress: Address;
+  deploymentTransaction: Hash | undefined;
+}
+
 export async function deployAccount(
-  initialSignerAddress: Address,
-  walletClient: WalletClient<Transport, ChainEIP712, Account>,
-  publicClient: PublicClient<Transport, ChainEIP712>,
-  paymaster?: Account,
-  paymasterInput?: Hex,
-) {
+  params: DeployAccountParameters,
+): Promise<DeployAccountReturnType> {
+  const {
+    initialSignerAddress,
+    walletClient,
+    publicClient,
+    paymaster,
+    paymasterInput,
+  } = params;
+
   const address = await getSmartAccountAddressFromInitialSigner(
     initialSignerAddress,
     publicClient,

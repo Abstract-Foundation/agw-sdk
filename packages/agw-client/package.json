@@ -37,7 +37,7 @@
   "peerDependencies": {
     "abitype": "^1.0.0",
     "typescript": ">=5.0.4",
-    "viem": "^2.21.8"
+    "viem": "^2.21.26"
   },
   "devDependencies": {
     "@types/node": "^22.5.5",

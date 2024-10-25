@@ -8,7 +8,7 @@ import {
   type Transport,
   type WalletClient,
 } from 'viem';
-import { getChainId } from 'viem/actions';
+import { getChainId, sendRawTransaction } from 'viem/actions';
 import {
   assertCurrentChain,
   getAction,
@@ -27,6 +27,7 @@ import { AccountNotFoundError } from '../errors/account.js';
 import { InsufficientBalanceError } from '../errors/insufficientBalance.js';
 import { prepareTransactionRequest } from './prepareTransaction.js';
 import { sendPrivyTransaction } from './sendPrivyTransaction.js';
+import { signTransaction } from './signTransaction.js';
 
 export async function sendTransactionInternal<
   const request extends SendTransactionRequest<chain, chainOverride>,
@@ -44,6 +45,7 @@ export async function sendTransactionInternal<
     request
   >,
   isInitialTransaction: boolean,
+  isPrivyCrossApp = false,
 ): Promise<SendEip712TransactionReturnType> {
   const { chain = client.chain } = parameters;
 
@@ -77,33 +79,34 @@ export async function sendTransactionInternal<
       });
     }
 
-    // const serializedTransaction = await signTransaction(
-    //   client,
-    //   signerClient,
-    //   {
-    //     ...request,
-    //     chainId,
-    //   } as any,
-    //   isInitialTransaction,
-    // );
-    // return await getAction(
-    //   client,
-    //   sendRawTransaction,
-    //   'sendRawTransaction',
-    // )({
-    //   serializedTransaction,
-    // });
-
-    // TODO: Allow for non-privy transactions
-    return await sendPrivyTransaction(
-      client,
-      signerClient,
-      {
-        ...request,
-        chainId,
-      } as any,
-      isInitialTransaction,
-    );
+    if (isPrivyCrossApp) {
+      return await sendPrivyTransaction(
+        client,
+        signerClient,
+        {
+          ...request,
+          chainId,
+        } as any,
+        isInitialTransaction,
+      );
+    } else {
+      const serializedTransaction = await signTransaction(
+        client,
+        signerClient,
+        {
+          ...request,
+          chainId,
+        } as any,
+        isInitialTransaction,
+      );
+      return await getAction(
+        client,
+        sendRawTransaction,
+        'sendRawTransaction',
+      )({
+        serializedTransaction,
+      });
+    }
   } catch (err) {
     if (
       err instanceof Error &&

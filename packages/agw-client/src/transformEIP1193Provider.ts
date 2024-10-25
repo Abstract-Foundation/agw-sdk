@@ -41,6 +41,7 @@ interface TransformEIP1193ProviderOptions {
   provider: EIP1193Provider;
   chain: Chain;
   transport?: Transport;
+  isPrivyCrossApp?: boolean;
 }
 
 async function getAgwAddressFromInitialSigner(
@@ -128,7 +129,12 @@ async function getAgwTypedSignature(
 export function transformEIP1193Provider(
   options: TransformEIP1193ProviderOptions,
 ): EIP1193Provider {
-  const { provider, chain, transport: overrideTransport } = options;
+  const {
+    provider,
+    chain,
+    transport: overrideTransport,
+    isPrivyCrossApp = true,
+  } = options;
 
   const transport = overrideTransport ?? custom(provider);
 
@@ -225,6 +231,7 @@ export function transformEIP1193Provider(
           chain,
           signer,
           transport,
+          isPrivyCrossApp,
         });
 
         // Undo the automatic formatting applied by Wagmi's eth_signTransaction

@@ -25,7 +25,7 @@ export interface DeployAccountParameters {
   walletClient: WalletClient<Transport, ChainEIP712, Account>;
   publicClient: PublicClient<Transport, ChainEIP712>;
   initialSignerAddress?: Address;
-  paymaster?: Account;
+  paymaster?: Address;
   paymasterInput?: Hex;
 }
 

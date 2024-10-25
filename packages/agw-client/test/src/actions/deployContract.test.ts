@@ -97,6 +97,7 @@ test('create2 with factoryDeps', async () => {
       factoryDeps: [contractBytecode],
       to: CONTRACT_DEPLOYER_ADDRESS,
     },
+    false,
   );
 });
 
@@ -137,5 +138,6 @@ test('create2 with no chain and no account', async () => {
       factoryDeps: [contractBytecode],
       to: CONTRACT_DEPLOYER_ADDRESS,
     },
+    false,
   );
 });

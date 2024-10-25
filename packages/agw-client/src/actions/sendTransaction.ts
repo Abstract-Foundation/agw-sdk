@@ -167,6 +167,7 @@ export async function sendTransaction<
     chainOverride,
     request
   >,
+  isPrivyCrossApp = false,
 ): Promise<SendEip712TransactionReturnType> {
   const isDeployed = await isSmartAccountDeployed(
     publicClient,
@@ -206,5 +207,6 @@ export async function sendTransaction<
     publicClient,
     parameters,
     !isDeployed,
+    isPrivyCrossApp,
   );
 }

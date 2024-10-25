@@ -6,7 +6,8 @@
     "lint:fix": "eslint --fix",
     "prettier-format": "prettier --config .prettierrc './**/*.ts' --write",
     "prettier-check": "prettier --config .prettierrc './**/*.ts' --check",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint": "pnpm run lint:fix && pnpm run prettier-format"
   },
   "packageManager": "pnpm@9.4.0",
   "lint-staged": {

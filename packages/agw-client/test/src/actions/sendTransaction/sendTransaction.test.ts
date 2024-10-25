@@ -124,6 +124,7 @@ describe('sendTransaction', () => {
           account: baseClient.account,
           chain: anvilAbstractTestnet.chain as ChainEIP712,
         } as any,
+        false,
       );
 
       if (shouldCallEncodeFunctionData) {
@@ -151,6 +152,7 @@ describe('sendTransaction', () => {
           chain: anvilAbstractTestnet.chain as ChainEIP712,
         }),
         !isDeployed,
+        false,
       );
       expect(transactionHash).toBe('0xmockedTransactionHash');
     },

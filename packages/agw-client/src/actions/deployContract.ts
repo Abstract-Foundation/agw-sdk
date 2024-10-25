@@ -12,7 +12,6 @@ import {
   type DeployContractParameters,
   type DeployContractReturnType,
   encodeDeployData,
-  type SendEip712TransactionParameters,
 } from 'viem/zksync';
 
 import { CONTRACT_DEPLOYER_ADDRESS } from '../constants.js';
@@ -35,6 +34,7 @@ export function deployContract<
     chainOverride,
     allArgs
   >,
+  isPrivyCrossApp = false,
 ): Promise<DeployContractReturnType> {
   const { abi, args, bytecode, deploymentType, salt, ...request } =
     parameters as DeployContractParameters;
@@ -52,13 +52,15 @@ export function deployContract<
   if (!request.factoryDeps.includes(bytecode))
     request.factoryDeps.push(bytecode);
 
-  return sendTransaction(walletClient, signerClient, publicClient, {
-    ...request,
-    data,
-    to: CONTRACT_DEPLOYER_ADDRESS,
-  } as unknown as SendEip712TransactionParameters<
-    chain,
-    account,
-    chainOverride
-  >);
+  return sendTransaction(
+    walletClient,
+    signerClient,
+    publicClient,
+    {
+      ...request,
+      data,
+      to: CONTRACT_DEPLOYER_ADDRESS,
+    },
+    isPrivyCrossApp,
+  );
 }

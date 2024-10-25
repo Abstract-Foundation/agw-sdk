@@ -43,6 +43,7 @@ export function globalWalletActions<
 >(
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
+  isPrivyCrossApp = false,
 ) {
   return (
     client: Client<Transport, ChainEIP712, Account>,
@@ -52,7 +53,8 @@ export function globalWalletActions<
         client,
         signerClient,
         publicClient,
-        args as SendEip712TransactionParameters<chain, account>,
+        args as any,
+        isPrivyCrossApp,
       ),
     sendTransactionBatch: (args) =>
       sendTransactionBatch(client, signerClient, publicClient, args),
@@ -63,13 +65,20 @@ export function globalWalletActions<
         args as SignEip712TransactionParameters<chain, account>,
       ),
     deployContract: (args) =>
-      deployContract(client, signerClient, publicClient, args),
+      deployContract(client, signerClient, publicClient, args, isPrivyCrossApp),
     writeContract: (args) =>
       writeContract(
         Object.assign(client, {
           sendTransaction: (
             args: SendEip712TransactionParameters<chain, account>,
-          ) => sendTransaction(client, signerClient, publicClient, args),
+          ) =>
+            sendTransaction(
+              client,
+              signerClient,
+              publicClient,
+              args,
+              isPrivyCrossApp,
+            ),
         }),
         signerClient,
         publicClient,

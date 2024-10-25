@@ -39,6 +39,7 @@ interface CreateAbstractClientParameters {
    * @optional
    */
   transport?: Transport;
+  isPrivyCrossApp?: boolean;
 }
 
 type AbstractClientActions = AbstractWalletActions<ChainEIP712, Account>;
@@ -50,6 +51,7 @@ export async function createAbstractClient({
   signer,
   chain,
   transport,
+  isPrivyCrossApp = false,
 }: CreateAbstractClientParameters): Promise<AbstractClient> {
   if (!transport) {
     transport = http();
@@ -79,7 +81,7 @@ export async function createAbstractClient({
   });
 
   const abstractClient = baseClient.extend(
-    globalWalletActions(signerWalletClient, publicClient),
+    globalWalletActions(signerWalletClient, publicClient, isPrivyCrossApp),
   );
   return abstractClient as AbstractClient;
 }

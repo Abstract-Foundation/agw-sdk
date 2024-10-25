@@ -133,7 +133,7 @@ export function transformEIP1193Provider(
     provider,
     chain,
     transport: overrideTransport,
-    isPrivyCrossApp = true,
+    isPrivyCrossApp = false,
   } = options;
 
   const transport = overrideTransport ?? custom(provider);

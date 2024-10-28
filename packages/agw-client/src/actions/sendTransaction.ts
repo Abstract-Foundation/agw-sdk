@@ -1,7 +1,5 @@
 import {
   type Account,
-  type Address,
-  type Chain,
   type Client,
   encodeFunctionData,
   type Hex,
@@ -26,16 +24,10 @@ import {
   VALIDATOR_ADDRESS,
 } from '../constants.js';
 import { type Call } from '../types/call.js';
+import type { SendTransactionBatchParameters } from '../types/sendTransactionBatch.js';
 import { getInitializerCalldata, isSmartAccountDeployed } from '../utils.js';
+import { sendPrivyTransaction } from './sendPrivyTransaction.js';
 import { sendTransactionInternal } from './sendTransactionInternal.js';
-export interface SendTransactionBatchParameters<
-  request extends SendTransactionRequest<Chain> = SendTransactionRequest<Chain>,
-> {
-  // TODO: figure out if more fields need to be lifted up
-  calls: SendEip712TransactionParameters<Chain, Account, Chain, request>[];
-  paymaster?: Address | undefined;
-  paymasterInput?: Hex | undefined;
-}
 
 export async function sendTransactionBatch<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
@@ -49,9 +41,13 @@ export async function sendTransactionBatch<
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
   parameters: SendTransactionBatchParameters<request>,
+  isPrivyCrossApp = false,
 ): Promise<SendTransactionReturnType> {
   if (parameters.calls.length === 0) {
     throw new Error('No calls provided');
+  }
+  if (isPrivyCrossApp) {
+    return await sendPrivyTransaction(client, parameters);
   }
 
   const calls: Call[] = parameters.calls.map((tx) => {
@@ -169,6 +165,8 @@ export async function sendTransaction<
   >,
   isPrivyCrossApp = false,
 ): Promise<SendEip712TransactionReturnType> {
+  if (isPrivyCrossApp) return await sendPrivyTransaction(client, parameters);
+
   const isDeployed = await isSmartAccountDeployed(
     publicClient,
     client.account.address,
@@ -207,6 +205,5 @@ export async function sendTransaction<
     publicClient,
     parameters,
     !isDeployed,
-    isPrivyCrossApp,
   );
 }

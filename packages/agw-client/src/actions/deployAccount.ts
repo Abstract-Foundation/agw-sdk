@@ -75,6 +75,7 @@ export async function deployAccount(
     });
 
     deploymentTransaction = await walletClient.sendTransaction({
+      account: walletClient.account,
       to: SMART_ACCOUNT_FACTORY_ADDRESS,
       data: deploymentCalldata,
       paymaster,

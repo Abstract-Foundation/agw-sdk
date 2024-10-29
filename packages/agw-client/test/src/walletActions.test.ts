@@ -66,6 +66,7 @@ describe('globalWalletActions', () => {
       mockSignerClient,
       mockPublicClient,
       mockArgs,
+      false,
     );
   });
 

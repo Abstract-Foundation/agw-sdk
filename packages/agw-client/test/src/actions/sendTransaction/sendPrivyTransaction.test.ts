@@ -1,12 +1,9 @@
 import {
   createClient,
   createPublicClient,
-  createWalletClient,
   EIP1193RequestFn,
-  http,
+  toHex,
 } from 'viem';
-import { toAccount } from 'viem/accounts';
-import { parseAccount } from 'viem/utils';
 import { ChainEIP712 } from 'viem/zksync';
 import { describe, expect, test, vi } from 'vitest';
 
@@ -31,12 +28,6 @@ const baseClient = createClient({
 });
 
 baseClient.request = baseClientRequestSpy as unknown as EIP1193RequestFn;
-
-const signerClient = createWalletClient({
-  account: toAccount(address.signerAddress),
-  chain: anvilAbstractTestnet.chain as ChainEIP712,
-  transport: http(baseClient.transport.url),
-});
 
 const publicClient = createPublicClient({
   chain: anvilAbstractTestnet.chain as ChainEIP712,
@@ -68,17 +59,12 @@ publicClient.request = (async ({ method, params }) => {
 
 describe('sendPrivyTransaction', () => {
   test('sends a transaction correctly', async () => {
-    const transactionHash = await sendPrivyTransaction(
-      baseClient,
-      signerClient,
-      {
-        ...transaction,
-        type: 'eip712',
-        account: baseClient.account,
-        chain: anvilAbstractTestnet.chain as ChainEIP712,
-      } as any,
-      false,
-    );
+    const transactionHash = await sendPrivyTransaction(baseClient, {
+      ...transaction,
+      type: 'eip712',
+      account: baseClient.account,
+      chain: anvilAbstractTestnet.chain as ChainEIP712,
+    } as any);
 
     expect(transactionHash).toBe(MOCK_TRANSACTION_HASH);
 
@@ -86,21 +72,19 @@ describe('sendPrivyTransaction', () => {
       {
         method: 'privy_sendSmartWalletTx',
         params: [
-          parseAccount(baseClient.account),
           {
-            ...transaction,
-            value: transaction.value.toString(),
+            to: transaction.to,
+            from: '0x0000000000000000000000000000000000000000',
+            value: transaction.value,
+            data: transaction.data,
             type: 'eip712',
-            gasLimit: transaction.gasLimit.toString(),
-            maxFeePerGas: transaction.maxFeePerGas.toString(),
+            account: baseClient.account,
+            chain: anvilAbstractTestnet.chain as ChainEIP712,
+            gasLimit: toHex(700n),
+            maxFeePerGas: toHex(900n),
+            paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
+            paymasterInput: '0x',
           },
-          [
-            {
-              to: transaction.to,
-              value: transaction.value.toString(),
-              data: transaction.data,
-            },
-          ],
         ],
       },
       { retryCount: 0 },

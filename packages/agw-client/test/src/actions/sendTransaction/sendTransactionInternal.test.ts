@@ -15,14 +15,6 @@ import { anvilAbstractTestnet } from '../../../anvil.js';
 import { address } from '../../../constants.js';
 
 // Mock the signTransaction function
-vi.mock('../../../../src/actions/sendPrivyTransaction', () => ({
-  sendPrivyTransaction: vi
-    .fn()
-    .mockResolvedValue(
-      '0x9afe47f3d95eccfc9210851ba5f877f76d372514a26b48bad848a07f77c33b87',
-    ),
-}));
-
 vi.mock('../../../../src/actions/signTransaction', () => ({
   signTransaction: vi
     .fn()
@@ -31,7 +23,6 @@ vi.mock('../../../../src/actions/signTransaction', () => ({
     ),
 }));
 
-import { sendPrivyTransaction } from '../../../../src/actions/sendPrivyTransaction.js';
 import { signTransaction } from '../../../../src/actions/signTransaction.js';
 
 const MOCK_TRANSACTION_HASH =
@@ -52,6 +43,9 @@ const baseClientRequestSpy = vi.fn(async ({ method, params }) => {
   }
   if (method === 'eth_estimateGas') {
     return 158774n;
+  }
+  if (method === 'eth_getTransactionCount') {
+    return '0x1';
   }
   if (method === 'eth_sendRawTransaction') {
     return MOCK_TRANSACTION_HASH;
@@ -105,31 +99,17 @@ describe('sendTransactionInternal', () => {
       name: 'is initial transaction, not privy cross app',
       isInitialTransaction: true,
       expectedFromAddress: address.signerAddress,
-      isPrivyCrossApp: false,
     },
     {
       name: 'is not initial transaction, not privy cross app',
       isInitialTransaction: false,
       expectedFromAddress: address.smartAccountAddress,
-      isPrivyCrossApp: false,
-    },
-    {
-      name: 'is initial transaction, privy cross app',
-      isInitialTransaction: true,
-      expectedFromAddress: address.signerAddress,
-      isPrivyCrossApp: true,
-    },
-    {
-      name: 'is not initial transaction, privy cross app',
-      isInitialTransaction: false,
-      expectedFromAddress: address.smartAccountAddress,
-      isPrivyCrossApp: true,
     },
   ];
 
   test.each(testCases)(
     '$name',
-    async ({ isInitialTransaction, expectedFromAddress, isPrivyCrossApp }) => {
+    async ({ isInitialTransaction, expectedFromAddress }) => {
       const transactionHash = await sendTransactionInternal(
         baseClient,
         signerClient,
@@ -141,54 +121,35 @@ describe('sendTransactionInternal', () => {
           chain: anvilAbstractTestnet.chain as ChainEIP712,
         } as any,
         isInitialTransaction,
-        isPrivyCrossApp,
       );
 
       expect(transactionHash).toBe(MOCK_TRANSACTION_HASH);
 
-      if (isPrivyCrossApp) {
-        // Validate that signTransaction was called with the correct parameters
-        expect(sendPrivyTransaction).toHaveBeenCalledWith(
-          baseClient,
-          signerClient,
-          expect.objectContaining({
-            type: 'eip712',
-            to: '0x5432100000000000000000000000000000000000',
-            from: expectedFromAddress,
-            data: '0x1234',
-            paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
-            paymasterInput: '0x',
-            chainId: abstractTestnet.id,
-          }),
-          isInitialTransaction,
-        );
-      } else {
-        expect(signTransaction).to.toHaveBeenCalledWith(
-          baseClient,
-          signerClient,
-          expect.objectContaining({
-            type: 'eip712',
-            to: '0x5432100000000000000000000000000000000000',
-            from: expectedFromAddress,
-            data: '0x1234',
-            paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
-            paymasterInput: '0x',
-            chainId: abstractTestnet.id,
-          }),
-          isInitialTransaction,
-        );
+      expect(signTransaction).to.toHaveBeenCalledWith(
+        baseClient,
+        signerClient,
+        expect.objectContaining({
+          type: 'eip712',
+          to: '0x5432100000000000000000000000000000000000',
+          from: expectedFromAddress,
+          data: '0x1234',
+          paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
+          paymasterInput: '0x',
+          chainId: abstractTestnet.id,
+        }),
+        isInitialTransaction,
+      );
 
-        // Validate that the sendRawTransaction call was made with the correct parameters
-        const sendRawTransactionCall = baseClientRequestSpy.mock.calls.find(
-          (call) => call[0].method === 'eth_sendRawTransaction',
+      // Validate that the sendRawTransaction call was made with the correct parameters
+      const sendRawTransactionCall = baseClientRequestSpy.mock.calls.find(
+        (call) => call[0].method === 'eth_sendRawTransaction',
+      );
+      expect(sendRawTransactionCall).toBeDefined();
+      if (sendRawTransactionCall) {
+        const [rawTransaction] = sendRawTransactionCall[0].params;
+        expect(rawTransaction).toEqual(
+          '0x9afe47f3d95eccfc9210851ba5f877f76d372514a26b48bad848a07f77c33b87',
         );
-        expect(sendRawTransactionCall).toBeDefined();
-        if (sendRawTransactionCall) {
-          const [rawTransaction] = sendRawTransactionCall[0].params;
-          expect(rawTransaction).toEqual(
-            '0x9afe47f3d95eccfc9210851ba5f877f76d372514a26b48bad848a07f77c33b87',
-          );
-        }
       }
     },
   );

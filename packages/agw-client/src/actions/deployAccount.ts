@@ -13,13 +13,16 @@ import {
 } from 'viem';
 import type { ChainEIP712 } from 'viem/chains';
 
-import AccountFactoryAbi from '../abis/AccountFactory';
-import { SMART_ACCOUNT_FACTORY_ADDRESS, VALIDATOR_ADDRESS } from '../constants';
+import AccountFactoryAbi from '../abis/AccountFactory.js';
+import {
+  SMART_ACCOUNT_FACTORY_ADDRESS,
+  VALIDATOR_ADDRESS,
+} from '../constants.js';
 import {
   getInitializerCalldata,
   getSmartAccountAddressFromInitialSigner,
   isSmartAccountDeployed,
-} from '../utils';
+} from '../utils.js';
 
 export interface DeployAccountParameters {
   walletClient: WalletClient<Transport, ChainEIP712, Account>;

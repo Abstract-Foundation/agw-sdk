@@ -55,7 +55,7 @@
   },
   "devDependencies": {
     "@abstract-foundation/agw-client": "workspace:*",
-    "@privy-io/cross-app-connect": "^0.0.6",
+    "@privy-io/cross-app-connect": "^0.0.7",
     "@privy-io/react-auth": "^1.92.2",
     "@rainbow-me/rainbowkit": "^2.1.6",
     "@tanstack/query-core": "^5.56.2",

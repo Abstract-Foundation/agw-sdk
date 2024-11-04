@@ -2,6 +2,7 @@ import {
   type Account,
   type Client,
   type SendTransactionRequest,
+  toHex,
   type Transport,
 } from 'viem';
 import {
@@ -10,25 +11,8 @@ import {
   type SignEip712TransactionReturnType,
 } from 'viem/zksync';
 
+import { replaceBigInts } from '../replaceBigInts';
 import type { SendTransactionBatchParameters } from '../types/sendTransactionBatch';
-
-function convertBigIntToString(obj: any): any {
-  if (typeof obj === 'bigint') {
-    return '0x' + obj.toString(16); // Convert BigInt to hex string
-  }
-  if (typeof obj !== 'object' || obj === null) {
-    return obj;
-  }
-  if (Array.isArray(obj)) {
-    return obj.map(convertBigIntToString);
-  }
-  return Object.fromEntries(
-    Object.entries(obj).map(([key, value]) => [
-      key,
-      convertBigIntToString(value),
-    ]),
-  );
-}
 
 export async function sendPrivyTransaction<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
@@ -47,7 +31,7 @@ export async function sendPrivyTransaction<
   const result = (await client.request(
     {
       method: 'privy_sendSmartWalletTx',
-      params: [convertBigIntToString(parameters)],
+      params: [replaceBigInts(parameters, toHex)],
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any,
     { retryCount: 0 },

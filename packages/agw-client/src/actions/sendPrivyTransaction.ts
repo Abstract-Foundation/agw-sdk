@@ -11,8 +11,8 @@ import {
   type SignEip712TransactionReturnType,
 } from 'viem/zksync';
 
-import { replaceBigInts } from '../replaceBigInts';
-import type { SendTransactionBatchParameters } from '../types/sendTransactionBatch';
+import { replaceBigInts } from '../replaceBigInts.js';
+import type { SendTransactionBatchParameters } from '../types/sendTransactionBatch.js';
 
 export async function sendPrivyTransaction<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,

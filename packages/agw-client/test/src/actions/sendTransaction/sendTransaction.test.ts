@@ -152,7 +152,6 @@ describe('sendTransaction', () => {
           chain: anvilAbstractTestnet.chain as ChainEIP712,
         }),
         !isDeployed,
-        false,
       );
       expect(transactionHash).toBe('0xmockedTransactionHash');
     },

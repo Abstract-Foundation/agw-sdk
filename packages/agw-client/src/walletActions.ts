@@ -21,10 +21,10 @@ import { deployContract } from './actions/deployContract.js';
 import {
   sendTransaction,
   sendTransactionBatch,
-  type SendTransactionBatchParameters,
 } from './actions/sendTransaction.js';
 import { signTransaction } from './actions/signTransaction.js';
 import { writeContract } from './actions/writeContract.js';
+import type { SendTransactionBatchParameters } from './types/sendTransactionBatch.js';
 
 export type AbstractWalletActions<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
@@ -57,7 +57,13 @@ export function globalWalletActions<
         isPrivyCrossApp,
       ),
     sendTransactionBatch: (args) =>
-      sendTransactionBatch(client, signerClient, publicClient, args),
+      sendTransactionBatch(
+        client,
+        signerClient,
+        publicClient,
+        args,
+        isPrivyCrossApp,
+      ),
     signTransaction: (args) =>
       signTransaction(
         client,

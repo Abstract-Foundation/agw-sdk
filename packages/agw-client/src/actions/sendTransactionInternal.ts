@@ -26,7 +26,6 @@ import { INSUFFICIENT_BALANCE_SELECTOR } from '../constants.js';
 import { AccountNotFoundError } from '../errors/account.js';
 import { InsufficientBalanceError } from '../errors/insufficientBalance.js';
 import { prepareTransactionRequest } from './prepareTransaction.js';
-import { sendPrivyTransaction } from './sendPrivyTransaction.js';
 import { signTransaction } from './signTransaction.js';
 
 export async function sendTransactionInternal<
@@ -45,7 +44,6 @@ export async function sendTransactionInternal<
     request
   >,
   isInitialTransaction: boolean,
-  isPrivyCrossApp = false,
 ): Promise<SendEip712TransactionReturnType> {
   const { chain = client.chain } = parameters;
 
@@ -79,34 +77,22 @@ export async function sendTransactionInternal<
       });
     }
 
-    if (isPrivyCrossApp) {
-      return await sendPrivyTransaction(
-        client,
-        signerClient,
-        {
-          ...request,
-          chainId,
-        } as any,
-        isInitialTransaction,
-      );
-    } else {
-      const serializedTransaction = await signTransaction(
-        client,
-        signerClient,
-        {
-          ...request,
-          chainId,
-        } as any,
-        isInitialTransaction,
-      );
-      return await getAction(
-        client,
-        sendRawTransaction,
-        'sendRawTransaction',
-      )({
-        serializedTransaction,
-      });
-    }
+    const serializedTransaction = await signTransaction(
+      client,
+      signerClient,
+      {
+        ...request,
+        chainId,
+      } as any,
+      isInitialTransaction,
+    );
+    return await getAction(
+      client,
+      sendRawTransaction,
+      'sendRawTransaction',
+    )({
+      serializedTransaction,
+    });
   } catch (err) {
     if (
       err instanceof Error &&

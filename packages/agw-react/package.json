@@ -14,7 +14,8 @@
     "build:cjs": "tsc -p tsconfig.cjs.json && printf '{\"type\":\"commonjs\"}' > ./dist/cjs/package.json",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
-    "debug": "tsc-watch --sourceMap true --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types"
+    "debug": "tsc-watch --sourceMap true --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types",
+    "test:build": "publint && attw --pack --ignore-rules false-cjs"
   },
   "main": "./dist/cjs/exports/index.js",
   "module": "./dist/esm/exports/index.js",
@@ -37,6 +38,16 @@
       "require": "./dist/cjs/exports/privy.js"
     },
     "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "connectors": [
+        "dist/types/exports/connectors.d.ts"
+      ],
+      "privy": [
+        "dist/types/exports/privy.d.ts"
+      ]
+    }
   },
   "files": [
     "dist",

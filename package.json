@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.16.4",
+    "@changesets/cli": "^2.27.9",
     "@types/eslint__js": "^8.42.3",
     "eslint": "^9.10.0",
     "eslint-plugin-require-extensions": "^0.1.3",

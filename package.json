@@ -17,13 +17,15 @@
     ]
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.16.4",
     "@types/eslint__js": "^8.42.3",
     "eslint": "^9.10.0",
     "eslint-plugin-simple-import-sort": "^12.1.1",
-    "prettier": "^3.3.3",
-    "tsc-watch": "^6.2.0",
-    "typescript-eslint": "^8.5.0",
     "husky": "^9.1.6",
-    "lint-staged": "^15.2.10"
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "publint": "^0.2.12",
+    "tsc-watch": "^6.2.0",
+    "typescript-eslint": "^8.5.0"
   }
 }

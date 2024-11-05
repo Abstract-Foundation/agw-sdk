@@ -1,6 +1,9 @@
 import eslint from '@eslint/js';
 import eslintPluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
+import { createRequire } from "module"
 import tseslint from 'typescript-eslint';
+const require = createRequire(import.meta.url)
+const requireExtensions = require("eslint-plugin-require-extensions")
 
 export default tseslint.config(
   eslint.configs.recommended,
@@ -8,9 +11,11 @@ export default tseslint.config(
   ...tseslint.configs.strict,
   {
     plugins: {
-      'simple-import-sort': eslintPluginSimpleImportSort
+      'simple-import-sort': eslintPluginSimpleImportSort,
+      'require-extensions': requireExtensions,
     },
     rules: {
+      'require-extensions/require-extensions': 'error',
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-non-null-assertion': 'warn',
       '@typescript-eslint/no-empty-object-type': 'warn',

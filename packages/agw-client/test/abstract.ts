@@ -1,7 +1,7 @@
 import { createClient, defineChain, http } from 'viem';
 import { chainConfig } from 'viem/zksync';
 
-import { accounts } from './constants';
+import { accounts } from './constants.js';
 
 export const abstractLocalNode = defineChain({
   ...chainConfig,

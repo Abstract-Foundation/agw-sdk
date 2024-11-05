@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "build": "pnpm run --r --filter \"./packages/**\" build",
+    "test:build": "pnpm run --r --filter \"./packages/**\" test:build",
     "lint:check": "eslint",
     "lint:fix": "eslint --fix",
     "prettier-format": "prettier --config .prettierrc './**/*.ts' --write",

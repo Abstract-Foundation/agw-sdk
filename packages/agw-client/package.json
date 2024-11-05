@@ -28,6 +28,18 @@
       "types": "./dist/types/exports/index.d.ts",
       "import": "./dist/esm/exports/index.js",
       "require": "./dist/cjs/exports/index.js"
+    },
+    "./constants": {
+      "types": "./dist/types/exports/constants.d.ts",
+      "import": "./dist/esm/exports/constants.js",
+      "require": "./dist/cjs/exports/constants.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "constants": [
+        "./dist/types/exports/constants.d.ts"
+      ]
     }
   },
   "files": [

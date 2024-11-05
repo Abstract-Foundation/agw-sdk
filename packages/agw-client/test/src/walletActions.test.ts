@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import * as deployContractModule from '../../src/actions/deployContract';
-import * as sendTransactionModule from '../../src/actions/sendTransaction';
-import * as signTransactionModule from '../../src/actions/signTransaction';
-import * as writeContractModule from '../../src/actions/writeContract';
-import { globalWalletActions } from '../../src/walletActions';
-import { address } from '../constants';
+import * as deployContractModule from '../../src/actions/deployContract.js';
+import * as sendTransactionModule from '../../src/actions/sendTransaction.js';
+import * as signTransactionModule from '../../src/actions/signTransaction.js';
+import * as writeContractModule from '../../src/actions/writeContract.js';
+import { globalWalletActions } from '../../src/walletActions.js';
+import { address } from '../constants.js';
 
 // Mock the imported modules
 vi.mock('../../src/actions/sendTransaction');

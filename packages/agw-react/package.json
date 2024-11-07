@@ -1,7 +1,7 @@
 {
   "name": "@abstract-foundation/agw-react",
   "description": "Abstract Global Wallet React Components",
-  "version": "0.0.1-beta.14",
+  "version": "0.0.1",
   "license": "MIT",
   "repository": {
     "type": "git",

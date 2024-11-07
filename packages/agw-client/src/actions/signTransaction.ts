@@ -46,6 +46,7 @@ export async function signTransaction<
   transformHexValues(transaction, [
     'value',
     'nonce',
+    'maxFeePerGas',
     'maxPriorityFeePerGas',
     'gas',
     'value',

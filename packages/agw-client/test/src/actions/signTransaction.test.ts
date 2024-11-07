@@ -62,6 +62,7 @@ const transactionWithBigIntValues = {
   maxPriorityFeePerGas: 3n,
   gas: 4n,
   gasPerPubdata: 5n,
+  maxFeePerGas: 6n,
 };
 
 const transactionWithHexValues = {
@@ -70,6 +71,7 @@ const transactionWithHexValues = {
   maxPriorityFeePerGas: '0x3',
   gas: '0x4',
   gasPerPubdata: '0x5',
+  maxFeePerGas: '0x6',
 };
 
 test('with useSignerAddress false', async () => {

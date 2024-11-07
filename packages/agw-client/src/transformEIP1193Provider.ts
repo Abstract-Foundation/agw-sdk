@@ -32,6 +32,7 @@ import {
   SMART_ACCOUNT_FACTORY_ADDRESS,
   VALIDATOR_ADDRESS,
 } from './constants.js';
+import { isEIP712Transaction } from './eip712.js';
 import {
   getInitializerCalldata,
   getSmartAccountAddressFromInitialSigner,
@@ -178,11 +179,26 @@ export function transformEIP1193Provider(
         if (params[0] === signer) {
           return provider.request(e);
         }
+
+        // if the typed data is already a zkSync EIP712 transaction, don't try to transform it
+        // to an AGW typed signature, just pass it through to the signer.
+        const parsedTypedData = JSON.parse(params[1]);
+        if (
+          parsedTypedData?.message &&
+          parsedTypedData?.domain?.name === 'zkSync' &&
+          isEIP712Transaction(parsedTypedData.message as any)
+        ) {
+          return provider.request({
+            method: 'eth_signTypedData_v4',
+            params: [signer, params[1]],
+          });
+        }
+
         return await getAgwTypedSignature(
           provider,
           params[0],
           signer,
-          hashTypedData(JSON.parse(params[1])),
+          hashTypedData(parsedTypedData),
         );
       }
       case 'personal_sign': {

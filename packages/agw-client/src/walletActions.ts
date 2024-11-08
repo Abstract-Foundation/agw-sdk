@@ -42,7 +42,7 @@ export type AbstractWalletActions<
   >(
     args: SendTransactionBatchParameters<request>,
   ) => Promise<SendTransactionReturnType>;
-  prepareTransactionRequest: <
+  prepareAbstractTransactionRequest: <
     chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
     account extends Account | undefined = Account | undefined,
     accountOverride extends Account | Address | undefined = undefined,
@@ -73,7 +73,7 @@ export function globalWalletActions<
   return (
     client: Client<Transport, ChainEIP712, Account>,
   ): AbstractWalletActions<Chain, Account> => ({
-    prepareTransactionRequest: (args) =>
+    prepareAbstractTransactionRequest: (args) =>
       prepareTransactionRequest(
         client,
         signerClient,

@@ -20,6 +20,7 @@ vi.mock('viem', async () => {
         signTransaction: vi.fn(),
         deployContract: vi.fn(),
         writeContract: vi.fn(),
+        prepareAbstractTransactionRequest: vi.fn(),
       }),
     }),
     createPublicClient: vi.fn(),
@@ -60,7 +61,7 @@ describe('createAbstractClient', () => {
       'signTransaction',
       'deployContract',
       'writeContract',
-      'prepareTransactionRequest',
+      'prepareAbstractTransactionRequest',
     ].forEach((prop) => {
       expect(abstractClient).toHaveProperty(prop);
     });

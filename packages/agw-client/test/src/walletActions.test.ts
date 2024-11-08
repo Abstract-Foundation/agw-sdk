@@ -121,7 +121,7 @@ describe('globalWalletActions', () => {
       value: 100n,
       isInitialTransaction: true,
     };
-    await actions.prepareTransactionRequest(mockArgs as any);
+    await actions.prepareAbstractTransactionRequest(mockArgs as any);
     expect(
       prepareTransactionRequestModule.prepareTransactionRequest,
     ).toHaveBeenCalledWith(

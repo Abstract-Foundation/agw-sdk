@@ -1,6 +1,5 @@
 import {
   Address,
-  createPublicClient,
   decodeAbiParameters,
   type EIP1193EventMap,
   type EIP1193Provider,
@@ -10,7 +9,6 @@ import {
   hashMessage,
   hashTypedData,
   hexToBytes,
-  http,
   keccak256,
   parseAbiParameters,
   serializeErc6492Signature,
@@ -20,7 +18,6 @@ import {
   TypedDataDefinition,
   zeroAddress,
 } from 'viem';
-import { getEip712Domain } from 'viem/actions';
 import { abstractTestnet } from 'viem/chains';
 import { getGeneralPaymasterInput } from 'viem/zksync';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';

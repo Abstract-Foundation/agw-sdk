@@ -188,10 +188,17 @@ export function transformEIP1193Provider(
           parsedTypedData?.domain?.name === 'zkSync' &&
           isEIP712Transaction(parsedTypedData.message as any)
         ) {
-          return provider.request({
+          const rawSignature = await provider.request({
             method: 'eth_signTypedData_v4',
             params: [signer, params[1]],
           });
+          // Match the expect signature format of the AGW smart account so the result can be
+          // directly used in eth_sendRawTransaction as the customSignature field
+          const signature = encodeAbiParameters(
+            parseAbiParameters(['bytes', 'address', 'bytes[]']),
+            [rawSignature, VALIDATOR_ADDRESS, []],
+          );
+          return signature;
         }
 
         return await getAgwTypedSignature(

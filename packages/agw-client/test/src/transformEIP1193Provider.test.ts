@@ -1,6 +1,7 @@
 import {
   Address,
   createPublicClient,
+  decodeAbiParameters,
   type EIP1193EventMap,
   type EIP1193Provider,
   encodeAbiParameters,
@@ -528,7 +529,14 @@ describe('transformEIP1193Provider', () => {
         params: [mockAccounts[0], message],
       });
 
-      expect(result).toBe(mockHexSignature);
+      const [rawSignature, validatorAddress, hookData] = decodeAbiParameters(
+        parseAbiParameters(['bytes', 'address', 'bytes[]']),
+        result,
+      );
+
+      expect(rawSignature).toBe(mockHexSignature);
+      expect(validatorAddress).toBe(VALIDATOR_ADDRESS);
+      expect(hookData).toEqual([]);
     });
 
     it('should pass through eth_signTypedData_v4 to original provider for signer wallet', async () => {

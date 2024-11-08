@@ -244,11 +244,14 @@ export type PrepareTransactionRequestErrorType =
  * })
  */
 export async function prepareTransactionRequest<
-  const request extends PrepareTransactionRequestRequest<chain, chainOverride>,
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
   accountOverride extends Account | Address | undefined = undefined,
   chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  const request extends PrepareTransactionRequestRequest<
+    chain,
+    chainOverride
+  > = PrepareTransactionRequestRequest<chain, chainOverride>,
 >(
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
@@ -260,17 +263,14 @@ export async function prepareTransactionRequest<
     accountOverride,
     request
   >,
-  isInitialTransaction: boolean,
-): Promise<
-  PrepareTransactionRequestReturnType<
-    chain,
-    account,
-    chainOverride,
-    accountOverride,
-    request
-  >
-> {
+  isInitialTransaction?: boolean,
+): Promise<PrepareTransactionRequestReturnType> {
   const { chain, gas, nonce, parameters = defaultParameters } = args;
+  if (isInitialTransaction === undefined) {
+    // TODO Determine if initial transaction and prep as such in here!
+    isInitialTransaction = false;
+  }
+
   const initiatorAccount = parseAccount(
     isInitialTransaction ? signerClient.account : client.account,
   );

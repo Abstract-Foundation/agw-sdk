@@ -124,6 +124,11 @@ export type PrepareTransactionRequestRequest<
      * @default ['blobVersionedHashes', 'chainId', 'fees', 'gas', 'nonce', 'type']
      */
     parameters?: readonly PrepareTransactionRequestParameterType[] | undefined;
+
+    /**
+     * Whether the transaction is the first transaction of the account.
+     */
+    isInitialTransaction?: boolean;
   };
 
 export type PrepareTransactionRequestParameters<
@@ -141,7 +146,9 @@ export type PrepareTransactionRequestParameters<
 > = request &
   GetAccountParameter<account, accountOverride, false> &
   GetChainParameter<chain, chainOverride> &
-  GetTransactionRequestKzgParameter<request> & { chainId?: number | undefined };
+  GetTransactionRequestKzgParameter<request> & {
+    chainId?: number | undefined;
+  };
 
 export type PrepareTransactionRequestReturnType<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
@@ -263,16 +270,17 @@ export async function prepareTransactionRequest<
     accountOverride,
     request
   >,
-  isInitialTransaction?: boolean,
 ): Promise<PrepareTransactionRequestReturnType> {
-  const { chain, gas, nonce, parameters = defaultParameters } = args;
-  if (isInitialTransaction === undefined) {
-    // TODO Determine if initial transaction and prep as such in here!
-    isInitialTransaction = false;
-  }
+  const {
+    isInitialTransaction,
+    chain,
+    gas,
+    nonce,
+    parameters = defaultParameters,
+  } = args;
 
   const initiatorAccount = parseAccount(
-    isInitialTransaction ? signerClient.account : client.account,
+    (isInitialTransaction ?? false) ? signerClient.account : client.account,
   );
   const request = {
     ...args,
@@ -369,6 +377,7 @@ export async function prepareTransactionRequest<
   assertRequest(request as AssertRequestParameters);
 
   delete request.parameters;
+  delete request.isInitialTransaction;
 
   return request as any;
 }

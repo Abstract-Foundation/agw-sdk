@@ -4,8 +4,6 @@ import {
   type Address,
   type Chain,
   type Client,
-  type PrepareTransactionRequestParameters,
-  type PrepareTransactionRequestRequest,
   type PrepareTransactionRequestReturnType,
   type PublicClient,
   type SendTransactionRequest,
@@ -22,7 +20,11 @@ import {
 } from 'viem/zksync';
 
 import { deployContract } from './actions/deployContract.js';
-import { prepareTransactionRequest } from './actions/prepareTransaction.js';
+import {
+  prepareTransactionRequest,
+  type PrepareTransactionRequestParameters,
+  type PrepareTransactionRequestRequest,
+} from './actions/prepareTransaction.js';
 import {
   sendTransaction,
   sendTransactionBatch,

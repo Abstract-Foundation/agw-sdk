@@ -60,6 +60,7 @@ describe('createAbstractClient', () => {
       'signTransaction',
       'deployContract',
       'writeContract',
+      'prepareTransactionRequest',
     ].forEach((prop) => {
       expect(abstractClient).toHaveProperty(prop);
     });

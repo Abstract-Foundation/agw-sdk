@@ -13,6 +13,7 @@ import {
   type Transport,
   zeroAddress,
 } from 'viem';
+import { signTypedData } from 'viem/actions';
 import type { ChainEIP712 } from 'viem/chains';
 
 import AccountFactoryAbi from './abis/AccountFactory.js';
@@ -35,7 +36,7 @@ export async function getAgwTypedSignature(
   const chainId = client.chain.id;
   const account = client.account;
 
-  const rawSignature = await signer.signTypedData({
+  const rawSignature = await signTypedData(signer, {
     domain: {
       name: 'AbstractGlobalWallet',
       version: '1.0.0',

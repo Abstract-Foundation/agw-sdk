@@ -1,4 +1,4 @@
-import { toBytes, zeroAddress } from 'viem';
+import { fromHex, toBytes, TypedDataDefinition, zeroAddress } from 'viem';
 import {
   createClient,
   createWalletClient,
@@ -15,7 +15,7 @@ import { ChainEIP712 } from 'viem/zksync';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import AccountFactoryAbi from '../../../src/abis/AccountFactory.js';
-import { signMessage } from '../../../src/actions/signMessage.js';
+import { signTypedData } from '../../../src/actions/signTypedData.js';
 import {
   SMART_ACCOUNT_FACTORY_ADDRESS,
   VALIDATOR_ADDRESS,
@@ -23,6 +23,7 @@ import {
 import { getInitializerCalldata } from '../../../src/utils.js';
 import { anvilAbstractTestnet } from '../../anvil.js';
 import { address } from '../../constants.js';
+import { exampleTypedData } from '../../fixtures.js';
 
 const RAW_SIGNATURE =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -57,8 +58,62 @@ beforeEach(() => {
   vi.resetAllMocks();
 });
 
-describe('signMessage', async () => {
-  it('should transform personal_sign to typed signature for smart account', async () => {
+describe('signTypedData', async () => {
+  it('should pass through zksync eip712 transaction', async () => {
+    const signedMessage = await signTypedData(baseClient, signerClient, {
+      domain: {
+        name: 'zkSync',
+        version: '2',
+        chainId: 11124,
+      },
+      types: {
+        EIP712Domain: [
+          { name: 'name', type: 'string' },
+          { name: 'version', type: 'string' },
+          { name: 'chainId', type: 'uint256' },
+        ],
+        Transaction: [
+          { name: 'txType', type: 'uint256' },
+          { name: 'from', type: 'uint256' },
+          { name: 'to', type: 'uint256' },
+          { name: 'gasLimit', type: 'uint256' },
+          { name: 'gasPerPubdataByteLimit', type: 'uint256' },
+          { name: 'maxFeePerGas', type: 'uint256' },
+          { name: 'maxPriorityFeePerGas', type: 'uint256' },
+          { name: 'paymaster', type: 'uint256' },
+          { name: 'nonce', type: 'uint256' },
+          { name: 'value', type: 'uint256' },
+          { name: 'data', type: 'bytes' },
+          { name: 'factoryDeps', type: 'bytes32[]' },
+          { name: 'paymasterInput', type: 'bytes' },
+        ],
+      },
+      primaryType: 'Transaction',
+      message: {
+        txType: 113n,
+        from: fromHex('0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199', 'bigint'),
+        to: fromHex('0x742d35Cc6634C0532925a3b844Bc454e4438f44e', 'bigint'),
+        gasLimit: 200824n,
+        gasPerPubdataByteLimit: 50000n,
+        maxFeePerGas: 61775821n,
+        maxPriorityFeePerGas: 0n,
+        paymaster: 479727098668981938005249499649736900492014609297n,
+        nonce: 18n,
+        value: 0n,
+        data: '0x',
+        factoryDeps: [],
+        paymasterInput: '0x',
+      },
+    });
+    expect(signedMessage).toBe(
+      encodeAbiParameters(parseAbiParameters(['bytes', 'address', 'bytes[]']), [
+        RAW_SIGNATURE,
+        VALIDATOR_ADDRESS,
+        [],
+      ]),
+    );
+  });
+  it('should transform typed data to typed signature for smart account', async () => {
     const expectedSignature = serializeErc6492Signature({
       address: SMART_ACCOUNT_FACTORY_ADDRESS,
       signature: encodeAbiParameters(parseAbiParameters(['bytes', 'address']), [
@@ -80,9 +135,11 @@ describe('signMessage', async () => {
       }),
     });
 
-    const signedMessage = await signMessage(baseClient, signerClient, {
-      message: 'Hello world',
-    });
+    const signedMessage = await signTypedData(
+      baseClient,
+      signerClient,
+      exampleTypedData,
+    );
 
     expect(signedMessage).toBe(expectedSignature);
   });

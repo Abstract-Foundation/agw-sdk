@@ -9,6 +9,7 @@ import {
   type WalletClient,
 } from 'viem';
 import type { SignTypedDataParameters } from 'viem/accounts';
+import { signTypedData as viemSignTypedData } from 'viem/actions';
 import type { ChainEIP712 } from 'viem/chains';
 
 import { VALIDATOR_ADDRESS } from '../constants.js';
@@ -27,20 +28,19 @@ export async function signTypedData(
     parameters.domain?.name === 'zkSync' &&
     isEIP712Transaction(parameters.message)
   ) {
-    return await signerClient.signTypedData(parameters);
+    const rawSignature = await viemSignTypedData(signerClient, parameters);
+    // Match the expect signature format of the AGW smart account so the result can be
+    // directly used in eth_sendRawTransaction as the customSignature field
+    const signature = encodeAbiParameters(
+      parseAbiParameters(['bytes', 'address', 'bytes[]']),
+      [rawSignature, VALIDATOR_ADDRESS, []],
+    );
+    return signature;
   }
 
-  const rawSignature = await getAgwTypedSignature({
+  return await getAgwTypedSignature({
     client,
     signer: signerClient,
     messageHash: hashTypedData(parameters),
   });
-
-  // Match the expect signature format of the AGW smart account so the result can be
-  // directly used in eth_sendRawTransaction as the customSignature field
-  const signature = encodeAbiParameters(
-    parseAbiParameters(['bytes', 'address', 'bytes[]']),
-    [rawSignature, VALIDATOR_ADDRESS, []],
-  );
-  return signature;
 }

@@ -67,9 +67,7 @@ export const AbstractWalletProvider = ({
   const queryClient = new QueryClient();
   return (
     <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </WagmiProvider>
   );
 };

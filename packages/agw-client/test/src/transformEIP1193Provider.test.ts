@@ -329,46 +329,22 @@ describe('transformEIP1193Provider', () => {
 
       const mockHexSignature = '0xababcd';
 
-      const expectedSignature = serializeErc6492Signature({
-        address: SMART_ACCOUNT_FACTORY_ADDRESS,
-        signature: encodeAbiParameters(
-          parseAbiParameters(['bytes', 'address']),
-          [mockHexSignature, VALIDATOR_ADDRESS],
-        ),
-        data: encodeFunctionData({
-          abi: AccountFactoryAbi,
-          functionName: 'deployAccount',
-          args: [
-            keccak256(toBytes(mockAccounts[0])),
-            getInitializerCalldata(mockAccounts[0], VALIDATOR_ADDRESS, {
-              target: zeroAddress,
-              allowFailure: false,
-              callData: '0x',
-              value: 0n,
-            }),
-          ],
-        }),
-      });
-
-      const messageHash = hashMessage(mockMessage);
       (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
-      (mockProvider.request as Mock).mockResolvedValueOnce('0x2b74');
-      (mockProvider.request as Mock).mockResolvedValueOnce(mockHexSignature);
+      vi.spyOn(
+        abstractClientModule,
+        'createAbstractClient',
+      ).mockResolvedValueOnce({
+        signMessage: vi.fn().mockResolvedValueOnce(mockHexSignature),
+      } as any);
+
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
 
       const result = await transformedProvider.request({
         method: 'personal_sign',
         params: [toHex(mockMessage), mockSmartAccount as any],
       });
 
-      expect(mockProvider.request).toHaveBeenNthCalledWith(3, {
-        method: 'eth_signTypedData_v4',
-        params: [
-          mockAccounts[0],
-          `{"domain":{"name":"AbstractGlobalWallet","version":"1.0.0","chainId":"11124","verifyingContract":"${mockSmartAccount.toLowerCase()}"},"message":{"signedHash":"${messageHash}"},"primaryType":"ClaveMessage","types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"},{"name":"verifyingContract","type":"address"}],"ClaveMessage":[{"name":"signedHash","type":"bytes32"}]}}`,
-        ],
-      });
-
-      expect(result).toBe(expectedSignature);
+      expect(result).toBe(mockHexSignature);
     });
 
     it('should pass through personal_sign signature to original provider for signer wallet', async () => {

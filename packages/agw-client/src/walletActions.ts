@@ -8,6 +8,10 @@ import {
   type PublicClient,
   type SendTransactionRequest,
   type SendTransactionReturnType,
+  type SignMessageParameters,
+  type SignMessageReturnType,
+  type SignTypedDataParameters,
+  type SignTypedDataReturnType,
   type Transport,
   type WalletClient,
   type WriteContractParameters,
@@ -29,7 +33,9 @@ import {
   sendTransaction,
   sendTransactionBatch,
 } from './actions/sendTransaction.js';
+import { signMessage } from './actions/signMessage.js';
 import { signTransaction } from './actions/signTransaction.js';
+import { signTypedData } from './actions/signTypedData.js';
 import { writeContract } from './actions/writeContract.js';
 import type { SendTransactionBatchParameters } from './types/sendTransactionBatch.js';
 
@@ -37,6 +43,12 @@ export type AbstractWalletActions<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
 > = Eip712WalletActions<chain, account> & {
+  signMessage: (
+    args: Omit<SignMessageParameters, 'account'>,
+  ) => Promise<SignMessageReturnType>;
+  signTypedData: (
+    args: Omit<SignTypedDataParameters, 'account' | 'privateKey'>,
+  ) => Promise<SignTypedDataReturnType>;
   sendTransactionBatch: <
     const request extends SendTransactionRequest<ChainEIP712>,
   >(
@@ -96,12 +108,18 @@ export function globalWalletActions<
         args,
         isPrivyCrossApp,
       ),
+
+    signMessage: (args: Omit<SignMessageParameters, 'account'>) =>
+      signMessage(client, signerClient, args),
     signTransaction: (args) =>
       signTransaction(
         client,
         signerClient,
         args as SignEip712TransactionParameters<chain, account>,
       ),
+    signTypedData: (
+      args: Omit<SignTypedDataParameters, 'account' | 'privateKey'>,
+    ) => signTypedData(client, signerClient, args),
     deployContract: (args) =>
       deployContract(client, signerClient, publicClient, args, isPrivyCrossApp),
     writeContract: (args) =>

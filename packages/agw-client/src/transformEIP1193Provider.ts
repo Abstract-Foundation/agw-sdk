@@ -8,35 +8,13 @@ import {
   type EIP1193Provider,
   type EIP1193RequestFn,
   type EIP1474Methods,
-  encodeAbiParameters,
-  encodeFunctionData,
-  fromHex,
-  type Hash,
-  hashMessage,
-  hashTypedData,
-  type Hex,
-  keccak256,
-  parseAbiParameters,
-  serializeErc6492Signature,
-  serializeTypedData,
-  toBytes,
   toHex,
   type Transport,
-  zeroAddress,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
 
-import AccountFactoryAbi from './abis/AccountFactory.js';
 import { createAbstractClient } from './abstractClient.js';
-import {
-  SMART_ACCOUNT_FACTORY_ADDRESS,
-  VALIDATOR_ADDRESS,
-} from './constants.js';
-import { isEIP712Transaction } from './eip712.js';
-import {
-  getInitializerCalldata,
-  getSmartAccountAddressFromInitialSigner,
-} from './utils.js';
+import { getSmartAccountAddressFromInitialSigner } from './utils.js';
 
 interface TransformEIP1193ProviderOptions {
   provider: EIP1193Provider;
@@ -66,65 +44,32 @@ async function getAgwSigner(
   return accounts?.[0];
 }
 
-async function getAgwTypedSignature(
-  provider: EIP1193Provider,
+async function getAgwClient(
   account: Address,
-  signer: Address,
-  messageHash: Hash,
-): Promise<Hex> {
-  const chainId = await provider.request({ method: 'eth_chainId' });
-
-  const typedData = serializeTypedData({
-    domain: {
-      name: 'AbstractGlobalWallet',
-      version: '1.0.0',
-      chainId: fromHex(chainId, 'bigint'),
-      verifyingContract: account,
-    },
-    types: {
-      EIP712Domain: [
-        { name: 'name', type: 'string' },
-        { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
-      ],
-      ClaveMessage: [{ name: 'signedHash', type: 'bytes32' }],
-    },
-    message: {
-      signedHash: messageHash,
-    },
-    primaryType: 'ClaveMessage',
+  chain: Chain,
+  transport: Transport,
+  isPrivyCrossApp: boolean,
+) {
+  const wallet = createWalletClient({
+    account,
+    transport,
   });
 
-  const rawSignature = await provider.request({
-    method: 'eth_signTypedData_v4',
-    params: [signer, typedData],
+  const signer = toAccount({
+    address: account,
+    signMessage: wallet.signMessage,
+    signTransaction: wallet.signTransaction as CustomSource['signTransaction'],
+    signTypedData: wallet.signTypedData as CustomSource['signTypedData'],
   });
 
-  const signature = encodeAbiParameters(
-    parseAbiParameters(['bytes', 'address']),
-    [rawSignature, VALIDATOR_ADDRESS],
-  );
-
-  const addressBytes = toBytes(signer);
-  const salt = keccak256(addressBytes);
-  return serializeErc6492Signature({
-    address: SMART_ACCOUNT_FACTORY_ADDRESS,
-    data: encodeFunctionData({
-      abi: AccountFactoryAbi,
-      functionName: 'deployAccount',
-      args: [
-        salt,
-        getInitializerCalldata(signer, VALIDATOR_ADDRESS, {
-          target: zeroAddress,
-          allowFailure: false,
-          callData: '0x',
-          value: 0n,
-        }),
-      ],
-    }),
-    signature,
+  const abstractClient = await createAbstractClient({
+    chain,
+    signer,
+    transport,
+    isPrivyCrossApp,
   });
+
+  return abstractClient;
 }
 
 export function transformEIP1193Provider(
@@ -172,58 +117,44 @@ export function transformEIP1193Provider(
         return [smartAccount, signer];
       }
       case 'eth_signTypedData_v4': {
-        const signer = await getAgwSigner(provider);
-        if (!signer) {
+        const account = await getAgwSigner(provider);
+        if (!account) {
           throw new Error('Account not found');
         }
-        if (params[0] === signer) {
+        if (params[0] === account) {
           return provider.request(e);
         }
 
-        // if the typed data is already a zkSync EIP712 transaction, don't try to transform it
-        // to an AGW typed signature, just pass it through to the signer.
-        const parsedTypedData = JSON.parse(params[1]);
-        if (
-          parsedTypedData?.message &&
-          parsedTypedData?.domain?.name === 'zkSync' &&
-          isEIP712Transaction(parsedTypedData.message as any)
-        ) {
-          const rawSignature = await provider.request({
-            method: 'eth_signTypedData_v4',
-            params: [signer, params[1]],
-          });
-          // Match the expect signature format of the AGW smart account so the result can be
-          // directly used in eth_sendRawTransaction as the customSignature field
-          const signature = encodeAbiParameters(
-            parseAbiParameters(['bytes', 'address', 'bytes[]']),
-            [rawSignature, VALIDATOR_ADDRESS, []],
-          );
-          return signature;
-        }
-
-        return await getAgwTypedSignature(
-          provider,
-          params[0],
-          signer,
-          hashTypedData(parsedTypedData),
+        const abstractClient = await getAgwClient(
+          account,
+          chain,
+          transport,
+          isPrivyCrossApp,
         );
+
+        return abstractClient.signTypedData(JSON.parse(params[1]));
       }
       case 'personal_sign': {
-        const signer = await getAgwSigner(provider);
-        if (!signer) {
+        const account = await getAgwSigner(provider);
+        if (!account) {
           throw new Error('Account not found');
         }
-        if (params[1] === signer) {
+        if (params[1] === account) {
           return provider.request(e);
         }
-        return await getAgwTypedSignature(
-          provider,
-          params[1],
-          signer,
-          hashMessage({
-            raw: params[0],
-          }),
+
+        const abstractClient = await getAgwClient(
+          account,
+          chain,
+          transport,
+          isPrivyCrossApp,
         );
+
+        return await abstractClient.signMessage({
+          message: {
+            raw: params[0],
+          },
+        });
       }
       case 'eth_signTransaction':
       case 'eth_sendTransaction': {
@@ -237,25 +168,12 @@ export function transformEIP1193Provider(
           return await provider.request(e);
         }
 
-        const wallet = createWalletClient({
+        const abstractClient = await getAgwClient(
           account,
-          transport,
-        });
-
-        const signer = toAccount({
-          address: account,
-          signMessage: wallet.signMessage,
-          signTransaction:
-            wallet.signTransaction as CustomSource['signTransaction'],
-          signTypedData: wallet.signTypedData as CustomSource['signTypedData'],
-        });
-
-        const abstractClient = await createAbstractClient({
           chain,
-          signer,
           transport,
           isPrivyCrossApp,
-        });
+        );
 
         // Undo the automatic formatting applied by Wagmi's eth_signTransaction
         // Formatter: https://github.com/wevm/viem/blob/main/src/zksync/formatters.ts#L114

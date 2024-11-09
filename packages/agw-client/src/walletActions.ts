@@ -1,8 +1,10 @@
 import {
   type Abi,
   type Account,
+  type Address,
   type Chain,
   type Client,
+  type PrepareTransactionRequestReturnType,
   type PublicClient,
   type SendTransactionRequest,
   type SendTransactionReturnType,
@@ -18,6 +20,11 @@ import {
 } from 'viem/zksync';
 
 import { deployContract } from './actions/deployContract.js';
+import {
+  prepareTransactionRequest,
+  type PrepareTransactionRequestParameters,
+  type PrepareTransactionRequestRequest,
+} from './actions/prepareTransaction.js';
 import {
   sendTransaction,
   sendTransactionBatch,
@@ -35,6 +42,24 @@ export type AbstractWalletActions<
   >(
     args: SendTransactionBatchParameters<request>,
   ) => Promise<SendTransactionReturnType>;
+  prepareAbstractTransactionRequest: <
+    chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+    account extends Account | undefined = Account | undefined,
+    accountOverride extends Account | Address | undefined = undefined,
+    chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+    const request extends PrepareTransactionRequestRequest<
+      chain,
+      chainOverride
+    > = PrepareTransactionRequestRequest<chain, chainOverride>,
+  >(
+    args: PrepareTransactionRequestParameters<
+      chain,
+      account,
+      chainOverride,
+      accountOverride,
+      request
+    >,
+  ) => Promise<PrepareTransactionRequestReturnType>;
 };
 
 export function globalWalletActions<
@@ -48,6 +73,13 @@ export function globalWalletActions<
   return (
     client: Client<Transport, ChainEIP712, Account>,
   ): AbstractWalletActions<Chain, Account> => ({
+    prepareAbstractTransactionRequest: (args) =>
+      prepareTransactionRequest(
+        client,
+        signerClient,
+        publicClient,
+        args as any,
+      ),
     sendTransaction: (args) =>
       sendTransaction(
         client,

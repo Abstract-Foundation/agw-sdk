@@ -124,6 +124,11 @@ export type PrepareTransactionRequestRequest<
      * @default ['blobVersionedHashes', 'chainId', 'fees', 'gas', 'nonce', 'type']
      */
     parameters?: readonly PrepareTransactionRequestParameterType[] | undefined;
+
+    /**
+     * Whether the transaction is the first transaction of the account.
+     */
+    isInitialTransaction?: boolean;
   };
 
 export type PrepareTransactionRequestParameters<
@@ -141,7 +146,9 @@ export type PrepareTransactionRequestParameters<
 > = request &
   GetAccountParameter<account, accountOverride, false> &
   GetChainParameter<chain, chainOverride> &
-  GetTransactionRequestKzgParameter<request> & { chainId?: number | undefined };
+  GetTransactionRequestKzgParameter<request> & {
+    chainId?: number | undefined;
+  };
 
 export type PrepareTransactionRequestReturnType<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
@@ -244,11 +251,14 @@ export type PrepareTransactionRequestErrorType =
  * })
  */
 export async function prepareTransactionRequest<
-  const request extends PrepareTransactionRequestRequest<chain, chainOverride>,
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
   accountOverride extends Account | Address | undefined = undefined,
   chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  const request extends PrepareTransactionRequestRequest<
+    chain,
+    chainOverride
+  > = PrepareTransactionRequestRequest<chain, chainOverride>,
 >(
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
@@ -260,19 +270,17 @@ export async function prepareTransactionRequest<
     accountOverride,
     request
   >,
-  isInitialTransaction: boolean,
-): Promise<
-  PrepareTransactionRequestReturnType<
+): Promise<PrepareTransactionRequestReturnType> {
+  const {
+    isInitialTransaction,
     chain,
-    account,
-    chainOverride,
-    accountOverride,
-    request
-  >
-> {
-  const { chain, gas, nonce, parameters = defaultParameters } = args;
+    gas,
+    nonce,
+    parameters = defaultParameters,
+  } = args;
+
   const initiatorAccount = parseAccount(
-    isInitialTransaction ? signerClient.account : client.account,
+    (isInitialTransaction ?? false) ? signerClient.account : client.account,
   );
   const request = {
     ...args,
@@ -369,6 +377,7 @@ export async function prepareTransactionRequest<
   assertRequest(request as AssertRequestParameters);
 
   delete request.parameters;
+  delete request.isInitialTransaction;
 
   return request as any;
 }

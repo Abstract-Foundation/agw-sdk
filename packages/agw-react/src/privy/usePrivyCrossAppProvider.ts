@@ -11,6 +11,7 @@ import { useCallback, useMemo } from 'react';
 import {
   type Address,
   createPublicClient,
+  custom,
   type EIP1193Provider,
   type EIP1193RequestFn,
   type EIP1474Methods,
@@ -199,7 +200,7 @@ export const usePrivyCrossAppProvider = ({
   const wrappedProvider = transformEIP1193Provider({
     chain,
     provider,
-    transport,
+    transport: custom(provider),
   });
 
   return {

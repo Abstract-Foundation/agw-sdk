@@ -1,11 +1,17 @@
 import {
   type Abi,
   type Account,
+  type Address,
   type Chain,
   type Client,
+  type PrepareTransactionRequestReturnType,
   type PublicClient,
   type SendTransactionRequest,
   type SendTransactionReturnType,
+  type SignMessageParameters,
+  type SignMessageReturnType,
+  type SignTypedDataParameters,
+  type SignTypedDataReturnType,
   type Transport,
   type WalletClient,
   type WriteContractParameters,
@@ -19,10 +25,17 @@ import {
 
 import { deployContract } from './actions/deployContract.js';
 import {
+  prepareTransactionRequest,
+  type PrepareTransactionRequestParameters,
+  type PrepareTransactionRequestRequest,
+} from './actions/prepareTransaction.js';
+import {
   sendTransaction,
   sendTransactionBatch,
 } from './actions/sendTransaction.js';
+import { signMessage } from './actions/signMessage.js';
 import { signTransaction } from './actions/signTransaction.js';
+import { signTypedData } from './actions/signTypedData.js';
 import { writeContract } from './actions/writeContract.js';
 import type { SendTransactionBatchParameters } from './types/sendTransactionBatch.js';
 
@@ -30,11 +43,35 @@ export type AbstractWalletActions<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
 > = Eip712WalletActions<chain, account> & {
+  signMessage: (
+    args: Omit<SignMessageParameters, 'account'>,
+  ) => Promise<SignMessageReturnType>;
+  signTypedData: (
+    args: Omit<SignTypedDataParameters, 'account' | 'privateKey'>,
+  ) => Promise<SignTypedDataReturnType>;
   sendTransactionBatch: <
     const request extends SendTransactionRequest<ChainEIP712>,
   >(
     args: SendTransactionBatchParameters<request>,
   ) => Promise<SendTransactionReturnType>;
+  prepareAbstractTransactionRequest: <
+    chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+    account extends Account | undefined = Account | undefined,
+    accountOverride extends Account | Address | undefined = undefined,
+    chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+    const request extends PrepareTransactionRequestRequest<
+      chain,
+      chainOverride
+    > = PrepareTransactionRequestRequest<chain, chainOverride>,
+  >(
+    args: PrepareTransactionRequestParameters<
+      chain,
+      account,
+      chainOverride,
+      accountOverride,
+      request
+    >,
+  ) => Promise<PrepareTransactionRequestReturnType>;
 };
 
 export function globalWalletActions<
@@ -48,6 +85,13 @@ export function globalWalletActions<
   return (
     client: Client<Transport, ChainEIP712, Account>,
   ): AbstractWalletActions<Chain, Account> => ({
+    prepareAbstractTransactionRequest: (args) =>
+      prepareTransactionRequest(
+        client,
+        signerClient,
+        publicClient,
+        args as any,
+      ),
     sendTransaction: (args) =>
       sendTransaction(
         client,
@@ -64,12 +108,18 @@ export function globalWalletActions<
         args,
         isPrivyCrossApp,
       ),
+
+    signMessage: (args: Omit<SignMessageParameters, 'account'>) =>
+      signMessage(client, signerClient, args),
     signTransaction: (args) =>
       signTransaction(
         client,
         signerClient,
         args as SignEip712TransactionParameters<chain, account>,
       ),
+    signTypedData: (
+      args: Omit<SignTypedDataParameters, 'account' | 'privateKey'>,
+    ) => signTypedData(client, signerClient, args),
     deployContract: (args) =>
       deployContract(client, signerClient, publicClient, args, isPrivyCrossApp),
     writeContract: (args) =>

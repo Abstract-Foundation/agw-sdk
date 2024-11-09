@@ -1,6 +1,6 @@
 import {
   Address,
-  createPublicClient,
+  decodeAbiParameters,
   type EIP1193EventMap,
   type EIP1193Provider,
   encodeAbiParameters,
@@ -9,7 +9,6 @@ import {
   hashMessage,
   hashTypedData,
   hexToBytes,
-  http,
   keccak256,
   parseAbiParameters,
   serializeErc6492Signature,
@@ -19,7 +18,6 @@ import {
   TypedDataDefinition,
   zeroAddress,
 } from 'viem';
-import { getEip712Domain } from 'viem/actions';
 import { abstractTestnet } from 'viem/chains';
 import { getGeneralPaymasterInput } from 'viem/zksync';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
@@ -33,48 +31,11 @@ import {
 import { transformEIP1193Provider } from '../../src/transformEIP1193Provider.js';
 import * as utilsModule from '../../src/utils.js';
 import { getInitializerCalldata } from '../../src/utils.js';
+import { exampleTypedData } from '../fixtures.js';
 
 const listeners: Partial<{
   [K in keyof EIP1193EventMap]: Set<EIP1193EventMap[K]>;
 }> = {};
-
-const exampleTypedData: TypedDataDefinition = {
-  domain: {
-    name: 'Ether Mail',
-    version: '1',
-    chainId: 11124,
-    verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-  },
-  primaryType: 'Mail',
-  types: {
-    EIP712Domain: [
-      { name: 'name', type: 'string' },
-      { name: 'version', type: 'string' },
-      { name: 'chainId', type: 'uint256' },
-      { name: 'verifyingContract', type: 'address' },
-    ],
-    Mail: [
-      { name: 'from', type: 'Person' },
-      { name: 'to', type: 'Person' },
-      { name: 'contents', type: 'string' },
-    ],
-    Person: [
-      { name: 'name', type: 'string' },
-      { name: 'wallet', type: 'address' },
-    ],
-  },
-  message: {
-    contents: 'Hello Bob',
-    from: {
-      name: 'Alice',
-      wallet: '0x0000000000000000000000000000000000001234',
-    },
-    to: {
-      name: 'Bob',
-      wallet: '0x0000000000000000000000000000000000005678',
-    },
-  },
-};
 
 const mockProvider: EIP1193Provider & { randomParam: string } = {
   request: vi.fn(),
@@ -331,46 +292,22 @@ describe('transformEIP1193Provider', () => {
 
       const mockHexSignature = '0xababcd';
 
-      const expectedSignature = serializeErc6492Signature({
-        address: SMART_ACCOUNT_FACTORY_ADDRESS,
-        signature: encodeAbiParameters(
-          parseAbiParameters(['bytes', 'address']),
-          [mockHexSignature, VALIDATOR_ADDRESS],
-        ),
-        data: encodeFunctionData({
-          abi: AccountFactoryAbi,
-          functionName: 'deployAccount',
-          args: [
-            keccak256(toBytes(mockAccounts[0])),
-            getInitializerCalldata(mockAccounts[0], VALIDATOR_ADDRESS, {
-              target: zeroAddress,
-              allowFailure: false,
-              callData: '0x',
-              value: 0n,
-            }),
-          ],
-        }),
-      });
-
-      const messageHash = hashMessage(mockMessage);
       (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
-      (mockProvider.request as Mock).mockResolvedValueOnce('0x2b74');
-      (mockProvider.request as Mock).mockResolvedValueOnce(mockHexSignature);
+      vi.spyOn(
+        abstractClientModule,
+        'createAbstractClient',
+      ).mockResolvedValueOnce({
+        signMessage: vi.fn().mockResolvedValueOnce(mockHexSignature),
+      } as any);
+
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
 
       const result = await transformedProvider.request({
         method: 'personal_sign',
         params: [toHex(mockMessage), mockSmartAccount as any],
       });
 
-      expect(mockProvider.request).toHaveBeenNthCalledWith(3, {
-        method: 'eth_signTypedData_v4',
-        params: [
-          mockAccounts[0],
-          `{"domain":{"name":"AbstractGlobalWallet","version":"1.0.0","chainId":"11124","verifyingContract":"${mockSmartAccount.toLowerCase()}"},"message":{"signedHash":"${messageHash}"},"primaryType":"ClaveMessage","types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"},{"name":"verifyingContract","type":"address"}],"ClaveMessage":[{"name":"signedHash","type":"bytes32"}]}}`,
-        ],
-      });
-
-      expect(result).toBe(expectedSignature);
+      expect(result).toBe(mockHexSignature);
     });
 
     it('should pass through personal_sign signature to original provider for signer wallet', async () => {
@@ -419,113 +356,19 @@ describe('transformEIP1193Provider', () => {
 
       const mockHexSignature = '0xababcd';
 
-      const expectedSignature = serializeErc6492Signature({
-        address: SMART_ACCOUNT_FACTORY_ADDRESS,
-        signature: encodeAbiParameters(
-          parseAbiParameters(['bytes', 'address']),
-          [mockHexSignature, VALIDATOR_ADDRESS],
-        ),
-        data: encodeFunctionData({
-          abi: AccountFactoryAbi,
-          functionName: 'deployAccount',
-          args: [
-            keccak256(toBytes(mockAccounts[0])),
-            getInitializerCalldata(mockAccounts[0], VALIDATOR_ADDRESS, {
-              target: zeroAddress,
-              allowFailure: false,
-              callData: '0x',
-              value: 0n,
-            }),
-          ],
-        }),
-      });
-
-      const messageHash = hashTypedData(JSON.parse(mockMessage));
       (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
-      (mockProvider.request as Mock).mockResolvedValueOnce('0x2b74');
-      (mockProvider.request as Mock).mockResolvedValueOnce(mockHexSignature);
+      vi.spyOn(
+        abstractClientModule,
+        'createAbstractClient',
+      ).mockResolvedValueOnce({
+        signTypedData: vi.fn().mockResolvedValueOnce(mockHexSignature),
+      } as any);
+
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
 
       const result = await transformedProvider.request({
         method: 'eth_signTypedData_v4',
         params: [mockSmartAccount as any, mockMessage],
-      });
-
-      expect(mockProvider.request).toHaveBeenNthCalledWith(3, {
-        method: 'eth_signTypedData_v4',
-        params: [
-          mockAccounts[0],
-          `{"domain":{"name":"AbstractGlobalWallet","version":"1.0.0","chainId":"11124","verifyingContract":"${mockSmartAccount.toLowerCase()}"},"message":{"signedHash":"${messageHash}"},"primaryType":"ClaveMessage","types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"},{"name":"verifyingContract","type":"address"}],"ClaveMessage":[{"name":"signedHash","type":"bytes32"}]}}`,
-        ],
-      });
-
-      expect(result).toBe(expectedSignature);
-    });
-
-    it('should pass through zkSync EIP712 transactions to original provider', async () => {
-      const mockAccounts: Address[] = [
-        '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-      ];
-      const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
-
-      const message = serializeTypedData({
-        domain: {
-          name: 'zkSync',
-          version: '2',
-          chainId: 11124n,
-        },
-        types: {
-          EIP712Domain: [
-            { name: 'name', type: 'string' },
-            { name: 'version', type: 'string' },
-            { name: 'chainId', type: 'uint256' },
-          ],
-          Transaction: [
-            { name: 'txType', type: 'uint256' },
-            { name: 'from', type: 'uint256' },
-            { name: 'to', type: 'uint256' },
-            { name: 'gasLimit', type: 'uint256' },
-            { name: 'gasPerPubdataByteLimit', type: 'uint256' },
-            { name: 'maxFeePerGas', type: 'uint256' },
-            { name: 'maxPriorityFeePerGas', type: 'uint256' },
-            { name: 'paymaster', type: 'uint256' },
-            { name: 'nonce', type: 'uint256' },
-            { name: 'value', type: 'uint256' },
-            { name: 'data', type: 'bytes' },
-            { name: 'factoryDeps', type: 'bytes32[]' },
-            { name: 'paymasterInput', type: 'bytes' },
-          ],
-        },
-        primaryType: 'Transaction',
-        message: {
-          txType: 113n,
-          from: fromHex('0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199', 'bigint'),
-          to: fromHex('0x742d35Cc6634C0532925a3b844Bc454e4438f44e', 'bigint'),
-          gasLimit: 200824n,
-          gasPerPubdataByteLimit: 50000n,
-          maxFeePerGas: 61775821n,
-          maxPriorityFeePerGas: 0n,
-          paymaster: 479727098668981938005249499649736900492014609297n,
-          nonce: 18n,
-          value: 0n,
-          data: '0x',
-          factoryDeps: [],
-          paymasterInput: '0x',
-        },
-      });
-
-      const mockHexSignature = '0xababcd';
-
-      (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
-      (mockProvider.request as Mock).mockResolvedValueOnce(mockHexSignature);
-
-      const result = await transformedProvider.request({
-        method: 'eth_signTypedData_v4',
-        params: [mockSmartAccount as any, message],
-      });
-
-      expect(mockProvider.request).toHaveBeenNthCalledWith(2, {
-        method: 'eth_signTypedData_v4',
-        params: [mockAccounts[0], message],
       });
 
       expect(result).toBe(mockHexSignature);

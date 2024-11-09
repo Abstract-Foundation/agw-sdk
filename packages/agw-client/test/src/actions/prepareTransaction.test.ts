@@ -90,8 +90,8 @@ test('minimum', async () => {
     {
       ...transaction,
       chain: anvilAbstractTestnet.chain,
+      isInitialTransaction: false,
     },
-    false,
   );
   expect(request).toEqual({
     ...transaction,
@@ -113,8 +113,8 @@ test('is initial transaction', async () => {
     {
       ...transaction,
       chain: anvilAbstractTestnet.chain,
+      isInitialTransaction: true,
     },
-    true,
   );
   expect(request).toEqual({
     ...transaction,
@@ -138,8 +138,8 @@ test('with fees', async () => {
       maxFeePerGas: 10000n,
       maxPriorityFeePerGas: 0n,
       chain: anvilAbstractTestnet.chain,
+      isInitialTransaction: false,
     },
-    false,
   );
   expect(request).toEqual({
     ...transaction,
@@ -162,8 +162,8 @@ test('to contract deployer', async () => {
       ...transaction,
       to: CONTRACT_DEPLOYER_ADDRESS,
       chain: anvilAbstractTestnet.chain,
+      isInitialTransaction: false,
     },
-    false,
   );
   expect(request).toEqual({
     ...transaction,
@@ -187,7 +187,6 @@ test('with chainId but not chain', async () => {
       chainId: anvilAbstractTestnet.chain.id,
       ...transaction,
     } as any,
-    false,
   );
   expect(request).toEqual({
     ...transaction,
@@ -206,7 +205,6 @@ test('with no chainId or chain', async () => {
     signerClient,
     publicClient,
     transaction as any,
-    false,
   );
   expect(request).toEqual({
     ...transaction,
@@ -238,16 +236,10 @@ test('throws if maxFeePerGas is too low', async () => {
   }) as EIP1193RequestFn;
 
   await expect(
-    prepareTransactionRequest(
-      baseClient,
-      signerClient,
-      publicClientModified,
-      {
-        ...transaction,
-        chain: anvilAbstractTestnet.chain,
-        maxFeePerGas: 10000n,
-      },
-      false,
-    ),
+    prepareTransactionRequest(baseClient, signerClient, publicClientModified, {
+      ...transaction,
+      chain: anvilAbstractTestnet.chain,
+      maxFeePerGas: 10000n,
+    }),
   ).rejects.toThrow(MaxFeePerGasTooLowError);
 });

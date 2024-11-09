@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import * as deployContractModule from '../../src/actions/deployContract.js';
+import * as prepareTransactionRequestModule from '../../src/actions/prepareTransaction.js';
 import * as sendTransactionModule from '../../src/actions/sendTransaction.js';
 import * as signTransactionModule from '../../src/actions/signTransaction.js';
 import * as writeContractModule from '../../src/actions/writeContract.js';
@@ -12,6 +13,7 @@ vi.mock('../../src/actions/sendTransaction');
 vi.mock('../../src/actions/signTransaction');
 vi.mock('../../src/actions/deployContract');
 vi.mock('../../src/actions/writeContract');
+vi.mock('../../src/actions/prepareTransaction');
 
 describe('globalWalletActions', () => {
   const mockSignerClient = {
@@ -107,6 +109,23 @@ describe('globalWalletActions', () => {
       expect.objectContaining({
         sendTransaction: expect.any(Function),
       }),
+      mockSignerClient,
+      mockPublicClient,
+      mockArgs,
+    );
+  });
+
+  it('should call prepareTransaction with correct arguments', async () => {
+    const mockArgs = {
+      to: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+      value: 100n,
+      isInitialTransaction: true,
+    };
+    await actions.prepareAbstractTransactionRequest(mockArgs as any);
+    expect(
+      prepareTransactionRequestModule.prepareTransactionRequest,
+    ).toHaveBeenCalledWith(
+      mockClient,
       mockSignerClient,
       mockPublicClient,
       mockArgs,

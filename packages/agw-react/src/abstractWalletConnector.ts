@@ -82,7 +82,7 @@ function abstractWalletConnector(
       ...connector,
       ...rkDetails,
       getProvider: getAbstractProvider,
-      type: 'abstract',
+      type: 'injected',
       id: 'xyz.abs.privy',
     };
     return abstractConnector;

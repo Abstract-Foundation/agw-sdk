@@ -1,7 +1,10 @@
 import {
   type Account,
   type Client,
+  type Hex,
   type SendTransactionRequest,
+  type SignMessageParameters,
+  type SignTypedDataParameters,
   toHex,
   type Transport,
 } from 'viem';
@@ -35,6 +38,36 @@ export async function sendPrivyTransaction<
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any,
     { retryCount: 0 },
-  )) as any;
+  )) as SignEip712TransactionReturnType;
+  return result;
+}
+
+export async function sendPrivySignMessage(
+  client: Client<Transport, ChainEIP712, Account>,
+  parameters: Omit<SignMessageParameters, 'account'>,
+): Promise<Hex> {
+  const result = (await client.request(
+    {
+      method: 'privy_signSmartWalletMessage',
+      params: [parameters.message],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any,
+    { retryCount: 0 },
+  )) as Hex;
+  return result;
+}
+
+export async function sendPrivySignTypedData(
+  client: Client<Transport, ChainEIP712, Account>,
+  parameters: Omit<SignTypedDataParameters, 'account' | 'privateKey'>,
+): Promise<Hex> {
+  const result = (await client.request(
+    {
+      method: 'privy_signSmartWalletTypedData',
+      params: [client.account.address, parameters],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any,
+    { retryCount: 0 },
+  )) as Hex;
   return result;
 }

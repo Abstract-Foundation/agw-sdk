@@ -15,12 +15,16 @@ import type { ChainEIP712 } from 'viem/chains';
 import { VALIDATOR_ADDRESS } from '../constants.js';
 import { isEIP712Transaction } from '../eip712.js';
 import { getAgwTypedSignature } from '../getAgwTypedSignature.js';
+import { sendPrivySignTypedData } from './sendPrivyTransaction.js';
 
 export async function signTypedData(
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   parameters: Omit<SignTypedDataParameters, 'account' | 'privateKey'>,
+  isPrivyCrossApp = false,
 ): Promise<Hex> {
+  if (isPrivyCrossApp) return await sendPrivySignTypedData(client, parameters);
+
   // if the typed data is already a zkSync EIP712 transaction, don't try to transform it
   // to an AGW typed signature, just pass it through to the signer.
   if (

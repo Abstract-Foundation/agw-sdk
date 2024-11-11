@@ -110,7 +110,7 @@ export function globalWalletActions<
       ),
 
     signMessage: (args: Omit<SignMessageParameters, 'account'>) =>
-      signMessage(client, signerClient, args),
+      signMessage(client, signerClient, args, isPrivyCrossApp),
     signTransaction: (args) =>
       signTransaction(
         client,
@@ -119,7 +119,7 @@ export function globalWalletActions<
       ),
     signTypedData: (
       args: Omit<SignTypedDataParameters, 'account' | 'privateKey'>,
-    ) => signTypedData(client, signerClient, args),
+    ) => signTypedData(client, signerClient, args, isPrivyCrossApp),
     deployContract: (args) =>
       deployContract(client, signerClient, publicClient, args, isPrivyCrossApp),
     writeContract: (args) =>

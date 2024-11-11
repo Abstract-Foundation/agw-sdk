@@ -27,18 +27,20 @@ import { address } from '../../constants.js';
 const RAW_SIGNATURE =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
+const baseClientRequestSpy = vi.fn(async ({ method, params }) => {
+  if (method === 'privy_signSmartWalletMessage') {
+    return RAW_SIGNATURE;
+  }
+  return anvilAbstractTestnet.getClient().request({ method, params } as any);
+});
+
 const baseClient = createClient({
   account: address.smartAccountAddress,
   chain: anvilAbstractTestnet.chain as ChainEIP712,
   transport: anvilAbstractTestnet.clientConfig.transport,
 });
 
-baseClient.request = (async ({ method, params }) => {
-  if (method === 'eth_chainId') {
-    return anvilAbstractTestnet.chain.id;
-  }
-  return anvilAbstractTestnet.getClient().request({ method, params } as any);
-}) as EIP1193RequestFn;
+baseClient.request = baseClientRequestSpy as unknown as EIP1193RequestFn;
 
 const signerClient = createWalletClient({
   account: toAccount(address.signerAddress),
@@ -52,10 +54,6 @@ signerClient.request = (async ({ method, params }) => {
   }
   return anvilAbstractTestnet.getClient().request({ method, params } as any);
 }) as EIP1193RequestFn;
-
-beforeEach(() => {
-  vi.resetAllMocks();
-});
 
 describe('signMessage', async () => {
   it('should transform personal_sign to typed signature for smart account', async () => {
@@ -85,5 +83,26 @@ describe('signMessage', async () => {
     });
 
     expect(signedMessage).toBe(expectedSignature);
+  });
+
+  it('should pass through to privy if privyCrossApp is true', async () => {
+    const signedMessage = await signMessage(
+      baseClient,
+      signerClient,
+      {
+        message: 'Hello world',
+      },
+      true,
+    );
+
+    expect(signedMessage).toBe(RAW_SIGNATURE);
+
+    expect(baseClientRequestSpy).toHaveBeenCalledWith(
+      {
+        method: 'privy_signSmartWalletMessage',
+        params: ['Hello world'],
+      },
+      { retryCount: 0 },
+    );
   });
 });

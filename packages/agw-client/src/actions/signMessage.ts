@@ -22,7 +22,9 @@ export async function signMessage(
   if (typeof parameters.message === 'object')
     parameters.message = parameters.message.raw.toString();
 
-  if (isPrivyCrossApp) return await sendPrivySignMessage(client, parameters);
+  if (isPrivyCrossApp) {
+    return await sendPrivySignMessage(client, parameters);
+  }
 
   return await getAgwTypedSignature({
     client,

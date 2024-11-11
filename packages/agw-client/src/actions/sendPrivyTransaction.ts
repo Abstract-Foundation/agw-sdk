@@ -38,7 +38,7 @@ export async function sendPrivyTransaction<
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any,
     { retryCount: 0 },
-  )) as any;
+  )) as SignEip712TransactionReturnType;
   return result;
 }
 
@@ -53,7 +53,7 @@ export async function sendPrivySignMessage(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any,
     { retryCount: 0 },
-  )) as any;
+  )) as Hex;
   return result;
 }
 
@@ -68,6 +68,6 @@ export async function sendPrivySignTypedData(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any,
     { retryCount: 0 },
-  )) as any;
+  )) as Hex;
   return result;
 }

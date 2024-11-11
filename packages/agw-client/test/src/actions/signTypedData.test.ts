@@ -1,4 +1,4 @@
-import { fromHex, toBytes, TypedDataDefinition, zeroAddress } from 'viem';
+import { fromHex, toBytes, zeroAddress } from 'viem';
 import {
   createClient,
   createWalletClient,
@@ -12,7 +12,7 @@ import {
 } from 'viem';
 import { toAccount } from 'viem/accounts';
 import { ChainEIP712 } from 'viem/zksync';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import AccountFactoryAbi from '../../../src/abis/AccountFactory.js';
 import { signTypedData } from '../../../src/actions/signTypedData.js';
@@ -28,18 +28,20 @@ import { exampleTypedData } from '../../fixtures.js';
 const RAW_SIGNATURE =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
+const baseClientRequestSpy = vi.fn(async ({ method, params }) => {
+  if (method === 'privy_signSmartWalletTypedData') {
+    return RAW_SIGNATURE;
+  }
+  return anvilAbstractTestnet.getClient().request({ method, params } as any);
+});
+
 const baseClient = createClient({
   account: address.smartAccountAddress,
   chain: anvilAbstractTestnet.chain as ChainEIP712,
   transport: anvilAbstractTestnet.clientConfig.transport,
 });
 
-baseClient.request = (async ({ method, params }) => {
-  if (method === 'eth_chainId') {
-    return anvilAbstractTestnet.chain.id;
-  }
-  return anvilAbstractTestnet.getClient().request({ method, params } as any);
-}) as EIP1193RequestFn;
+baseClient.request = baseClientRequestSpy as unknown as EIP1193RequestFn;
 
 const signerClient = createWalletClient({
   account: toAccount(address.signerAddress),
@@ -53,10 +55,6 @@ signerClient.request = (async ({ method, params }) => {
   }
   return anvilAbstractTestnet.getClient().request({ method, params } as any);
 }) as EIP1193RequestFn;
-
-beforeEach(() => {
-  vi.resetAllMocks();
-});
 
 describe('signTypedData', async () => {
   it('should pass through zksync eip712 transaction', async () => {
@@ -142,5 +140,23 @@ describe('signTypedData', async () => {
     );
 
     expect(signedMessage).toBe(expectedSignature);
+  });
+  it('should pass through privy cross app', async () => {
+    const signedMessage = await signTypedData(
+      baseClient,
+      signerClient,
+      exampleTypedData,
+      true,
+    );
+
+    expect(signedMessage).toBe(RAW_SIGNATURE);
+
+    expect(baseClientRequestSpy).toHaveBeenCalledWith(
+      {
+        method: 'privy_signSmartWalletTypedData',
+        params: [address.smartAccountAddress, exampleTypedData],
+      },
+      { retryCount: 0 },
+    );
   });
 });

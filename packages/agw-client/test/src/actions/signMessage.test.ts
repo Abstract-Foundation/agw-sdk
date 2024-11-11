@@ -12,7 +12,7 @@ import {
 } from 'viem';
 import { toAccount } from 'viem/accounts';
 import { ChainEIP712 } from 'viem/zksync';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import AccountFactoryAbi from '../../../src/abis/AccountFactory.js';
 import { signMessage } from '../../../src/actions/signMessage.js';

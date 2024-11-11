@@ -89,8 +89,8 @@ importers:
         specifier: workspace:*
         version: link:../agw-client
       '@privy-io/cross-app-connect':
-        specifier: 0.0.8-beta-20241111164156
-        version: 0.0.8-beta-20241111164156(exrm5rvwyxsv5ods2xefnc55be)
+        specifier: ^0.0.8
+        version: 0.0.8(exrm5rvwyxsv5ods2xefnc55be)
       '@privy-io/react-auth':
         specifier: ^1.92.2
         version: 1.92.2(@solana/web3.js@1.95.3(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10))(@types/react@18.3.9)(bs58@5.0.0)(bufferutil@4.0.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8)
@@ -1500,8 +1500,8 @@ packages:
     resolution: {integrity: sha512-DjfECWu/YhI5WGnUtdzvQnnj7JVCtSh+hbgIX0zjybvjKGt7mI41cUSvHhgr613so7tupbklJeUSXqIsIt66tw==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
 
-  '@privy-io/cross-app-connect@0.0.8-beta-20241111164156':
-    resolution: {integrity: sha512-HBmcqWd/BuCUx/DpDNQu+Tz2kQDI4wcfasKt+KDTDuDhvN5sFVAW1jweOqWoVPZGKBoH22BcD/1m5Sm70QHW4w==}
+  '@privy-io/cross-app-connect@0.0.8':
+    resolution: {integrity: sha512-47pHtMvIucAOey6daVJtduyDJzta9vZK/EdOTFOjpQ6ctN7HMtNHwi4iOQl8U7CWoAjxzzyzvWGJx/1Q31WQrQ==}
     peerDependencies:
       '@rainbow-me/rainbowkit': ^2.1.5
       '@wagmi/core': ^2.13.4
@@ -7670,7 +7670,7 @@ snapshots:
     dependencies:
       zod: 3.23.8
 
-  '@privy-io/cross-app-connect@0.0.8-beta-20241111164156(exrm5rvwyxsv5ods2xefnc55be)':
+  '@privy-io/cross-app-connect@0.0.8(exrm5rvwyxsv5ods2xefnc55be)':
     dependencies:
       '@noble/curves': 1.6.0
       '@noble/hashes': 1.3.2

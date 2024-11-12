@@ -1,0 +1,57 @@
+{
+  "name": "@abstract-foundation/web3-react-agw",
+  "description": "Abstract Global Wallet for web3-react",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "pnpm run clean && pnpm run build:esm+types && pnpm run build:cjs",
+    "build:esm+types": "tsc --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types && printf '{\"type\":\"module\"}' > ./dist/esm/package.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json && printf '{\"type\":\"commonjs\"}' > ./dist/cjs/package.json",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "debug": "tsc-watch --sourceMap true --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types"
+  },
+  "keywords": [
+    "eth",
+    "ethereum",
+    "smart-account",
+    "abstract",
+    "account-abstraction",
+    "global-wallet",
+    "wallet",
+    "web3",
+    "web3-react"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abstract-foundation/agw-sdk.git",
+    "directory": "packages/web3-react-agw"
+  },
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "typings": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "package.json"
+  ],
+  "dependencies": {
+    "@abstract-foundation/agw-client": "0.0.1-beta.18",
+    "@privy-io/cross-app-connect": "0.1.0-beta-20241111213347",
+    "@web3-react/types": "^8.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.5",
+    "@web3-react/core": "^8.2.3",
+    "@web3-react/store": "^8.2.3",
+    "viem": "^2.21.26"
+  }
+}

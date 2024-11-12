@@ -122,10 +122,10 @@ importers:
   packages/web3-react-agw:
     dependencies:
       '@abstract-foundation/agw-client':
-        specifier: 0.0.1-beta.18
-        version: 0.0.1-beta.18(abitype@1.0.6(typescript@5.6.2)(zod@3.23.8))(typescript@5.6.2)(viem@2.21.32(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8))
+        specifier: workspace:^
+        version: link:../agw-client
       '@privy-io/cross-app-connect':
-        specifier: 0.1.0-beta-20241111213347
+        specifier: ^0.1.0-beta-20241111213347
         version: 0.1.0-beta-20241111213347(exrm5rvwyxsv5ods2xefnc55be)
       '@web3-react/types':
         specifier: ^8.2.3
@@ -145,16 +145,6 @@ importers:
         version: 2.21.32(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8)
 
 packages:
-
-  '@abstract-foundation/agw-client@0.0.1-beta.18':
-    resolution: {integrity: sha512-K49TW/ST0T+qQ1/7nIDk+VT2GrH1yXphOdcaS1q9qHhIw9xVegtwktkbE7vM/CA2aHZq6mvIg8nQwKwdyqjAUQ==}
-    peerDependencies:
-      abitype: ^1.0.0
-      typescript: '>=5.0.4'
-      viem: ^2.21.26
-    peerDependenciesMeta:
-      typescript:
-        optional: true
 
   '@adraffy/ens-normalize@1.11.0':
     resolution: {integrity: sha512-/3DDPKHqqIqxUULp8yP4zODUY1i+2xvVWsv8A79xGWdCAG+8sb0hRh0Rk2QyOJUnnbyPUAZYcpBuRe3nS2OIUg==}
@@ -5915,13 +5905,6 @@ packages:
         optional: true
 
 snapshots:
-
-  '@abstract-foundation/agw-client@0.0.1-beta.18(abitype@1.0.6(typescript@5.6.2)(zod@3.23.8))(typescript@5.6.2)(viem@2.21.32(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8))':
-    dependencies:
-      abitype: 1.0.6(typescript@5.6.2)(zod@3.23.8)
-      viem: 2.21.32(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8)
-    optionalDependencies:
-      typescript: 5.6.2
 
   '@adraffy/ens-normalize@1.11.0': {}
 

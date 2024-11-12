@@ -1,6 +1,8 @@
 import {
   type Account,
+  bytesToString,
   type Client,
+  fromHex,
   hashMessage,
   type Hex,
   type SignMessageParameters,
@@ -18,11 +20,15 @@ export async function signMessage(
   parameters: Omit<SignMessageParameters, 'account'>,
   isPrivyCrossApp = false,
 ): Promise<Hex> {
-  // We handle {message: {raw}} here because the message is expected to be a string
-  if (typeof parameters.message === 'object')
-    parameters.message = parameters.message.raw.toString();
-
   if (isPrivyCrossApp) {
+    // We handle {message: {raw}} here because the message is expected to be a string
+    if (typeof parameters.message === 'object') {
+      if (parameters.message.raw instanceof Uint8Array) {
+        parameters.message = bytesToString(parameters.message.raw);
+      } else {
+        parameters.message = fromHex(parameters.message.raw, 'string');
+      }
+    }
     return await sendPrivySignMessage(client, parameters);
   }
 

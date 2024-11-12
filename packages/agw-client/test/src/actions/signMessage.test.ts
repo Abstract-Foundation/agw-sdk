@@ -1,4 +1,4 @@
-import { toBytes, zeroAddress } from 'viem';
+import { toBytes, toHex, zeroAddress } from 'viem';
 import {
   createClient,
   createWalletClient,
@@ -97,7 +97,53 @@ describe('signMessage', async () => {
 
     expect(signedMessage).toBe(RAW_SIGNATURE);
 
-    expect(baseClientRequestSpy).toHaveBeenCalledWith(
+    expect(baseClientRequestSpy).toHaveBeenLastCalledWith(
+      {
+        method: 'privy_signSmartWalletMessage',
+        params: ['Hello world'],
+      },
+      { retryCount: 0 },
+    );
+  });
+
+  it('should pass raw message to privy as string if privyCrossApp is true', async () => {
+    const signedMessage = await signMessage(
+      baseClient,
+      signerClient,
+      {
+        message: {
+          raw: new Uint8Array([
+            72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100,
+          ]),
+        },
+      },
+      true,
+    );
+
+    expect(signedMessage).toBe(RAW_SIGNATURE);
+
+    expect(baseClientRequestSpy).toHaveBeenLastCalledWith(
+      {
+        method: 'privy_signSmartWalletMessage',
+        params: ['Hello world'],
+      },
+      { retryCount: 0 },
+    );
+  });
+
+  it('should pass raw message to privy as hex string if privyCrossApp is true', async () => {
+    const signedMessage = await signMessage(
+      baseClient,
+      signerClient,
+      {
+        message: { raw: toHex('Hello world') },
+      },
+      true,
+    );
+
+    expect(signedMessage).toBe(RAW_SIGNATURE);
+
+    expect(baseClientRequestSpy).toHaveBeenLastCalledWith(
       {
         method: 'privy_signSmartWalletMessage',
         params: ['Hello world'],

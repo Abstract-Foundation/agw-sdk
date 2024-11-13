@@ -64,8 +64,8 @@ export async function sendTransactionInternal<
       {
         ...parameters,
         parameters: ['gas', 'nonce', 'fees'],
+        isInitialTransaction,
       } as any,
-      isInitialTransaction,
     );
 
     let chainId: number | undefined;

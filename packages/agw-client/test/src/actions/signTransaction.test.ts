@@ -56,6 +56,24 @@ const transaction: ZksyncTransactionRequestEIP712 = {
   paymasterInput: '0x',
 };
 
+const transactionWithBigIntValues = {
+  value: 1n,
+  nonce: 2n,
+  maxPriorityFeePerGas: 3n,
+  gas: 4n,
+  gasPerPubdata: 5n,
+  maxFeePerGas: 6n,
+};
+
+const transactionWithHexValues = {
+  value: '0x1',
+  nonce: '0x2',
+  maxPriorityFeePerGas: '0x3',
+  gas: '0x4',
+  gasPerPubdata: '0x5',
+  maxFeePerGas: '0x6',
+};
+
 test('with useSignerAddress false', async () => {
   const signature = encodeAbiParameters(
     parseAbiParameters(['bytes', 'address', 'bytes[]']),
@@ -115,6 +133,36 @@ test('with useSignerAddress true', async () => {
     true,
   );
   expect(signedTransaction).toBe(expectedSignedTransaction);
+});
+
+test('handles hex values', async () => {
+  const signedTransactionWithHexValues = await signTransaction(
+    baseClient,
+    signerClient,
+    {
+      ...transactionWithHexValues,
+      type: 'eip712',
+      account: baseClient.account,
+      chain: anvilAbstractTestnet.chain as ChainEIP712,
+    } as any,
+    false,
+  );
+
+  const signedTransactionWithBigIntValues = await signTransaction(
+    baseClient,
+    signerClient,
+    {
+      ...transactionWithBigIntValues,
+      type: 'eip712',
+      account: baseClient.account,
+      chain: anvilAbstractTestnet.chain as ChainEIP712,
+    } as any,
+    false,
+  );
+
+  expect(signedTransactionWithHexValues).toBe(
+    signedTransactionWithBigIntValues,
+  );
 });
 
 test('invalid chain', async () => {

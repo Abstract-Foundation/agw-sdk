@@ -22,6 +22,7 @@ import {
   type AssertEip712RequestParameters,
 } from '../eip712.js';
 import { AccountNotFoundError } from '../errors/account.js';
+import { transformHexValues } from '../utils.js';
 
 const ALLOWED_CHAINS: number[] = [abstractTestnet.id];
 
@@ -42,9 +43,16 @@ export async function signTransaction<
   } = args;
   // TODO: open up typing to allow for eip712 transactions
   transaction.type = 'eip712' as any;
-  transaction.value = transaction.value
-    ? BigInt(transaction.value)
-    : (0n as any);
+  transformHexValues(transaction, [
+    'value',
+    'nonce',
+    'maxFeePerGas',
+    'maxPriorityFeePerGas',
+    'gas',
+    'value',
+    'chainId',
+    'gasPerPubdata',
+  ]);
 
   if (!account_)
     throw new AccountNotFoundError({

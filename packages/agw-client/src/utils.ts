@@ -1,7 +1,9 @@
 import {
   type Address,
   encodeFunctionData,
+  fromHex,
   type Hex,
+  isHex,
   keccak256,
   type PublicClient,
   toBytes,
@@ -99,4 +101,13 @@ export function getInitializerCalldata(
     functionName: 'initialize',
     args: [initialOwnerAddress, validatorAddress, [], initialCall],
   });
+}
+
+export function transformHexValues(transaction: any, keys: string[]) {
+  if (!transaction) return;
+  for (const key of keys) {
+    if (isHex(transaction[key])) {
+      transaction[key] = fromHex(transaction[key], 'bigint');
+    }
+  }
 }

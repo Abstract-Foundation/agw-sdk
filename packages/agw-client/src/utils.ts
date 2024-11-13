@@ -1,5 +1,6 @@
 import {
   type Address,
+  type Chain,
   encodeFunctionData,
   fromHex,
   type Hex,
@@ -9,11 +10,17 @@ import {
   toBytes,
   type Transport,
 } from 'viem';
+import { abstractTestnet } from 'viem/chains';
 import { type ChainEIP712 } from 'viem/zksync';
 
 import AccountFactoryAbi from './abis/AccountFactory.js';
 import { SMART_ACCOUNT_FACTORY_ADDRESS } from './constants.js';
 import { type Call } from './types/call.js';
+
+// TODO: support Abstract mainnet
+export const VALID_CHAINS: Record<number, Chain> = {
+  [abstractTestnet.id]: abstractTestnet,
+};
 
 export function convertBigIntToString(value: any): any {
   if (typeof value === 'bigint') {

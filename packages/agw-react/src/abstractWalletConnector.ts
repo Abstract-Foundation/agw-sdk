@@ -1,9 +1,11 @@
-import { transformEIP1193Provider } from '@abstract-foundation/agw-client';
+import {
+  transformEIP1193Provider,
+  validChains,
+} from '@abstract-foundation/agw-client';
 import { toPrivyWalletConnector } from '@privy-io/cross-app-connect';
 import type { WalletDetailsParams } from '@rainbow-me/rainbowkit';
 import { type CreateConnectorFn } from '@wagmi/core';
 import {
-  type Chain,
   type EIP1193EventMap,
   type EIP1193RequestFn,
   type EIP1474Methods,
@@ -11,11 +13,6 @@ import {
 import { abstractTestnet } from 'viem/chains';
 
 import { AGW_APP_ID, ICON_URL } from './constants.js';
-
-// TODO: support Abstract mainnet
-export const VALID_CHAINS: Record<number, Chain> = {
-  [abstractTestnet.id]: abstractTestnet,
-};
 
 /**
  * Create a wagmi connector for the Abstract Global Wallet.
@@ -65,7 +62,7 @@ function abstractWalletConnector(
       parameters?: { chainId?: number | undefined } | undefined,
     ) => {
       const chainId = parameters?.chainId ?? abstractTestnet.id;
-      const chain = VALID_CHAINS[chainId];
+      const chain = validChains[chainId];
       if (!chain) {
         throw new Error('Unsupported chain');
       }

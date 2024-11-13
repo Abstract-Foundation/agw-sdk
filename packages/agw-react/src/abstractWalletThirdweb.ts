@@ -1,11 +1,9 @@
+import { validChains } from '@abstract-foundation/agw-client';
 import { createEmitter } from '@wagmi/core/internal';
 import { EIP1193, type Wallet } from 'thirdweb/wallets';
 import type { Chain } from 'viem/chains';
 
-import {
-  abstractWalletConnector,
-  VALID_CHAINS,
-} from './abstractWalletConnector.js';
+import { abstractWalletConnector } from './abstractWalletConnector.js';
 
 /**
  * Create a thirdweb wallet for Abstract Global Wallet
@@ -24,7 +22,7 @@ import {
  */
 const abstractWallet = (): Wallet => {
   const connector = abstractWalletConnector()({
-    chains: Object.values(VALID_CHAINS) as [Chain, ...Chain[]],
+    chains: Object.values(validChains) as [Chain, ...Chain[]],
     emitter: createEmitter('xyz.abs'),
   });
   return EIP1193.fromProvider({

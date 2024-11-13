@@ -51,6 +51,9 @@
       ],
       "privy": [
         "dist/types/exports/privy.d.ts"
+      ],
+      "thirdweb": [
+        "dist/types/exports/thirdweb.d.ts"
       ]
     }
   },

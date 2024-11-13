@@ -13,7 +13,7 @@ import { abstractTestnet } from 'viem/chains';
 import { AGW_APP_ID, ICON_URL } from './constants.js';
 
 // TODO: support Abstract mainnet
-const VALID_CHAINS: Record<number, Chain> = {
+export const VALID_CHAINS: Record<number, Chain> = {
   [abstractTestnet.id]: abstractTestnet,
 };
 

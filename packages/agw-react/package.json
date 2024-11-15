@@ -68,6 +68,7 @@
     "@privy-io/react-auth": "^1.92.2",
     "@tanstack/react-query": "^5",
     "react": ">=18",
+    "secp256k1": ">=5.0.1",
     "typescript": ">=5.0.4",
     "thirdweb": "^5.68.0",
     "viem": "^2.21.26",

@@ -1,4 +1,3 @@
-import { transformEIP1193Provider } from '@abstract-foundation/agw-client';
 import {
   type CrossAppAccount,
   type SignTypedDataParams,
@@ -10,8 +9,8 @@ import { randomBytes } from 'crypto';
 import { useCallback, useMemo } from 'react';
 import {
   type Address,
+  type Chain,
   createPublicClient,
-  custom,
   type EIP1193Provider,
   type EIP1193RequestFn,
   type EIP1474Methods,
@@ -20,7 +19,6 @@ import {
   type RpcSchema,
   type Transport,
 } from 'viem';
-import { abstractTestnet } from 'viem/chains';
 
 import { AGW_APP_ID } from '../constants.js';
 
@@ -31,16 +29,14 @@ type RpcMethodNames<rpcSchema extends RpcSchema> =
 type EIP1474MethodNames = RpcMethodNames<EIP1474Methods>;
 
 interface UsePrivyCrossAppEIP1193Props {
-  testnet?: boolean;
+  chain: Chain;
   transport?: Transport;
 }
 
 export const usePrivyCrossAppProvider = ({
-  testnet = false,
+  chain,
   transport = http(),
 }: UsePrivyCrossAppEIP1193Props) => {
-  const chain = testnet ? abstractTestnet : abstractTestnet;
-
   const {
     loginWithCrossAppAccount,
     linkCrossAppAccount,
@@ -109,7 +105,7 @@ export const usePrivyCrossAppProvider = ({
         account.type === 'cross_app' && account.providerApp.id === AGW_APP_ID,
     ) as CrossAppAccount | undefined;
 
-    const address = crossAppAccount?.embeddedWallets?.[0]?.address;
+    const address = crossAppAccount?.smartWallets?.[0]?.address;
     return address ? (address as Address) : undefined;
   };
 
@@ -197,14 +193,8 @@ export const usePrivyCrossAppProvider = ({
     };
   }, [handleRequest]);
 
-  const wrappedProvider = transformEIP1193Provider({
-    chain,
-    provider,
-    transport: custom(provider),
-  });
-
   return {
     ready,
-    provider: wrappedProvider,
+    provider,
   };
 };

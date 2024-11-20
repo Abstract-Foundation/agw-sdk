@@ -1,22 +1,22 @@
 import { Fragment, useEffect, useState } from 'react';
 import React from 'react';
-import type { EIP1193Provider, Transport } from 'viem';
+import type { Chain, EIP1193Provider, Transport } from 'viem';
 import { useConfig, useReconnect } from 'wagmi';
 import { injected } from 'wagmi/connectors';
 
 import { usePrivyCrossAppProvider } from './usePrivyCrossAppProvider.js';
 
 interface InjectWagmiConnectorProps extends React.PropsWithChildren {
-  testnet: boolean;
-  transport: Transport;
+  chain: Chain;
+  transport?: Transport;
 }
 
 export const InjectWagmiConnector = (props: InjectWagmiConnectorProps) => {
-  const { testnet, transport, children } = props;
+  const { chain, transport, children } = props;
 
   const config = useConfig();
   const { reconnect } = useReconnect();
-  const { provider, ready } = usePrivyCrossAppProvider({ testnet, transport });
+  const { provider, ready } = usePrivyCrossAppProvider({ chain, transport });
   const [isSetup, setIsSetup] = useState(false);
 
   useEffect(() => {

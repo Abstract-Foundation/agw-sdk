@@ -5,7 +5,6 @@ import {
   usePrivy,
   type User,
 } from '@privy-io/react-auth';
-import { randomBytes } from 'crypto';
 import { useCallback, useMemo } from 'react';
 import {
   type Address,
@@ -17,6 +16,7 @@ import {
   fromHex,
   http,
   type RpcSchema,
+  toHex,
   type Transport,
 } from 'viem';
 
@@ -40,7 +40,7 @@ export const usePrivyCrossAppProvider = ({
   const {
     loginWithCrossAppAccount,
     linkCrossAppAccount,
-    // sendTransaction, TBD
+    sendTransaction,
     signMessage,
     signTypedData,
   } = useCrossAppAccounts();
@@ -152,10 +152,26 @@ export const usePrivyCrossAppProvider = ({
         case 'wallet_revokePermissions':
           // TODO: do we need to do anything here?
           return null;
-        case 'eth_sendTransaction':
         case 'eth_signTransaction':
-          // TODO: Implement
-          return randomBytes(32).toString('hex'); // fake tx hash
+          throw new Error('eth_signTransaction is not supported');
+        case 'eth_sendTransaction': {
+          const transaction = params[0];
+          // Undo the automatic formatting applied by Wagmi's eth_signTransaction
+          // Formatter: https://github.com/wevm/viem/blob/main/src/zksync/formatters.ts#L114
+          if (
+            transaction.eip712Meta &&
+            transaction.eip712Meta.paymasterParams
+          ) {
+            transaction.paymaster =
+              transaction.eip712Meta.paymasterParams.paymaster;
+            transaction.paymasterInput = toHex(
+              transaction.eip712Meta.paymasterParams.paymasterInput,
+            );
+          }
+          return await sendTransaction(transaction, {
+            address: transaction.from,
+          });
+        }
         case 'eth_signTypedData_v4':
           return await signTypedData(
             JSON.parse(params[1]) as SignTypedDataParams,

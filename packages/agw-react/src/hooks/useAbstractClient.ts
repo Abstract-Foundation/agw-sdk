@@ -20,6 +20,7 @@ export const useAbstractClient = () => {
         signer: signer.account,
         chain,
         transport: custom(signer.transport),
+        isPrivyCrossApp: true,
       });
 
       return client;

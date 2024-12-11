@@ -23,6 +23,11 @@ import {
   type SignEip712TransactionParameters,
 } from 'viem/zksync';
 
+import {
+  createSession,
+  type CreateSessionParameters,
+  type CreateSessionReturnType,
+} from './actions/createSession.js';
 import { deployContract } from './actions/deployContract.js';
 import {
   prepareTransactionRequest,
@@ -43,6 +48,9 @@ export type AbstractWalletActions<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
 > = Eip712WalletActions<chain, account> & {
+  createSession: (
+    args: CreateSessionParameters,
+  ) => Promise<CreateSessionReturnType>;
   signMessage: (
     args: Omit<SignMessageParameters, 'account'>,
   ) => Promise<SignMessageReturnType>;
@@ -85,6 +93,8 @@ export function globalWalletActions<
   return (
     client: Client<Transport, ChainEIP712, Account>,
   ): AbstractWalletActions<Chain, Account> => ({
+    createSession: (args) =>
+      createSession(client, signerClient, publicClient, args, isPrivyCrossApp),
     prepareAbstractTransactionRequest: (args) =>
       prepareTransactionRequest(
         client,

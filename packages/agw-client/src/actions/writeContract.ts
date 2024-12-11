@@ -42,6 +42,7 @@ export async function writeContract<
     account,
     chainOverride
   >,
+  isPrivyCrossApp = false,
 ): Promise<WriteContractReturnType> {
   const {
     abi,
@@ -66,12 +67,18 @@ export async function writeContract<
   } as EncodeFunctionDataParameters);
 
   try {
-    return await sendTransaction(client, signerClient, publicClient, {
-      data: `${data}${dataSuffix ? dataSuffix.replace('0x', '') : ''}`,
-      to: address,
-      account,
-      ...request,
-    });
+    return await sendTransaction(
+      client,
+      signerClient,
+      publicClient,
+      {
+        data: `${data}${dataSuffix ? dataSuffix.replace('0x', '') : ''}`,
+        to: address,
+        account,
+        ...request,
+      },
+      isPrivyCrossApp,
+    );
   } catch (error) {
     throw getContractError(error as BaseError, {
       abi,

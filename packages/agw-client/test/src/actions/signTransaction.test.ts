@@ -1,10 +1,13 @@
+import { Address } from 'abitype';
 import {
   createClient,
   createWalletClient,
   EIP1193RequestFn,
   encodeAbiParameters,
+  Hex,
   http,
   parseAbiParameters,
+  toFunctionSelector,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
 import { mainnet } from 'viem/chains';
@@ -33,6 +36,18 @@ const baseClient = createClient({
 baseClient.request = (async ({ method, params }) => {
   if (method === 'eth_chainId') {
     return anvilAbstractTestnet.chain.id;
+  } else if (method === 'eth_call') {
+    const callParams = params as {
+      to: Address;
+      data: Hex;
+    };
+    if (
+      callParams.to === address.smartAccountAddress &&
+      callParams.data.startsWith(toFunctionSelector('function listHooks(bool)'))
+    ) {
+      return encodeAbiParameters(parseAbiParameters(['address[]']), [[]]);
+    }
+    return encodeAbiParameters(parseAbiParameters(['address[]']), [[]]);
   }
   return anvilAbstractTestnet.getClient().request({ method, params } as any);
 }) as EIP1193RequestFn;

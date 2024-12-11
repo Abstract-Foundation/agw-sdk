@@ -133,11 +133,25 @@ export interface SessionState {
   }[];
 }
 
-export function encodeSession(sessionConfig: SessionConfig) {
+export function encodeSession(sessionConfig: SessionConfig): Hex {
   const callData = encodeFunctionData({
     abi: SessionKeyValidatorAbi,
     functionName: 'createSession',
     args: [sessionConfig],
+  });
+  const selector = callData.slice(0, '0x'.length + 8) as Hex; // first 4 bytes for function selector
+  const args = `0x${callData.slice(selector.length, callData.length)}` as Hex; // the rest is the arguments
+  return args;
+}
+
+export function encodeSessionWithPeriodIds(
+  sessionConfig: SessionConfig,
+  periods: bigint[],
+): Hex {
+  const callData = encodeFunctionData({
+    abi: SessionKeyValidatorAbi,
+    functionName: 'createSessionWithPeriods',
+    args: [sessionConfig, periods],
   });
   const selector = callData.slice(0, '0x'.length + 8) as Hex; // first 4 bytes for function selector
   const args = `0x${callData.slice(selector.length, callData.length)}` as Hex; // the rest is the arguments

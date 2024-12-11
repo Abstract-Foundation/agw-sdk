@@ -141,6 +141,7 @@ export async function sendTransactionBatch<
     signerClient,
     publicClient,
     batchTransaction,
+    EOA_VALIDATOR_ADDRESS,
     !isDeployed,
   );
 }
@@ -204,6 +205,7 @@ export async function sendTransaction<
     signerClient,
     publicClient,
     parameters,
+    EOA_VALIDATOR_ADDRESS,
     !isDeployed,
   );
 }

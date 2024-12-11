@@ -2,6 +2,7 @@ import {
   type Account,
   type Client,
   concatHex,
+  type GetChainParameter,
   type Hash,
   type PublicClient,
   type Transport,
@@ -15,25 +16,39 @@ import AGWAccountAbi from '../abis/AGWAccount.js';
 import SessionKeyValidatorAbi from '../abis/SessionKeyValidator.js';
 import { SESSION_KEY_VALIDATOR_ADDRESS } from '../constants.js';
 import { encodeSession, type SessionConfig } from '../sessions.js';
+import type { GetAccountParameter } from './prepareTransaction.js';
 import { writeContract } from './writeContract.js';
 
-export interface CreateSessionParameters {
+export interface CreateSessionParameters<
+  chain extends ChainEIP712 | undefined,
+  account extends Account | undefined,
+  chainOverride extends ChainEIP712 | undefined,
+> {
   session: SessionConfig;
-  parameters: any; // todo: tighten up scope to; intended to allow control over transaction parameters
+  parameters?: GetChainParameter<chain, chainOverride> &
+    GetAccountParameter<account, undefined, true>;
 }
 
 export interface CreateSessionReturnType {
   transactionHash: Hash | undefined;
+  session: SessionConfig;
 }
 
-export async function createSession(
+export async function createSession<
+  chain extends ChainEIP712 | undefined,
+  account extends Account | undefined,
+  chainOverride extends ChainEIP712 | undefined,
+>(
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
-  args: CreateSessionParameters,
+  args: CreateSessionParameters<chain, account, chainOverride>,
   isPrivyCrossApp = false,
 ): Promise<CreateSessionReturnType> {
-  const { session, parameters } = args;
+  const {
+    session,
+    // parameters
+  } = args;
 
   const validationHooks = await getAction(
     client,
@@ -59,7 +74,6 @@ export async function createSession(
       signerClient,
       publicClient,
       {
-        ...parameters,
         account: client.account,
         chain: client.chain,
         address: client.account.address,
@@ -75,17 +89,17 @@ export async function createSession(
       signerClient,
       publicClient,
       {
-        ...parameters,
+        //...parameters,
         account: client.account,
         chain: client.chain,
         address: SESSION_KEY_VALIDATOR_ADDRESS,
         abi: SessionKeyValidatorAbi,
         functionName: 'createSession',
-        args: [session],
+        args: [session as any],
       },
       isPrivyCrossApp,
     );
   }
 
-  return { transactionHash };
+  return { transactionHash, session };
 }

@@ -1,5 +1,6 @@
 import {
   type Account,
+  type Address,
   BaseError,
   type Client,
   encodeAbiParameters,
@@ -17,7 +18,6 @@ import {
 } from 'viem/zksync';
 
 import AGWAccountAbi from '../abis/AGWAccount.js';
-import { EOA_VALIDATOR_ADDRESS } from '../constants.js';
 import {
   assertEip712Request,
   type AssertEip712RequestParameters,
@@ -34,6 +34,7 @@ export async function signTransaction<
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   args: SignEip712TransactionParameters<chain, account, chainOverride>,
+  validator: Address,
   useSignerAddress = false,
   validationHookData: Record<string, Hex> = {},
 ): Promise<SignEip712TransactionReturnType> {
@@ -119,7 +120,7 @@ export async function signTransaction<
     // Match the expect signature format of the AGW smart account
     signature = encodeAbiParameters(
       parseAbiParameters(['bytes', 'address', 'bytes[]']),
-      [rawSignature, EOA_VALIDATOR_ADDRESS, hookData],
+      [rawSignature, validator, hookData],
     );
   }
 

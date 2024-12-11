@@ -1,5 +1,6 @@
 import {
   type Account,
+  type Address,
   type Client,
   createClient,
   createPublicClient,
@@ -39,6 +40,7 @@ interface CreateAbstractClientParameters {
    * @optional
    */
   transport?: Transport;
+  address?: Address;
   isPrivyCrossApp?: boolean;
 }
 
@@ -51,6 +53,7 @@ export async function createAbstractClient({
   signer,
   chain,
   transport,
+  address,
   isPrivyCrossApp = false,
 }: CreateAbstractClientParameters): Promise<AbstractClient> {
   if (!transport) {
@@ -62,10 +65,12 @@ export async function createAbstractClient({
     transport: http(),
   });
 
-  const smartAccountAddress = await getSmartAccountAddressFromInitialSigner(
-    signer.address,
-    publicClient,
-  );
+  const smartAccountAddress =
+    address ??
+    (await getSmartAccountAddressFromInitialSigner(
+      signer.address,
+      publicClient,
+    ));
 
   const baseClient = createClient({
     account: smartAccountAddress,

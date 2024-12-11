@@ -1,8 +1,10 @@
 import {
   type Account,
+  type Address,
   BaseError,
   type Chain,
   type Client,
+  type Hex,
   type PublicClient,
   type SendTransactionRequest,
   type Transport,
@@ -43,7 +45,9 @@ export async function sendTransactionInternal<
     chainOverride,
     request
   >,
+  validator: Address,
   isInitialTransaction: boolean,
+  validationHookData: Record<string, Hex> = {},
 ): Promise<SendEip712TransactionReturnType> {
   const { chain = client.chain } = parameters;
 
@@ -84,7 +88,9 @@ export async function sendTransactionInternal<
         ...request,
         chainId,
       } as any,
+      validator,
       isInitialTransaction,
+      validationHookData,
     );
     return await getAction(
       client,

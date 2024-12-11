@@ -424,6 +424,185 @@ const SessionKeyValidatorAbi = [
     type: 'function',
   },
   {
+    inputs: [
+      {
+        components: [
+          {
+            internalType: 'address',
+            name: 'signer',
+            type: 'address',
+          },
+          {
+            internalType: 'uint256',
+            name: 'expiresAt',
+            type: 'uint256',
+          },
+          {
+            components: [
+              {
+                internalType: 'enum SessionLib.LimitType',
+                name: 'limitType',
+                type: 'uint8',
+              },
+              {
+                internalType: 'uint256',
+                name: 'limit',
+                type: 'uint256',
+              },
+              {
+                internalType: 'uint256',
+                name: 'period',
+                type: 'uint256',
+              },
+            ],
+            internalType: 'struct SessionLib.UsageLimit',
+            name: 'feeLimit',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'address',
+                name: 'target',
+                type: 'address',
+              },
+              {
+                internalType: 'bytes4',
+                name: 'selector',
+                type: 'bytes4',
+              },
+              {
+                internalType: 'uint256',
+                name: 'maxValuePerUse',
+                type: 'uint256',
+              },
+              {
+                components: [
+                  {
+                    internalType: 'enum SessionLib.LimitType',
+                    name: 'limitType',
+                    type: 'uint8',
+                  },
+                  {
+                    internalType: 'uint256',
+                    name: 'limit',
+                    type: 'uint256',
+                  },
+                  {
+                    internalType: 'uint256',
+                    name: 'period',
+                    type: 'uint256',
+                  },
+                ],
+                internalType: 'struct SessionLib.UsageLimit',
+                name: 'valueLimit',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  {
+                    internalType: 'enum SessionLib.Condition',
+                    name: 'condition',
+                    type: 'uint8',
+                  },
+                  {
+                    internalType: 'uint64',
+                    name: 'index',
+                    type: 'uint64',
+                  },
+                  {
+                    internalType: 'bytes32',
+                    name: 'refValue',
+                    type: 'bytes32',
+                  },
+                  {
+                    components: [
+                      {
+                        internalType: 'enum SessionLib.LimitType',
+                        name: 'limitType',
+                        type: 'uint8',
+                      },
+                      {
+                        internalType: 'uint256',
+                        name: 'limit',
+                        type: 'uint256',
+                      },
+                      {
+                        internalType: 'uint256',
+                        name: 'period',
+                        type: 'uint256',
+                      },
+                    ],
+                    internalType: 'struct SessionLib.UsageLimit',
+                    name: 'limit',
+                    type: 'tuple',
+                  },
+                ],
+                internalType: 'struct SessionLib.Constraint[]',
+                name: 'constraints',
+                type: 'tuple[]',
+              },
+            ],
+            internalType: 'struct SessionLib.CallSpec[]',
+            name: 'callPolicies',
+            type: 'tuple[]',
+          },
+          {
+            components: [
+              {
+                internalType: 'address',
+                name: 'target',
+                type: 'address',
+              },
+              {
+                internalType: 'uint256',
+                name: 'maxValuePerUse',
+                type: 'uint256',
+              },
+              {
+                components: [
+                  {
+                    internalType: 'enum SessionLib.LimitType',
+                    name: 'limitType',
+                    type: 'uint8',
+                  },
+                  {
+                    internalType: 'uint256',
+                    name: 'limit',
+                    type: 'uint256',
+                  },
+                  {
+                    internalType: 'uint256',
+                    name: 'period',
+                    type: 'uint256',
+                  },
+                ],
+                internalType: 'struct SessionLib.UsageLimit',
+                name: 'valueLimit',
+                type: 'tuple',
+              },
+            ],
+            internalType: 'struct SessionLib.TransferSpec[]',
+            name: 'transferPolicies',
+            type: 'tuple[]',
+          },
+        ],
+        internalType: 'struct SessionLib.SessionSpec',
+        name: 'sessionSpec',
+        type: 'tuple',
+      },
+      {
+        internalType: 'uint64[]',
+        name: 'periods',
+        type: 'uint64[]',
+      },
+    ],
+    name: 'createSessionWithPeriods',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'disable',
     outputs: [],

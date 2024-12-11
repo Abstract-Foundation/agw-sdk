@@ -12,7 +12,7 @@ import type { SignTypedDataParameters } from 'viem/accounts';
 import { signTypedData as viemSignTypedData } from 'viem/actions';
 import type { ChainEIP712 } from 'viem/chains';
 
-import { VALIDATOR_ADDRESS } from '../constants.js';
+import { EOA_VALIDATOR_ADDRESS } from '../constants.js';
 import { isEIP712Transaction } from '../eip712.js';
 import { getAgwTypedSignature } from '../getAgwTypedSignature.js';
 import { sendPrivySignTypedData } from './sendPrivyTransaction.js';
@@ -37,7 +37,7 @@ export async function signTypedData(
     // directly used in eth_sendRawTransaction as the customSignature field
     const signature = encodeAbiParameters(
       parseAbiParameters(['bytes', 'address', 'bytes[]']),
-      [rawSignature, VALIDATOR_ADDRESS, []],
+      [rawSignature, EOA_VALIDATOR_ADDRESS, []],
     );
     return signature;
   }

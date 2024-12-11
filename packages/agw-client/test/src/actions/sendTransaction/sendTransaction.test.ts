@@ -17,8 +17,8 @@ import {
 } from '../../../../src/actions/sendTransaction.js';
 import {
   BATCH_CALLER_ADDRESS,
+  EOA_VALIDATOR_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
-  VALIDATOR_ADDRESS,
 } from '../../../../src/constants.js';
 import {
   getInitializerCalldata,
@@ -261,7 +261,7 @@ describe('sendTransactionBatch', () => {
         // Verify that getInitializerCalldata is called with the correct arguments
         expect(getInitializerCalldata).toHaveBeenCalledWith(
           address.signerAddress,
-          VALIDATOR_ADDRESS,
+          EOA_VALIDATOR_ADDRESS,
           {
             target: BATCH_CALLER_ADDRESS,
             allowFailure: false,

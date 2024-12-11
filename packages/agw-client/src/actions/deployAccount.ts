@@ -15,8 +15,8 @@ import type { ChainEIP712 } from 'viem/chains';
 
 import AccountFactoryAbi from '../abis/AccountFactory.js';
 import {
+  EOA_VALIDATOR_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
-  VALIDATOR_ADDRESS,
 } from '../constants.js';
 import {
   getInitializerCalldata,
@@ -61,7 +61,7 @@ export async function deployAccount(
   if (!isDeployed) {
     const initializerCallData = getInitializerCalldata(
       initialSigner,
-      VALIDATOR_ADDRESS,
+      EOA_VALIDATOR_ADDRESS,
       {
         allowFailure: false,
         callData: '0x',

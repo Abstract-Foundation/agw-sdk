@@ -20,8 +20,8 @@ import {
 import AccountFactoryAbi from '../abis/AccountFactory.js';
 import {
   BATCH_CALLER_ADDRESS,
+  EOA_VALIDATOR_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
-  VALIDATOR_ADDRESS,
 } from '../constants.js';
 import { type Call } from '../types/call.js';
 import type { SendTransactionBatchParameters } from '../types/sendTransactionBatch.js';
@@ -106,7 +106,7 @@ export async function sendTransactionBatch<
     // Create calldata for initializing the proxy account
     const initializerCallData = getInitializerCalldata(
       signerClient.account.address,
-      VALIDATOR_ADDRESS,
+      EOA_VALIDATOR_ADDRESS,
       initialCall,
     );
     const addressBytes = toBytes(signerClient.account.address);
@@ -182,7 +182,7 @@ export async function sendTransaction<
     // Create calldata for initializing the proxy account
     const initializerCallData = getInitializerCalldata(
       signerClient.account.address,
-      VALIDATOR_ADDRESS,
+      EOA_VALIDATOR_ADDRESS,
       initialCall,
     );
     const addressBytes = toBytes(signerClient.account.address);

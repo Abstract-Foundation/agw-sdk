@@ -17,8 +17,8 @@ import { describe, expect, it, vi } from 'vitest';
 import AccountFactoryAbi from '../../../src/abis/AccountFactory.js';
 import { signMessage } from '../../../src/actions/signMessage.js';
 import {
+  EOA_VALIDATOR_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
-  VALIDATOR_ADDRESS,
 } from '../../../src/constants.js';
 import { getInitializerCalldata } from '../../../src/utils.js';
 import { anvilAbstractTestnet } from '../../anvil.js';
@@ -61,14 +61,14 @@ describe('signMessage', async () => {
       address: SMART_ACCOUNT_FACTORY_ADDRESS,
       signature: encodeAbiParameters(parseAbiParameters(['bytes', 'address']), [
         RAW_SIGNATURE,
-        VALIDATOR_ADDRESS,
+        EOA_VALIDATOR_ADDRESS,
       ]),
       data: encodeFunctionData({
         abi: AccountFactoryAbi,
         functionName: 'deployAccount',
         args: [
           keccak256(toBytes(address.signerAddress)),
-          getInitializerCalldata(address.signerAddress, VALIDATOR_ADDRESS, {
+          getInitializerCalldata(address.signerAddress, EOA_VALIDATOR_ADDRESS, {
             target: zeroAddress,
             allowFailure: false,
             callData: '0x',

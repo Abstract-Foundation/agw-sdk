@@ -17,7 +17,7 @@ import {
 import { expect, test } from 'vitest';
 
 import { signTransaction } from '../../../src/actions/signTransaction.js';
-import { VALIDATOR_ADDRESS } from '../../../src/constants.js';
+import { EOA_VALIDATOR_ADDRESS } from '../../../src/constants.js';
 import { anvilAbstractTestnet } from '../../anvil.js';
 import { address } from '../../constants.js';
 
@@ -77,7 +77,7 @@ const transactionWithHexValues = {
 test('with useSignerAddress false', async () => {
   const signature = encodeAbiParameters(
     parseAbiParameters(['bytes', 'address', 'bytes[]']),
-    [RAW_SIGNATURE, VALIDATOR_ADDRESS, []],
+    [RAW_SIGNATURE, EOA_VALIDATOR_ADDRESS, []],
   );
 
   const expectedSignedTransaction =

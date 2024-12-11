@@ -15,7 +15,7 @@ import {
   type SignEip712TransactionReturnType,
 } from 'viem/zksync';
 
-import { VALIDATOR_ADDRESS } from '../constants.js';
+import { EOA_VALIDATOR_ADDRESS } from '../constants.js';
 import {
   assertEip712Request,
   type AssertEip712RequestParameters,
@@ -100,7 +100,7 @@ export async function signTransaction<
     // Match the expect signature format of the AGW smart account
     signature = encodeAbiParameters(
       parseAbiParameters(['bytes', 'address', 'bytes[]']),
-      [rawSignature, VALIDATOR_ADDRESS, []],
+      [rawSignature, EOA_VALIDATOR_ADDRESS, []],
     );
   }
 

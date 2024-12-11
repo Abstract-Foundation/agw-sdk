@@ -18,8 +18,8 @@ import type { ChainEIP712 } from 'viem/chains';
 
 import AccountFactoryAbi from './abis/AccountFactory.js';
 import {
+  EOA_VALIDATOR_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
-  VALIDATOR_ADDRESS,
 } from './constants.js';
 import { getInitializerCalldata } from './utils.js';
 
@@ -60,7 +60,7 @@ export async function getAgwTypedSignature(
 
   const signature = encodeAbiParameters(
     parseAbiParameters(['bytes', 'address']),
-    [rawSignature, VALIDATOR_ADDRESS],
+    [rawSignature, EOA_VALIDATOR_ADDRESS],
   );
 
   const addressBytes = toBytes(signer.account.address);
@@ -72,7 +72,7 @@ export async function getAgwTypedSignature(
       functionName: 'deployAccount',
       args: [
         salt,
-        getInitializerCalldata(signer.account.address, VALIDATOR_ADDRESS, {
+        getInitializerCalldata(signer.account.address, EOA_VALIDATOR_ADDRESS, {
           target: zeroAddress,
           allowFailure: false,
           callData: '0x',

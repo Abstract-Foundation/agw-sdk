@@ -15,7 +15,7 @@ import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
 import * as abstractClientModule from '../../src/abstractClient.js';
 import { sendTransactionBatch } from '../../src/actions/sendTransaction.js';
-import { agwCapablities } from '../../src/eip5792.js';
+import { agwCapablities, SendCallsParams } from '../../src/eip5792.js';
 import { transformEIP1193Provider } from '../../src/transformEIP1193Provider.js';
 import * as utilsModule from '../../src/utils.js';
 import { exampleTypedData } from '../fixtures.js';
@@ -435,7 +435,7 @@ describe('transformEIP1193Provider', () => {
 
       const mockSignedTransaction = '0xsigned';
 
-      const calls = [
+      const calls: SendCallsParams['calls'] = [
         {
           to: privateKeyToAccount(generatePrivateKey()).address,
           data: '0x12345678',
@@ -456,11 +456,17 @@ describe('transformEIP1193Provider', () => {
           .mockResolvedValueOnce(mockSignedTransaction),
       } as any);
       const result = await transformedProvider.request({
-        method: 'wallet_getCapabilities',
-        params: [mockSmartAccount as any],
+        method: 'wallet_sendCalls',
+        params: [
+          {
+            version: '1.0',
+            from: mockSmartAccount,
+            calls,
+          },
+        ],
       });
 
-      expect(result).toBe(agwCapablities);
+      expect(result).toBe(mockSignedTransaction);
     });
   });
 });

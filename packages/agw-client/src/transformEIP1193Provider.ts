@@ -8,12 +8,14 @@ import {
   type EIP1193Provider,
   type EIP1193RequestFn,
   type EIP1474Methods,
+  hexToBigInt,
   toHex,
   type Transport,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
 
 import { createAbstractClient } from './abstractClient.js';
+import { agwCapablities, type SendCallsParams } from './eip5792.js';
 import { getSmartAccountAddressFromInitialSigner } from './utils.js';
 
 interface TransformEIP1193ProviderOptions {
@@ -191,6 +193,53 @@ export function transformEIP1193Provider(
           return await abstractClient.sendTransaction(transaction);
         }
         throw new Error('Should not have reached this point');
+      }
+      case 'wallet_sendCalls': {
+        const account = await getAgwSigner(provider);
+        if (!account) {
+          throw new Error('Account not found');
+        }
+        const sendCallsParams = params[0] as SendCallsParams;
+
+        if (sendCallsParams.from === account) {
+          return await provider.request(e);
+        }
+
+        const abstractClient = await getAgwClient(
+          account,
+          chain,
+          transport,
+          isPrivyCrossApp,
+        );
+
+        return await abstractClient.sendTransactionBatch({
+          calls: sendCallsParams.calls.map((call) => ({
+            to: call.to,
+            value: call.value ? hexToBigInt(call.value) : undefined,
+            data: call.data,
+            chainId: call.chainId ? hexToBigInt(call.chainId) : undefined,
+          })),
+        });
+      }
+      case 'wallet_getCallsStatus': {
+        return await provider.request({
+          method: 'eth_getTransactionReceipt',
+          params,
+        });
+      }
+      case 'wallet_showCallsStatus': {
+        // not implemented
+        return undefined;
+      }
+      case 'wallet_getCapabilities': {
+        const account = await getAgwSigner(provider);
+        if (!account) {
+          throw new Error('Account not found');
+        }
+        if (params[0] === account) {
+          return await provider.request(e);
+        }
+        return agwCapablities;
       }
       default: {
         return await provider.request(e);

@@ -116,6 +116,7 @@ test('with useSignerAddress false', async () => {
       account: baseClient.account,
       chain: anvilAbstractTestnet.chain as ChainEIP712,
     } as SignEip712TransactionParameters,
+    EOA_VALIDATOR_ADDRESS,
     false,
   );
   expect(signedTransaction).toBe(expectedSignedTransaction);
@@ -145,6 +146,7 @@ test('with useSignerAddress true', async () => {
       account: baseClient.account,
       chain: anvilAbstractTestnet.chain as ChainEIP712,
     } as SignEip712TransactionParameters,
+    EOA_VALIDATOR_ADDRESS,
     true,
   );
   expect(signedTransaction).toBe(expectedSignedTransaction);
@@ -160,6 +162,7 @@ test('handles hex values', async () => {
       account: baseClient.account,
       chain: anvilAbstractTestnet.chain as ChainEIP712,
     } as any,
+    EOA_VALIDATOR_ADDRESS,
     false,
   );
 
@@ -172,6 +175,7 @@ test('handles hex values', async () => {
       account: baseClient.account,
       chain: anvilAbstractTestnet.chain as ChainEIP712,
     } as any,
+    EOA_VALIDATOR_ADDRESS,
     false,
   );
 
@@ -193,7 +197,8 @@ test('invalid chain', async () => {
           account: baseClient.account,
           chain: invalidChain,
         } as SignEip712TransactionParameters,
-        true,
+        EOA_VALIDATOR_ADDRESS,
+        false,
       ),
   ).rejects.toThrowError('Invalid chain specified');
 });
@@ -210,6 +215,7 @@ test('no account provided', async () => {
           type: 'eip712',
           chain: anvilAbstractTestnet.chain as ChainEIP712,
         } as any,
+        EOA_VALIDATOR_ADDRESS,
         false,
       ),
   ).rejects.toThrowError(

@@ -31,6 +31,8 @@ vi.mock('viem/utils', async (importOriginal) => {
 
 import { getContractError } from 'viem/utils';
 
+import { EOA_VALIDATOR_ADDRESS } from '../../../src/constants.js';
+
 const baseClient = createClient({
   account: address.smartAccountAddress,
   chain: anvilAbstractTestnet.chain as ChainEIP712,
@@ -110,6 +112,7 @@ test('basic', async () => {
       data: expectedData,
       to: MOCK_CONTRACT_ADDRESS,
     },
+    false,
   );
 });
 
@@ -145,6 +148,7 @@ test('getContractError', async () => {
       data: expectedData,
       to: MOCK_CONTRACT_ADDRESS,
     },
+    false,
   );
 
   expect(getContractError).toHaveBeenCalledWith(

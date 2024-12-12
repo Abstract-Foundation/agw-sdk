@@ -12,17 +12,16 @@ interface ChainCapabilities {
 
 type WalletCapabilities = Record<`0x${string}`, ChainCapabilities>;
 
-interface SendCallData {
-  to: Address;
-  value: Hex;
-  data: Hex;
-  chainId: Hex;
-}
-
-export interface SendCallsParameters {
-  version: '1.0';
+export interface SendCallsParams {
+  version: string;
   from: Address;
-  calls: SendCallData[];
+  calls: {
+    to?: Address | undefined;
+    data?: Hex | undefined;
+    value?: Hex | undefined;
+    chainId?: Hex | undefined;
+  }[];
+  capabilities?: WalletCapabilities | undefined;
 }
 
 export const agwCapablities: WalletCapabilities = {

@@ -15,7 +15,7 @@ import {
 import { toAccount } from 'viem/accounts';
 
 import { createAbstractClient } from './abstractClient.js';
-import { agwCapablities, type SendCallsParameters } from './eip5792.js';
+import { agwCapablities, type SendCallsParams } from './eip5792.js';
 import { getSmartAccountAddressFromInitialSigner } from './utils.js';
 
 interface TransformEIP1193ProviderOptions {
@@ -199,7 +199,7 @@ export function transformEIP1193Provider(
         if (!account) {
           throw new Error('Account not found');
         }
-        const sendCallsParams = params[0] as SendCallsParameters;
+        const sendCallsParams = params[0] as SendCallsParams;
 
         if (sendCallsParams.from === account) {
           return await provider.request(e);
@@ -215,9 +215,9 @@ export function transformEIP1193Provider(
         return await abstractClient.sendTransactionBatch({
           calls: sendCallsParams.calls.map((call) => ({
             to: call.to,
-            value: hexToBigInt(call.value),
+            value: call.value ? hexToBigInt(call.value) : undefined,
             data: call.data,
-            chainId: hexToBigInt(call.chainId),
+            chainId: call.chainId ? hexToBigInt(call.chainId) : undefined,
           })),
         });
       }

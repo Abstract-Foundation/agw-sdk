@@ -468,5 +468,18 @@ describe('transformEIP1193Provider', () => {
 
       expect(result).toBe(mockSignedTransaction);
     });
+    it('should pass transform wallet_getCallsStatus to eth_getTransactionReceipt', async () => {
+      const mockTxHash = '0xtxhash';
+
+      await transformedProvider.request({
+        method: 'wallet_getCallsStatus',
+        params: [mockTxHash],
+      });
+
+      expect(mockProvider.request).toHaveBeenCalledWith({
+        method: 'eth_getTransactionReceipt',
+        params: [mockTxHash],
+      });
+    });
   });
 });

@@ -49,16 +49,16 @@ export async function sendTransactionForSession<
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
-  parameters: SendTransactionForSessionParameters<
+  parameters: SendEip712TransactionParameters<
     chain,
     account,
     chainOverride,
     request
   >,
+  session: SessionConfig,
   isPrivyCrossApp = false,
 ): Promise<SendEip712TransactionReturnType> {
-  if (isPrivyCrossApp)
-    return await sendPrivyTransaction(client, parameters.parameters);
+  if (isPrivyCrossApp) return await sendPrivyTransaction(client, parameters);
 
   const isDeployed = await isSmartAccountDeployed(
     publicClient,
@@ -72,14 +72,11 @@ export async function sendTransactionForSession<
     client,
     signerClient,
     publicClient,
-    parameters.parameters,
+    parameters,
     SESSION_KEY_VALIDATOR_ADDRESS,
     !isDeployed,
     {
-      [SESSION_KEY_VALIDATOR_ADDRESS]: encodeSessionWithPeriodIds(
-        parameters.session,
-        [],
-      ),
+      [SESSION_KEY_VALIDATOR_ADDRESS]: encodeSessionWithPeriodIds(session, []),
     },
   );
 }

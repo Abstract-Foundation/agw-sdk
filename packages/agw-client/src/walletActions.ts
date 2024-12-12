@@ -4,8 +4,6 @@ import {
   type Address,
   type Chain,
   type Client,
-  type ContractFunctionArgs,
-  type ContractFunctionName,
   type PrepareTransactionRequestReturnType,
   type PublicClient,
   type SendTransactionRequest,
@@ -15,18 +13,22 @@ import {
   type SignTypedDataParameters,
   type SignTypedDataReturnType,
   type Transport,
+  type WalletActions,
   type WalletClient,
   type WriteContractParameters,
-  type WriteContractReturnType,
 } from 'viem';
 import {
   type ChainEIP712,
   type Eip712WalletActions,
   type SendEip712TransactionParameters,
-  type SendEip712TransactionReturnType,
   type SignEip712TransactionParameters,
 } from 'viem/zksync';
 
+import {
+  type AbstractClient,
+  type SessionClient,
+  toSessionClient,
+} from './abstractClient.js';
 import {
   createSession,
   type CreateSessionParameters,
@@ -42,19 +44,14 @@ import {
   sendTransaction,
   sendTransactionBatch,
 } from './actions/sendTransaction.js';
-import {
-  sendTransactionForSession,
-  type SendTransactionForSessionParameters,
-} from './actions/sendTransactionForSession.js';
+import { sendTransactionForSession } from './actions/sendTransactionForSession.js';
 import { signMessage } from './actions/signMessage.js';
 import { signTransaction } from './actions/signTransaction.js';
 import { signTypedData } from './actions/signTypedData.js';
 import { writeContract } from './actions/writeContract.js';
-import {
-  writeContractForSession,
-  type WriteContractForSessionParameters,
-} from './actions/writeContractForSession.js';
+import { writeContractForSession } from './actions/writeContractForSession.js';
 import { EOA_VALIDATOR_ADDRESS } from './constants.js';
+import type { SessionConfig } from './sessions.js';
 import type { SendTransactionBatchParameters } from './types/sendTransactionBatch.js';
 
 export type AbstractWalletActions<
@@ -75,20 +72,6 @@ export type AbstractWalletActions<
   >(
     args: SendTransactionBatchParameters<request>,
   ) => Promise<SendTransactionReturnType>;
-  sendTransactionForSession: <
-    chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
-    request extends SendTransactionRequest<
-      chain,
-      chainOverride
-    > = SendTransactionRequest<chain, chainOverride>,
-  >(
-    args: SendTransactionForSessionParameters<
-      chain,
-      account,
-      chainOverride,
-      request
-    >,
-  ) => Promise<SendEip712TransactionReturnType>;
   prepareAbstractTransactionRequest: <
     chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
     account extends Account | undefined = Account | undefined,
@@ -107,24 +90,56 @@ export type AbstractWalletActions<
       request
     >,
   ) => Promise<PrepareTransactionRequestReturnType>;
-  writeContractForSession: <
-    const abi extends Abi | readonly unknown[],
-    functionName extends ContractFunctionName<abi, 'nonpayable' | 'payable'>,
-    args extends ContractFunctionArgs<
-      abi,
-      'nonpayable' | 'payable',
-      functionName
-    >,
+  toSessionClient: (signer: Account, session: SessionConfig) => SessionClient;
+};
+
+export interface SessionClientActions<
+  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  account extends Account | undefined = Account | undefined,
+> {
+  sendTransaction: <
+    const request extends SendTransactionRequest<chain, chainOverride>,
+    chainOverride extends ChainEIP712 | undefined = undefined,
   >(
-    args: WriteContractForSessionParameters<
+    args: SendEip712TransactionParameters<
       chain,
       account,
-      abi,
-      functionName,
-      args
+      chainOverride,
+      request
     >,
-  ) => Promise<WriteContractReturnType>;
-};
+  ) => Promise<SendTransactionReturnType>;
+  writeContract: WalletActions<chain, account>['writeContract'];
+}
+
+export function sessionWalletActions<
+  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  account extends Account | undefined = Account | undefined,
+>(
+  signerClient: WalletClient<Transport, ChainEIP712, Account>,
+  publicClient: PublicClient<Transport, ChainEIP712>,
+  session: SessionConfig,
+) {
+  return (
+    client: Client<Transport, ChainEIP712, Account>,
+  ): SessionClientActions<chain, account> => ({
+    sendTransaction: (args) =>
+      sendTransactionForSession(
+        client,
+        signerClient,
+        publicClient,
+        args,
+        session,
+      ),
+    writeContract: (args) =>
+      writeContractForSession(
+        client,
+        signerClient,
+        publicClient,
+        args,
+        session,
+      ),
+  });
+}
 
 export function globalWalletActions<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
@@ -137,8 +152,7 @@ export function globalWalletActions<
   return (
     client: Client<Transport, ChainEIP712, Account>,
   ): AbstractWalletActions<Chain, Account> => ({
-    createSession: (args) =>
-      createSession(client, signerClient, publicClient, args, isPrivyCrossApp),
+    createSession: (args) => createSession(client, args),
     prepareAbstractTransactionRequest: (args) =>
       prepareTransactionRequest(
         client,
@@ -156,14 +170,6 @@ export function globalWalletActions<
       ),
     sendTransactionBatch: (args) =>
       sendTransactionBatch(
-        client,
-        signerClient,
-        publicClient,
-        args,
-        isPrivyCrossApp,
-      ),
-    sendTransactionForSession: (args) =>
-      sendTransactionForSession(
         client,
         signerClient,
         publicClient,
@@ -208,13 +214,11 @@ export function globalWalletActions<
           Account
         >,
       ),
-    writeContractForSession: (args) =>
-      writeContractForSession(
-        client,
-        signerClient,
-        publicClient,
-        args,
-        isPrivyCrossApp,
-      ),
+    toSessionClient: (signer, session) =>
+      toSessionClient({
+        client: client as AbstractClient,
+        signer,
+        session: session,
+      }),
   });
 }

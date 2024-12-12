@@ -5,6 +5,7 @@ import * as prepareTransactionRequestModule from '../../src/actions/prepareTrans
 import * as sendTransactionModule from '../../src/actions/sendTransaction.js';
 import * as signTransactionModule from '../../src/actions/signTransaction.js';
 import * as writeContractModule from '../../src/actions/writeContract.js';
+import { EOA_VALIDATOR_ADDRESS } from '../../src/constants.js';
 import { globalWalletActions } from '../../src/walletActions.js';
 import { address } from '../constants.js';
 
@@ -82,6 +83,7 @@ describe('globalWalletActions', () => {
       mockClient,
       mockSignerClient,
       mockArgs,
+      EOA_VALIDATOR_ADDRESS,
     );
   });
 

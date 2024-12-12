@@ -2,7 +2,6 @@ import {
   Address,
   type EIP1193EventMap,
   type EIP1193Provider,
-  formatEther,
   hexToBytes,
   parseEther,
   serializeTypedData,
@@ -14,7 +13,6 @@ import { getGeneralPaymasterInput } from 'viem/zksync';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
 import * as abstractClientModule from '../../src/abstractClient.js';
-import { sendTransactionBatch } from '../../src/actions/sendTransaction.js';
 import { agwCapablities, SendCallsParams } from '../../src/eip5792.js';
 import { transformEIP1193Provider } from '../../src/transformEIP1193Provider.js';
 import * as utilsModule from '../../src/utils.js';

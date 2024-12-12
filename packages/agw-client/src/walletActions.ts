@@ -37,6 +37,7 @@ import { signMessage } from './actions/signMessage.js';
 import { signTransaction } from './actions/signTransaction.js';
 import { signTypedData } from './actions/signTypedData.js';
 import { writeContract } from './actions/writeContract.js';
+import { EOA_VALIDATOR_ADDRESS } from './constants.js';
 import type { SendTransactionBatchParameters } from './types/sendTransactionBatch.js';
 
 export type AbstractWalletActions<
@@ -116,6 +117,7 @@ export function globalWalletActions<
         client,
         signerClient,
         args as SignEip712TransactionParameters<chain, account>,
+        EOA_VALIDATOR_ADDRESS,
       ),
     signTypedData: (
       args: Omit<SignTypedDataParameters, 'account' | 'privateKey'>,

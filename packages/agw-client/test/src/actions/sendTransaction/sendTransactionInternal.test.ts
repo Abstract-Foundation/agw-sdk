@@ -1,9 +1,14 @@
 import {
+  Address,
   createClient,
   createPublicClient,
   createWalletClient,
   EIP1193RequestFn,
+  encodeAbiParameters,
+  Hex,
   http,
+  parseAbiParameters,
+  toFunctionSelector,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
 import { abstractTestnet, mainnet } from 'viem/chains';
@@ -24,6 +29,7 @@ vi.mock('../../../../src/actions/signTransaction', () => ({
 }));
 
 import { signTransaction } from '../../../../src/actions/signTransaction.js';
+import { EOA_VALIDATOR_ADDRESS } from '../../../../src/constants.js';
 
 const MOCK_TRANSACTION_HASH =
   '0x9afe47f3d95eccfc9210851ba5f877f76d372514a26b48bad848a07f77c33b87';
@@ -49,6 +55,18 @@ const baseClientRequestSpy = vi.fn(async ({ method, params }) => {
   }
   if (method === 'eth_sendRawTransaction') {
     return MOCK_TRANSACTION_HASH;
+  }
+  if (method === 'eth_call') {
+    const callParams = params as {
+      to: Address;
+      data: Hex;
+    };
+    if (
+      callParams.to === address.smartAccountAddress &&
+      callParams.data.startsWith(toFunctionSelector('function listHooks(bool)'))
+    ) {
+      return encodeAbiParameters(parseAbiParameters(['address[]']), [[]]);
+    }
   }
   return anvilAbstractTestnet.getClient().request({ method, params } as any);
 });
@@ -120,6 +138,7 @@ describe('sendTransactionInternal', () => {
           account: baseClient.account,
           chain: anvilAbstractTestnet.chain as ChainEIP712,
         } as any,
+        EOA_VALIDATOR_ADDRESS,
         isInitialTransaction,
       );
 
@@ -137,7 +156,9 @@ describe('sendTransactionInternal', () => {
           paymasterInput: '0x',
           chainId: abstractTestnet.id,
         }),
+        EOA_VALIDATOR_ADDRESS,
         isInitialTransaction,
+        {},
       );
 
       // Validate that the sendRawTransaction call was made with the correct parameters
@@ -169,6 +190,7 @@ test('sendTransactionInternal with mismatched chain', async () => {
           account: baseClient.account,
           chain: invalidChain,
         } as any,
+        EOA_VALIDATOR_ADDRESS,
         false,
       ),
   ).rejects.toThrowError('Current Chain ID:  11124');

@@ -5,6 +5,7 @@ import {
   http,
   keccak256,
   toBytes,
+  zeroAddress,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
 import { ChainEIP712, ZksyncTransactionRequestEIP712 } from 'viem/zksync';
@@ -17,8 +18,8 @@ import {
 } from '../../../../src/actions/sendTransaction.js';
 import {
   BATCH_CALLER_ADDRESS,
+  EOA_VALIDATOR_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
-  VALIDATOR_ADDRESS,
 } from '../../../../src/constants.js';
 import {
   getInitializerCalldata,
@@ -143,6 +144,7 @@ describe('sendTransaction', () => {
         signerClient,
         publicClient,
         expect.objectContaining({
+          from: zeroAddress,
           to: expectedTo,
           data: expectedData,
           type: 'eip712',
@@ -151,6 +153,7 @@ describe('sendTransaction', () => {
           account: baseClient.account,
           chain: anvilAbstractTestnet.chain as ChainEIP712,
         }),
+        EOA_VALIDATOR_ADDRESS,
         !isDeployed,
       );
       expect(transactionHash).toBe('0xmockedTransactionHash');
@@ -261,7 +264,7 @@ describe('sendTransactionBatch', () => {
         // Verify that getInitializerCalldata is called with the correct arguments
         expect(getInitializerCalldata).toHaveBeenCalledWith(
           address.signerAddress,
-          VALIDATOR_ADDRESS,
+          EOA_VALIDATOR_ADDRESS,
           {
             target: BATCH_CALLER_ADDRESS,
             allowFailure: false,
@@ -299,6 +302,7 @@ describe('sendTransactionBatch', () => {
           paymasterInput: '0xabc',
           value: BigInt(1000),
         }),
+        EOA_VALIDATOR_ADDRESS,
         !isDeployed,
       );
       expect(transactionHash).toBe('0xmockedTransactionHash');

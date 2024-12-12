@@ -1,13 +1,15 @@
 import {
   type Account,
+  type Address,
   BaseError,
   type Client,
   encodeAbiParameters,
+  type Hex,
   parseAbiParameters,
   type Transport,
   type WalletClient,
 } from 'viem';
-import { getChainId, signTypedData } from 'viem/actions';
+import { getChainId, readContract, signTypedData } from 'viem/actions';
 import { assertCurrentChain, getAction, parseAccount } from 'viem/utils';
 import {
   type ChainEIP712,
@@ -15,7 +17,7 @@ import {
   type SignEip712TransactionReturnType,
 } from 'viem/zksync';
 
-import { VALIDATOR_ADDRESS } from '../constants.js';
+import AGWAccountAbi from '../abis/AGWAccount.js';
 import {
   assertEip712Request,
   type AssertEip712RequestParameters,
@@ -32,7 +34,9 @@ export async function signTransaction<
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   args: SignEip712TransactionParameters<chain, account, chainOverride>,
+  validator: Address,
   useSignerAddress = false,
+  validationHookData: Record<string, Hex> = {},
 ): Promise<SignEip712TransactionReturnType> {
   const {
     account: account_ = client.account,
@@ -97,10 +101,26 @@ export async function signTransaction<
   if (useSignerAddress) {
     signature = rawSignature;
   } else {
+    const hookData: Hex[] = [];
+    if (!useSignerAddress) {
+      const validationHooks = await getAction(
+        client,
+        readContract,
+        'readContract',
+      )({
+        address: client.account.address,
+        abi: AGWAccountAbi,
+        functionName: 'listHooks',
+        args: [true],
+      });
+      for (const hook of validationHooks) {
+        hookData.push(validationHookData[hook] ?? '0x');
+      }
+    }
     // Match the expect signature format of the AGW smart account
     signature = encodeAbiParameters(
       parseAbiParameters(['bytes', 'address', 'bytes[]']),
-      [rawSignature, VALIDATOR_ADDRESS, []],
+      [rawSignature, validator, hookData],
     );
   }
 

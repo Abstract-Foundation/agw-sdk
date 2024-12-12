@@ -74,7 +74,7 @@ export async function sendTransactionForSession<
   }
 
   const selector: Hex | undefined = parameters.data
-    ? `0x${parameters.data.slice(2, 8)}`
+    ? `0x${parameters.data.slice(2, 10)}`
     : undefined;
 
   if (!parameters.to) {

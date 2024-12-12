@@ -1,4 +1,11 @@
-import { type Address, encodeFunctionData, type Hash, type Hex } from 'viem';
+import {
+  type Address,
+  encodeAbiParameters,
+  getAbiItem,
+  getAddress,
+  type Hash,
+  type Hex,
+} from 'viem';
 
 import SessionKeyValidatorAbi from './abis/SessionKeyValidator.js';
 
@@ -133,27 +140,68 @@ export interface SessionState {
   }[];
 }
 
-export function encodeSession(sessionConfig: SessionConfig): Hex {
-  const callData = encodeFunctionData({
+export function getSessionSpec() {
+  return getAbiItem({
     abi: SessionKeyValidatorAbi,
-    functionName: 'createSession',
-    args: [sessionConfig],
-  });
-  const selector = callData.slice(0, '0x'.length + 8) as Hex; // first 4 bytes for function selector
-  const args = `0x${callData.slice(selector.length, callData.length)}` as Hex; // the rest is the arguments
-  return args;
+    name: 'createSession',
+  }).inputs[0];
+}
+
+export function encodeSession(sessionConfig: SessionConfig): Hex {
+  return encodeAbiParameters([getSessionSpec()], [sessionConfig]);
 }
 
 export function encodeSessionWithPeriodIds(
   sessionConfig: SessionConfig,
   periods: bigint[],
 ): Hex {
-  const callData = encodeFunctionData({
-    abi: SessionKeyValidatorAbi,
-    functionName: 'createSessionWithPeriods',
-    args: [sessionConfig, periods],
-  });
-  const selector = callData.slice(0, '0x'.length + 8) as Hex; // first 4 bytes for function selector
-  const args = `0x${callData.slice(selector.length, callData.length)}` as Hex; // the rest is the arguments
-  return args;
+  return encodeAbiParameters(
+    [getSessionSpec(), { type: 'uint64[]' }],
+    [sessionConfig, periods],
+  );
 }
+
+export const getPeriodIdsForTransaction = (args: {
+  sessionConfig: SessionConfig;
+  target: Address;
+  selector?: Hex;
+  timestamp?: bigint;
+}) => {
+  const timestamp = args.timestamp || BigInt(Math.floor(Date.now() / 1000));
+  const target = getAddress(args.target.toLowerCase());
+
+  const getId = (limit: Limit): bigint => {
+    if (limit.limitType === LimitType.Allowance) {
+      return timestamp / limit.period;
+    }
+    return 0n;
+  };
+
+  const findTransferPolicy = () => {
+    return args.sessionConfig.transferPolicies.find(
+      (policy) => policy.target === target,
+    );
+  };
+  const findCallPolicy = () => {
+    return args.sessionConfig.callPolicies.find(
+      (policy) => policy.target === target && policy.selector == args.selector,
+    );
+  };
+
+  const isContractCall = !!args.selector;
+  const policy: TransferPolicy | CallPolicy | undefined = isContractCall
+    ? findCallPolicy()
+    : findTransferPolicy();
+  if (!policy) throw new Error('Transaction does not fit any policy');
+
+  const periodIds = [
+    getId(args.sessionConfig.feeLimit),
+    getId(policy.valueLimit),
+    ...(isContractCall
+      ? (policy as CallPolicy).constraints.map((constraint) =>
+          getId(constraint.limit),
+        )
+      : []),
+  ];
+  return periodIds;
+};

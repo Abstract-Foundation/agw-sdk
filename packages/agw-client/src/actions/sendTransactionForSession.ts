@@ -2,6 +2,7 @@ import {
   type Account,
   BaseError,
   type Client,
+  type Hex,
   type PublicClient,
   type SendTransactionRequest,
   type Transport,
@@ -14,7 +15,11 @@ import {
 } from 'viem/zksync';
 
 import { SESSION_KEY_VALIDATOR_ADDRESS } from '../constants.js';
-import { encodeSessionWithPeriodIds, type SessionConfig } from '../sessions.js';
+import {
+  encodeSessionWithPeriodIds,
+  getPeriodIdsForTransaction,
+  type SessionConfig,
+} from '../sessions.js';
 import { isSmartAccountDeployed } from '../utils.js';
 import { sendPrivyTransaction } from './sendPrivyTransaction.js';
 import { sendTransactionInternal } from './sendTransactionInternal.js';
@@ -68,6 +73,13 @@ export async function sendTransactionForSession<
     throw new BaseError('Smart account not deployed');
   }
 
+  const selector: Hex | undefined = parameters.data
+    ? `0x${parameters.data.slice(2, 8)}`
+    : undefined;
+
+  if (!parameters.to) {
+    throw new BaseError('Transaction to field is not specified');
+  }
   return sendTransactionInternal(
     client,
     signerClient,
@@ -76,7 +88,15 @@ export async function sendTransactionForSession<
     SESSION_KEY_VALIDATOR_ADDRESS,
     !isDeployed,
     {
-      [SESSION_KEY_VALIDATOR_ADDRESS]: encodeSessionWithPeriodIds(session, []),
+      [SESSION_KEY_VALIDATOR_ADDRESS]: encodeSessionWithPeriodIds(
+        session,
+        getPeriodIdsForTransaction({
+          sessionConfig: session,
+          target: parameters.to,
+          selector,
+          timestamp: BigInt(Math.floor(Date.now() / 1000)),
+        }),
+      ),
     },
   );
 }

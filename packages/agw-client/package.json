@@ -33,12 +33,20 @@
       "types": "./dist/types/exports/constants.d.ts",
       "import": "./dist/esm/exports/constants.js",
       "require": "./dist/cjs/exports/constants.js"
+    },
+    "./sessions": {
+      "types": "./dist/types/exports/sessions.d.ts",
+      "import": "./dist/esm/exports/sessions.js",
+      "require": "./dist/cjs/exports/sessions.js"
     }
   },
   "typesVersions": {
     "*": {
       "constants": [
         "./dist/types/exports/constants.d.ts"
+      ],
+      "sessions": [
+        "./dist/types/exports/sessions.d.ts"
       ]
     }
   },

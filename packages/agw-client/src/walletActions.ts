@@ -37,6 +37,11 @@ import {
   type PrepareTransactionRequestRequest,
 } from './actions/prepareTransaction.js';
 import {
+  revokeSessions,
+  type RevokeSessionsParameters,
+  type RevokeSessionsReturnType,
+} from './actions/revokeSessions.js';
+import {
   sendTransaction,
   sendTransactionBatch,
 } from './actions/sendTransaction.js';
@@ -56,8 +61,11 @@ export type AbstractWalletActions<
   account extends Account | undefined = Account | undefined,
 > = Eip712WalletActions<chain, account> & {
   createSession: (
-    args: CreateSessionParameters<chain, account, undefined>,
+    args: CreateSessionParameters,
   ) => Promise<CreateSessionReturnType>;
+  revokeSessions: (
+    args: RevokeSessionsParameters,
+  ) => Promise<RevokeSessionsReturnType>;
   signMessage: (
     args: Omit<SignMessageParameters, 'account'>,
   ) => Promise<SignMessageReturnType>;
@@ -150,6 +158,7 @@ export function globalWalletActions<
     client: Client<Transport, ChainEIP712, Account>,
   ): AbstractWalletActions<Chain, Account> => ({
     createSession: (args) => createSession(client, args),
+    revokeSessions: (args) => revokeSessions(client, args),
     prepareAbstractTransactionRequest: (args) =>
       prepareTransactionRequest(
         client,

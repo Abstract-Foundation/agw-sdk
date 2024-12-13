@@ -5,6 +5,7 @@ import {
   getAddress,
   type Hash,
   type Hex,
+  keccak256,
 } from 'viem';
 
 import SessionKeyValidatorAbi from './abis/SessionKeyValidator.js';
@@ -205,3 +206,7 @@ export const getPeriodIdsForTransaction = (args: {
   ];
   return periodIds;
 };
+
+export function getSessionHash(sessionConfig: SessionConfig): Hash {
+  return keccak256(encodeSession(sessionConfig));
+}

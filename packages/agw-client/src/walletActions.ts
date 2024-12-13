@@ -24,11 +24,7 @@ import {
   type SignEip712TransactionParameters,
 } from 'viem/zksync';
 
-import {
-  type AbstractClient,
-  type SessionClient,
-  toSessionClient,
-} from './abstractClient.js';
+import { type AbstractClient } from './abstractClient.js';
 import {
   createSession,
   type CreateSessionParameters,
@@ -51,6 +47,7 @@ import { signTypedData } from './actions/signTypedData.js';
 import { writeContract } from './actions/writeContract.js';
 import { writeContractForSession } from './actions/writeContractForSession.js';
 import { EOA_VALIDATOR_ADDRESS } from './constants.js';
+import { type SessionClient, toSessionClient } from './sessionClient.js';
 import type { SessionConfig } from './sessions.js';
 import type { SendTransactionBatchParameters } from './types/sendTransactionBatch.js';
 

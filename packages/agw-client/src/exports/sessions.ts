@@ -1,3 +1,8 @@
+import {
+  createSessionClient,
+  type SessionClient,
+  toSessionClient,
+} from '../sessionClient.js';
 import type {
   CallPolicy,
   Constraint,
@@ -18,12 +23,15 @@ export {
   type CallPolicy,
   type Constraint,
   ConstraintCondition,
+  createSessionClient,
   type Limit,
   LimitType,
   LimitUnlimited,
   LimitZero,
+  type SessionClient,
   type SessionConfig,
   type SessionState,
   type SessionStatus,
+  toSessionClient,
   type TransferPolicy,
 };

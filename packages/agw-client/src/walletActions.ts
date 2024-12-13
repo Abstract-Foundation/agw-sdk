@@ -184,6 +184,7 @@ export function globalWalletActions<
         signerClient,
         args as SignEip712TransactionParameters<chain, account>,
         EOA_VALIDATOR_ADDRESS,
+        EOA_VALIDATOR_ADDRESS,
       ),
     signTypedData: (
       args: Omit<SignTypedDataParameters, 'account' | 'privateKey'>,

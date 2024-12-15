@@ -1,7 +1,9 @@
 import {
+  concatHex,
   createClient,
   createPublicClient,
   createWalletClient,
+  encodeFunctionData,
   http,
   parseEther,
 } from 'viem';
@@ -26,9 +28,14 @@ vi.mock('viem/actions', () => ({
   readContract: vi.fn(),
 }));
 
+import AGWAccountAbi from '../../../src/abis/AGWAccount.js';
 import { createSession } from '../../../src/actions/createSession.js';
 import { sendTransaction } from '../../../src/actions/sendTransaction.js';
-import { LimitType, SessionConfig } from '../../../src/sessions.js';
+import {
+  encodeSession,
+  LimitType,
+  SessionConfig,
+} from '../../../src/sessions.js';
 
 const sessionSigner = privateKeyToAccount(generatePrivateKey());
 
@@ -80,4 +87,52 @@ test('should create a session with module already installed', async () => {
   );
 
   expect(transactionHash).toBe('0xmockedTransactionHash');
+});
+
+test('should add module and create a session with module not installed', async () => {
+  vi.mocked(sendTransaction).mockResolvedValue('0xmockedTransactionHash');
+  vi.mocked(readContract).mockResolvedValue([]);
+
+  const session: SessionConfig = {
+    signer: sessionSigner.address,
+    expiresAt: 1099511627775n,
+    callPolicies: [],
+    transferPolicies: [],
+    feeLimit: {
+      limit: parseEther('1'),
+      limitType: LimitType.Lifetime,
+      period: 0n,
+    },
+  };
+
+  const { transactionHash } = await createSession(
+    baseClient,
+    signerClient,
+    publicClient,
+    {
+      session,
+    },
+    false,
+  );
+
+  expect(transactionHash).toBe('0xmockedTransactionHash');
+
+  expect(sendTransaction).toHaveBeenCalledWith(
+    baseClient,
+    signerClient,
+    publicClient,
+    {
+      account: baseClient.account,
+      chain: anvilAbstractTestnet.chain as ChainEIP712,
+      to: address.smartAccountAddress,
+      data: encodeFunctionData({
+        abi: AGWAccountAbi,
+        functionName: 'addModule',
+        args: [
+          concatHex([SESSION_KEY_VALIDATOR_ADDRESS, encodeSession(session)]),
+        ],
+      }),
+    },
+    false,
+  );
 });

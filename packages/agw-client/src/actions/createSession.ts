@@ -3,9 +3,11 @@ import {
   type Client,
   concatHex,
   type Hash,
+  type PublicClient,
   type Transport,
+  type WalletClient,
 } from 'viem';
-import { readContract, writeContract } from 'viem/actions';
+import { readContract } from 'viem/actions';
 import type { ChainEIP712 } from 'viem/chains';
 import { getAction } from 'viem/utils';
 
@@ -13,6 +15,7 @@ import AGWAccountAbi from '../abis/AGWAccount.js';
 import SessionKeyValidatorAbi from '../abis/SessionKeyValidator.js';
 import { SESSION_KEY_VALIDATOR_ADDRESS } from '../constants.js';
 import { encodeSession, type SessionConfig } from '../sessions.js';
+import { writeContract } from './writeContract.js';
 
 export interface CreateSessionParameters {
   session: SessionConfig;
@@ -25,7 +28,10 @@ export interface CreateSessionReturnType {
 
 export async function createSession(
   client: Client<Transport, ChainEIP712, Account>,
+  signerClient: WalletClient<Transport, ChainEIP712, Account>,
+  publicClient: PublicClient<Transport, ChainEIP712>,
   args: CreateSessionParameters,
+  isPrivyCrossApp = false,
 ): Promise<CreateSessionReturnType> {
   const {
     session,
@@ -51,31 +57,35 @@ export async function createSession(
 
   if (!hasSessionModule) {
     const encodedSession = encodeSession(session);
-    transactionHash = await getAction(
+    transactionHash = await writeContract(
       client,
-      writeContract,
-      'writeContract',
-    )({
-      account: client.account,
-      chain: client.chain,
-      address: client.account.address,
-      abi: AGWAccountAbi,
-      functionName: 'addModule',
-      args: [concatHex([SESSION_KEY_VALIDATOR_ADDRESS, encodedSession])],
-    });
+      signerClient,
+      publicClient,
+      {
+        account: client.account,
+        chain: client.chain,
+        address: client.account.address,
+        abi: AGWAccountAbi,
+        functionName: 'addModule',
+        args: [concatHex([SESSION_KEY_VALIDATOR_ADDRESS, encodedSession])],
+      },
+      isPrivyCrossApp,
+    );
   } else {
-    transactionHash = await getAction(
+    transactionHash = await writeContract(
       client,
-      writeContract,
-      'writeContract',
-    )({
-      account: client.account,
-      chain: client.chain,
-      address: SESSION_KEY_VALIDATOR_ADDRESS,
-      abi: SessionKeyValidatorAbi,
-      functionName: 'createSession',
-      args: [session as any],
-    });
+      signerClient,
+      publicClient,
+      {
+        account: client.account,
+        chain: client.chain,
+        address: SESSION_KEY_VALIDATOR_ADDRESS,
+        abi: SessionKeyValidatorAbi,
+        functionName: 'createSession',
+        args: [session as any],
+      },
+      isPrivyCrossApp,
+    );
   }
 
   return { transactionHash, session };

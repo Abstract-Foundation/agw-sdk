@@ -157,7 +157,8 @@ export function globalWalletActions<
   return (
     client: Client<Transport, ChainEIP712, Account>,
   ): AbstractWalletActions<Chain, Account> => ({
-    createSession: (args) => createSession(client, args),
+    createSession: (args) =>
+      createSession(client, signerClient, publicClient, args, isPrivyCrossApp),
     revokeSessions: (args) => revokeSessions(client, args),
     prepareAbstractTransactionRequest: (args) =>
       prepareTransactionRequest(

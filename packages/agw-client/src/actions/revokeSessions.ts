@@ -1,11 +1,18 @@
-import { type Account, type Client, type Hash, type Transport } from 'viem';
-import { writeContract } from 'viem/actions';
+import {
+  type Account,
+  type Client,
+  type Hash,
+  type PublicClient,
+  type Transport,
+  type WalletClient,
+} from 'viem';
 import type { ChainEIP712 } from 'viem/chains';
 import { getAction } from 'viem/utils';
 
 import SessionKeyValidatorAbi from '../abis/SessionKeyValidator.js';
 import { SESSION_KEY_VALIDATOR_ADDRESS } from '../constants.js';
 import { getSessionHash, type SessionConfig } from '../sessions.js';
+import { writeContract } from './writeContract.js';
 
 export interface RevokeSessionsParameters {
   session: SessionConfig | Hash | (SessionConfig | Hash)[];
@@ -16,7 +23,10 @@ export interface RevokeSessionsReturnType {
 
 export async function revokeSessions(
   client: Client<Transport, ChainEIP712, Account>,
+  signerClient: WalletClient<Transport, ChainEIP712, Account>,
+  publicClient: PublicClient<Transport, ChainEIP712>,
   args: RevokeSessionsParameters,
+  isPrivyCrossApp = false,
 ): Promise<RevokeSessionsReturnType> {
   const { session } = args;
 
@@ -27,18 +37,20 @@ export async function revokeSessions(
         ? session.map(sessionHash)
         : [getSessionHash(session)];
 
-  const transactionHash = await getAction(
+  const transactionHash = await writeContract(
     client,
-    writeContract,
-    'writeContract',
-  )({
-    account: client.account,
-    chain: client.chain,
-    address: SESSION_KEY_VALIDATOR_ADDRESS,
-    abi: SessionKeyValidatorAbi,
-    functionName: 'revokeKeys',
-    args: [sessionHashes],
-  });
+    signerClient,
+    publicClient,
+    {
+      account: client.account,
+      chain: client.chain,
+      address: SESSION_KEY_VALIDATOR_ADDRESS,
+      abi: SessionKeyValidatorAbi,
+      functionName: 'revokeKeys',
+      args: [sessionHashes],
+    },
+    isPrivyCrossApp,
+  );
 
   return { transactionHash };
 }

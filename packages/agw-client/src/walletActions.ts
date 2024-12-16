@@ -159,7 +159,8 @@ export function globalWalletActions<
   ): AbstractWalletActions<Chain, Account> => ({
     createSession: (args) =>
       createSession(client, signerClient, publicClient, args, isPrivyCrossApp),
-    revokeSessions: (args) => revokeSessions(client, args),
+    revokeSessions: (args) =>
+      revokeSessions(client, signerClient, publicClient, args, isPrivyCrossApp),
     prepareAbstractTransactionRequest: (args) =>
       prepareTransactionRequest(
         client,

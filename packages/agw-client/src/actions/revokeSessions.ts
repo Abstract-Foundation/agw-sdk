@@ -7,7 +7,6 @@ import {
   type WalletClient,
 } from 'viem';
 import type { ChainEIP712 } from 'viem/chains';
-import { getAction } from 'viem/utils';
 
 import SessionKeyValidatorAbi from '../abis/SessionKeyValidator.js';
 import { SESSION_KEY_VALIDATOR_ADDRESS } from '../constants.js';

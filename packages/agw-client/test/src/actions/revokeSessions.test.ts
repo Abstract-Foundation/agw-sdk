@@ -1,12 +1,10 @@
 import {
-  concatHex,
   createClient,
   createPublicClient,
   createWalletClient,
   encodeFunctionData,
   Hash,
   http,
-  keccak256,
   parseEther,
 } from 'viem';
 import {
@@ -30,13 +28,10 @@ vi.mock('viem/actions', () => ({
   readContract: vi.fn(),
 }));
 
-import AGWAccountAbi from '../../../src/abis/AGWAccount.js';
 import SessionKeyValidatorAbi from '../../../src/abis/SessionKeyValidator.js';
-import { createSession } from '../../../src/actions/createSession.js';
 import { revokeSessions } from '../../../src/actions/revokeSessions.js';
 import { sendTransaction } from '../../../src/actions/sendTransaction.js';
 import {
-  encodeSession,
   getSessionHash,
   LimitType,
   SessionConfig,
@@ -65,7 +60,7 @@ beforeEach(() => {
   vi.resetAllMocks();
 });
 
-describe.only('revokeSessions', () => {
+describe('revokeSessions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(sendTransaction).mockResolvedValue('0xmockedTransactionHash');

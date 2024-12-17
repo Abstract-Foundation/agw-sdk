@@ -41,7 +41,7 @@ export function toSessionClient({
   session,
 }: ToSessionClientParams) {
   return createSessionClient({
-    account: client.account.address,
+    account: client.account,
     chain: client.chain,
     session,
     signer,

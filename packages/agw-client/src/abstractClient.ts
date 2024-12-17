@@ -8,6 +8,7 @@ import {
   http,
   type Transport,
 } from 'viem';
+import { toAccount } from 'viem/accounts';
 import { type ChainEIP712 } from 'viem/zksync';
 
 import { getSmartAccountAddressFromInitialSigner } from './utils.js';
@@ -73,7 +74,7 @@ export async function createAbstractClient({
     ));
 
   const baseClient = createClient({
-    account: smartAccountAddress,
+    account: toAccount(smartAccountAddress),
     chain: chain,
     transport,
   });

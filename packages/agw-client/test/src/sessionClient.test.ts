@@ -6,8 +6,6 @@ import { createAbstractClient } from '../../src/abstractClient.js';
 import { anvilAbstractTestnet } from '../anvil.js';
 import { address } from '../constants.js';
 
-const MOCK_SMART_ACCOUNT_ADDRESS = address.smartAccountAddress;
-
 // Mock the entire viem module
 vi.mock('viem', async () => {
   const actual = await vi.importActual('viem');
@@ -28,7 +26,13 @@ vi.mock('viem', async () => {
   };
 });
 
-import { createClient, createPublicClient, createWalletClient } from 'viem';
+import {
+  createClient,
+  createPublicClient,
+  createWalletClient,
+  parseEther,
+  toFunctionSelector,
+} from 'viem';
 
 vi.mock('../../src/utils', () => ({
   getSmartAccountAddressFromInitialSigner: vi
@@ -36,10 +40,36 @@ vi.mock('../../src/utils', () => ({
     .mockResolvedValue('0x0000000000000000000000000000000000012345'),
 }));
 
+import { toSessionClient } from '../../src/sessionClient.js';
+import { LimitType, LimitZero } from '../../src/sessions.js';
+import { SessionConfig } from '../../src/sessions.js';
 import { getSmartAccountAddressFromInitialSigner } from '../../src/utils.js';
 
-describe('createAbstractClient', () => {
+const MOCK_CONTRACT_ADDRESS = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
+
+const session: SessionConfig = {
+  signer: address.sessionSignerAddress,
+  expiresAt: BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7),
+  feeLimit: {
+    limit: parseEther('1'),
+    limitType: LimitType.Lifetime,
+    period: 0n,
+  },
+  callPolicies: [
+    {
+      selector: toFunctionSelector('function mint(address,uint256)'),
+      target: MOCK_CONTRACT_ADDRESS,
+      constraints: [],
+      maxValuePerUse: 0n,
+      valueLimit: LimitZero,
+    },
+  ],
+  transferPolicies: [],
+};
+
+describe('createSessionClient', () => {
   const signer = toAccount(address.signerAddress);
+  const sessionSigner = toAccount(address.sessionSignerAddress);
   const mockWalletClient = vi.fn();
   const mockPublicClient = vi.fn();
 
@@ -48,30 +78,18 @@ describe('createAbstractClient', () => {
     vi.mocked(createPublicClient).mockReturnValue(mockPublicClient as any);
   });
 
-  const testAbstractClient = (abstractClient: any, expectedTransport: any) => {
+  const testSessionClient = (sessionClient: any, expectedTransport: any) => {
     expect(createClient).toHaveBeenCalledWith({
-      account: expect.objectContaining({
-        address: MOCK_SMART_ACCOUNT_ADDRESS,
-      }),
+      account: toAccount(address.smartAccountAddress),
       chain: anvilAbstractTestnet.chain as ChainEIP712,
       transport: expectedTransport,
     });
 
-    [
-      'sendTransaction',
-      'sendTransactionBatch',
-      'signTransaction',
-      'deployContract',
-      'writeContract',
-      'prepareAbstractTransactionRequest',
-    ].forEach((prop) => {
-      expect(abstractClient).toHaveProperty(prop);
+    ['sendTransaction', 'writeContract'].forEach((prop) => {
+      expect(sessionClient).toHaveProperty(prop);
     });
 
-    expect(getSmartAccountAddressFromInitialSigner).toHaveBeenCalledWith(
-      address.signerAddress,
-      mockPublicClient,
-    );
+    expect(getSmartAccountAddressFromInitialSigner).not.toHaveBeenCalled();
   };
 
   it('creates client without transport', async () => {
@@ -79,9 +97,16 @@ describe('createAbstractClient', () => {
     const abstractClient = await createAbstractClient({
       signer,
       chain: anvilAbstractTestnet.chain as ChainEIP712,
+      address: address.smartAccountAddress,
     });
 
-    testAbstractClient(abstractClient, mockTransport);
+    const sessionClient = toSessionClient({
+      client: abstractClient,
+      signer: sessionSigner,
+      session,
+    });
+
+    testSessionClient(sessionClient, mockTransport);
   });
 
   it('creates client with custom transport', async () => {
@@ -89,9 +114,16 @@ describe('createAbstractClient', () => {
     const abstractClient = await createAbstractClient({
       signer,
       chain: anvilAbstractTestnet.chain as ChainEIP712,
+      address: address.smartAccountAddress,
       transport: mockTransport,
     });
 
-    testAbstractClient(abstractClient, mockTransport);
+    const sessionClient = toSessionClient({
+      client: abstractClient,
+      signer: toAccount(address.sessionSignerAddress),
+      session,
+    });
+
+    testSessionClient(sessionClient, mockTransport);
   });
 });

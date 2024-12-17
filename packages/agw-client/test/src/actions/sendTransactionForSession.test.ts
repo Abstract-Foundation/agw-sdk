@@ -3,29 +3,14 @@ import {
   createPublicClient,
   createWalletClient,
   http,
-  keccak256,
   parseEther,
-  toBytes,
-  zeroAddress,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
 import { ChainEIP712, ZksyncTransactionRequestEIP712 } from 'viem/zksync';
-import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import AccountFactoryAbi from '../../../src/abis/AccountFactory.js';
-import {
-  sendTransaction,
-  sendTransactionBatch,
-} from '../../../src/actions/sendTransaction.js';
-import {
-  EOA_VALIDATOR_ADDRESS,
-  SESSION_KEY_VALIDATOR_ADDRESS,
-  SMART_ACCOUNT_FACTORY_ADDRESS,
-} from '../../../src/constants.js';
-import {
-  getInitializerCalldata,
-  isSmartAccountDeployed,
-} from '../../../src/utils.js';
+import { SESSION_KEY_VALIDATOR_ADDRESS } from '../../../src/constants.js';
+import { isSmartAccountDeployed } from '../../../src/utils.js';
 import { anvilAbstractTestnet } from '../../anvil.js';
 import { address } from '../../constants.js';
 
@@ -40,8 +25,6 @@ vi.mock('viem', async (importOriginal) => {
     encodeFunctionData: vi.fn().mockReturnValue('0xmockedEncodedData'),
   };
 });
-
-import { encodeFunctionData } from 'viem';
 
 import { sendTransactionForSession } from '../../../src/actions/sendTransactionForSession.js';
 import { sendTransactionInternal } from '../../../src/actions/sendTransactionInternal.js';
@@ -160,5 +143,42 @@ describe('sendTransaction', () => {
         ),
       },
     );
+  });
+
+  it('should call throw if AGW is not deployed', async () => {
+    vi.mocked(isSmartAccountDeployed).mockResolvedValue(false);
+    await expect(
+      sendTransactionForSession(
+        baseClient,
+        signerClient,
+        publicClient,
+        {
+          ...transaction1,
+          type: 'eip712',
+          account: baseClient.account,
+          chain: anvilAbstractTestnet.chain as ChainEIP712,
+        },
+        session,
+      ),
+    ).rejects.toThrow('Smart account not deployed');
+  });
+
+  it('should call throw if to field is not set', async () => {
+    vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
+    await expect(
+      sendTransactionForSession(
+        baseClient,
+        signerClient,
+        publicClient,
+        {
+          ...transaction1,
+          to: undefined,
+          type: 'eip712',
+          account: baseClient.account,
+          chain: anvilAbstractTestnet.chain as ChainEIP712,
+        },
+        session,
+      ),
+    ).rejects.toThrow('Transaction to field is not specified');
   });
 });

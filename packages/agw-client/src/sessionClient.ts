@@ -9,6 +9,7 @@ import {
   http,
   type Transport,
 } from 'viem';
+import { toAccount } from 'viem/accounts';
 import type { ChainEIP712 } from 'viem/chains';
 
 import type { AbstractClient } from './abstractClient.js';
@@ -19,7 +20,7 @@ import {
 } from './walletActions.js';
 
 interface CreateSessionClientParameters {
-  account: Address;
+  account: Account | Address;
   chain: ChainEIP712;
   signer: Account;
   session: SessionConfig;
@@ -66,7 +67,7 @@ export function createSessionClient({
   });
 
   const baseClient = createClient({
-    account,
+    account: typeof account === 'string' ? toAccount(account) : account,
     chain: chain,
     transport,
   });

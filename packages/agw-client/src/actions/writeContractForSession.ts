@@ -44,7 +44,6 @@ export async function writeContractForSession<
     chainOverride
   >,
   session: SessionConfig,
-  isPrivyCrossApp = false,
 ): Promise<WriteContractReturnType> {
   const {
     abi,
@@ -80,7 +79,6 @@ export async function writeContractForSession<
         ...request,
       },
       session,
-      isPrivyCrossApp,
     );
   } catch (error) {
     throw getContractError(error as BaseError, {

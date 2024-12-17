@@ -21,7 +21,6 @@ import {
   type SessionConfig,
 } from '../sessions.js';
 import { isSmartAccountDeployed } from '../utils.js';
-import { sendPrivyTransaction } from './sendPrivyTransaction.js';
 import { sendTransactionInternal } from './sendTransactionInternal.js';
 
 export interface SendTransactionForSessionParameters<
@@ -61,10 +60,7 @@ export async function sendTransactionForSession<
     request
   >,
   session: SessionConfig,
-  isPrivyCrossApp = false,
 ): Promise<SendEip712TransactionReturnType> {
-  if (isPrivyCrossApp) return await sendPrivyTransaction(client, parameters);
-
   const isDeployed = await isSmartAccountDeployed(
     publicClient,
     client.account.address,

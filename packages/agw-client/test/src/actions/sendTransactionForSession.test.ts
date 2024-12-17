@@ -63,9 +63,8 @@ const transaction1: ZksyncTransactionRequestEIP712 = {
 };
 
 const transaction2: ZksyncTransactionRequestEIP712 = {
-  to: '0x1234500000000000000000000000000000000000',
+  to: '0x0000000000000000000000000000000000000101',
   from: '0x0000000000000000000000000000000000000000',
-  data: '0x4321',
   value: 1000n,
 };
 
@@ -89,6 +88,28 @@ const session: SessionConfig = {
   transferPolicies: [],
 };
 
+const session2: SessionConfig = {
+  signer: signerClient.account.address,
+  expiresAt: BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7),
+  feeLimit: {
+    limit: parseEther('1'),
+    limitType: LimitType.Lifetime,
+    period: 0n,
+  },
+  callPolicies: [],
+  transferPolicies: [
+    {
+      maxValuePerUse: parseEther('1'),
+      target: '0x0000000000000000000000000000000000000101',
+      valueLimit: {
+        limit: parseEther('1'),
+        limitType: LimitType.Lifetime,
+        period: 0n,
+      },
+    },
+  ],
+};
+
 describe('sendTransaction', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -101,7 +122,7 @@ describe('sendTransaction', () => {
     vi.resetAllMocks();
   });
 
-  it('should call sendTransactionInternal with correct arguments', async () => {
+  it('should call sendTransactionInternal with correct arguments (function call)', async () => {
     vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
     await sendTransactionForSession(
       baseClient,
@@ -138,6 +159,48 @@ describe('sendTransaction', () => {
             sessionConfig: session,
             target: transaction1.to,
             selector: transaction1.data,
+            timestamp: BigInt(Math.floor(Date.now() / 1000)),
+          }),
+        ),
+      },
+    );
+  });
+
+  it('should call sendTransactionInternal with correct arguments (simple transfer)', async () => {
+    vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
+    await sendTransactionForSession(
+      baseClient,
+      signerClient,
+      publicClient,
+      {
+        ...transaction2,
+        type: 'eip712',
+        account: baseClient.account,
+        chain: anvilAbstractTestnet.chain as ChainEIP712,
+      },
+      session2,
+    );
+    expect(sendTransactionInternal).toHaveBeenCalledWith(
+      baseClient,
+      signerClient,
+      publicClient,
+      {
+        account: baseClient.account,
+        chain: anvilAbstractTestnet.chain as ChainEIP712,
+        to: transaction2.to,
+        from: transaction2.from,
+        value: transaction2.value,
+        type: 'eip712',
+      },
+      SESSION_KEY_VALIDATOR_ADDRESS,
+      false,
+      {
+        [SESSION_KEY_VALIDATOR_ADDRESS]: encodeSessionWithPeriodIds(
+          session2,
+          getPeriodIdsForTransaction({
+            sessionConfig: session2,
+            target: transaction2.to,
+            selector: transaction2.data,
             timestamp: BigInt(Math.floor(Date.now() / 1000)),
           }),
         ),

@@ -71,7 +71,7 @@ function abstractWalletConnector(
       return transformEIP1193Provider({
         provider,
         chain,
-        isPrivyCrossApp: false,
+        isPrivyCrossApp: true,
       });
     };
 

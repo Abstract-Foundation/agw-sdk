@@ -16,8 +16,10 @@ import { ChainEIP712 } from 'viem/zksync';
 import { beforeEach, expect, test, vi } from 'vitest';
 
 import { SESSION_KEY_VALIDATOR_ADDRESS } from '../../../src/constants.js';
+import { isSmartAccountDeployed } from '../../../src/utils.js';
 import { anvilAbstractTestnet } from '../../anvil.js';
 import { address } from '../../constants.js';
+vi.mock('../../../src/utils.js');
 vi.mock('../../../src/actions/sendTransaction', () => ({
   sendTransaction: vi.fn(),
 }));
@@ -61,6 +63,7 @@ beforeEach(() => {
 });
 
 test('should create a session with module already installed', async () => {
+  vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
   vi.mocked(sendTransaction).mockResolvedValue('0xmockedTransactionHash');
   vi.mocked(readContract).mockResolvedValue([SESSION_KEY_VALIDATOR_ADDRESS]);
 
@@ -89,7 +92,57 @@ test('should create a session with module already installed', async () => {
   expect(transactionHash).toBe('0xmockedTransactionHash');
 });
 
+test('should add module and create a session with contract not deployed', async () => {
+  vi.mocked(isSmartAccountDeployed).mockResolvedValue(false);
+  vi.mocked(sendTransaction).mockResolvedValue('0xmockedTransactionHash');
+  vi.mocked(readContract).mockResolvedValue([]);
+
+  const session: SessionConfig = {
+    signer: sessionSigner.address,
+    expiresAt: 1099511627775n,
+    callPolicies: [],
+    transferPolicies: [],
+    feeLimit: {
+      limit: parseEther('1'),
+      limitType: LimitType.Lifetime,
+      period: 0n,
+    },
+  };
+
+  const { transactionHash } = await createSession(
+    baseClient,
+    signerClient,
+    publicClient,
+    {
+      session,
+    },
+    false,
+  );
+
+  expect(transactionHash).toBe('0xmockedTransactionHash');
+
+  expect(sendTransaction).toHaveBeenCalledWith(
+    baseClient,
+    signerClient,
+    publicClient,
+    {
+      account: baseClient.account,
+      chain: anvilAbstractTestnet.chain as ChainEIP712,
+      to: address.smartAccountAddress,
+      data: encodeFunctionData({
+        abi: AGWAccountAbi,
+        functionName: 'addModule',
+        args: [
+          concatHex([SESSION_KEY_VALIDATOR_ADDRESS, encodeSession(session)]),
+        ],
+      }),
+    },
+    false,
+  );
+});
+
 test('should add module and create a session with module not installed', async () => {
+  vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
   vi.mocked(sendTransaction).mockResolvedValue('0xmockedTransactionHash');
   vi.mocked(readContract).mockResolvedValue([]);
 

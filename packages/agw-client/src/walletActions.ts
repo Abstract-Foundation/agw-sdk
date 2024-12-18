@@ -116,17 +116,14 @@ export interface SessionClientActions<
   writeContract: WalletActions<chain, account>['writeContract'];
 }
 
-export function sessionWalletActions<
-  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
-  account extends Account | undefined = Account | undefined,
->(
+export function sessionWalletActions(
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
   session: SessionConfig,
 ) {
   return (
     client: Client<Transport, ChainEIP712, Account>,
-  ): SessionClientActions<chain, account> => ({
+  ): SessionClientActions<Chain, Account> => ({
     sendTransaction: (args) =>
       sendTransactionForSession(
         client,

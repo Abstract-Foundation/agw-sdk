@@ -79,7 +79,7 @@ export function createSessionClient({
   });
 
   const sessionClient = baseClient.extend(
-    sessionWalletActions(signerWalletClient, publicClient, session) as any, // why do we need to cast to any here?
+    sessionWalletActions(signerWalletClient, publicClient, session),
   );
 
   return sessionClient as SessionClient;

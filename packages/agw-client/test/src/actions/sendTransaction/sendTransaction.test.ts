@@ -17,7 +17,6 @@ import {
   sendTransactionBatch,
 } from '../../../../src/actions/sendTransaction.js';
 import {
-  BATCH_CALLER_ADDRESS,
   EOA_VALIDATOR_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
 } from '../../../../src/constants.js';
@@ -182,7 +181,7 @@ describe('sendTransactionBatch', () => {
     },
     {
       isDeployed: true,
-      expectedTo: BATCH_CALLER_ADDRESS,
+      expectedTo: baseClient.account.address,
       encodeFunctionDataCallCount: 1,
       expectedData: '0xbatchCalldata',
     },
@@ -266,7 +265,7 @@ describe('sendTransactionBatch', () => {
           address.signerAddress,
           EOA_VALIDATOR_ADDRESS,
           {
-            target: BATCH_CALLER_ADDRESS,
+            target: baseClient.account.address,
             allowFailure: false,
             value: 1000n,
             callData: '0xbatchCalldata',

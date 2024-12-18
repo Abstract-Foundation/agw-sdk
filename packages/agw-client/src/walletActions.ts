@@ -13,6 +13,7 @@ import {
   type SignTypedDataParameters,
   type SignTypedDataReturnType,
   type Transport,
+  type WalletActions,
   type WalletClient,
   type WriteContractParameters,
 } from 'viem';
@@ -23,6 +24,12 @@ import {
   type SignEip712TransactionParameters,
 } from 'viem/zksync';
 
+import { type AbstractClient } from './abstractClient.js';
+import {
+  createSession,
+  type CreateSessionParameters,
+  type CreateSessionReturnType,
+} from './actions/createSession.js';
 import { deployContract } from './actions/deployContract.js';
 import {
   prepareTransactionRequest,
@@ -30,20 +37,35 @@ import {
   type PrepareTransactionRequestRequest,
 } from './actions/prepareTransaction.js';
 import {
+  revokeSessions,
+  type RevokeSessionsParameters,
+  type RevokeSessionsReturnType,
+} from './actions/revokeSessions.js';
+import {
   sendTransaction,
   sendTransactionBatch,
 } from './actions/sendTransaction.js';
+import { sendTransactionForSession } from './actions/sendTransactionForSession.js';
 import { signMessage } from './actions/signMessage.js';
 import { signTransaction } from './actions/signTransaction.js';
 import { signTypedData } from './actions/signTypedData.js';
 import { writeContract } from './actions/writeContract.js';
+import { writeContractForSession } from './actions/writeContractForSession.js';
 import { EOA_VALIDATOR_ADDRESS } from './constants.js';
+import { type SessionClient, toSessionClient } from './sessionClient.js';
+import type { SessionConfig } from './sessions.js';
 import type { SendTransactionBatchParameters } from './types/sendTransactionBatch.js';
 
 export type AbstractWalletActions<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
 > = Eip712WalletActions<chain, account> & {
+  createSession: (
+    args: CreateSessionParameters,
+  ) => Promise<CreateSessionReturnType>;
+  revokeSessions: (
+    args: RevokeSessionsParameters,
+  ) => Promise<RevokeSessionsReturnType>;
   signMessage: (
     args: Omit<SignMessageParameters, 'account'>,
   ) => Promise<SignMessageReturnType>;
@@ -73,7 +95,54 @@ export type AbstractWalletActions<
       request
     >,
   ) => Promise<PrepareTransactionRequestReturnType>;
+  toSessionClient: (signer: Account, session: SessionConfig) => SessionClient;
 };
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export type SessionClientActions<
+  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  account extends Account | undefined = Account | undefined,
+> = {
+  sendTransaction: <
+    const request extends SendTransactionRequest<chain, chainOverride>,
+    chainOverride extends ChainEIP712 | undefined = undefined,
+  >(
+    args: SendEip712TransactionParameters<
+      chain,
+      account,
+      chainOverride,
+      request
+    >,
+  ) => Promise<SendTransactionReturnType>;
+  writeContract: WalletActions<chain, account>['writeContract'];
+};
+
+export function sessionWalletActions(
+  signerClient: WalletClient<Transport, ChainEIP712, Account>,
+  publicClient: PublicClient<Transport, ChainEIP712>,
+  session: SessionConfig,
+) {
+  return (
+    client: Client<Transport, ChainEIP712, Account>,
+  ): SessionClientActions<Chain, Account> => ({
+    sendTransaction: (args) =>
+      sendTransactionForSession(
+        client,
+        signerClient,
+        publicClient,
+        args,
+        session,
+      ),
+    writeContract: (args) =>
+      writeContractForSession(
+        client,
+        signerClient,
+        publicClient,
+        args,
+        session,
+      ),
+  });
+}
 
 export function globalWalletActions<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
@@ -86,6 +155,10 @@ export function globalWalletActions<
   return (
     client: Client<Transport, ChainEIP712, Account>,
   ): AbstractWalletActions<Chain, Account> => ({
+    createSession: (args) =>
+      createSession(client, signerClient, publicClient, args, isPrivyCrossApp),
+    revokeSessions: (args) =>
+      revokeSessions(client, signerClient, publicClient, args, isPrivyCrossApp),
     prepareAbstractTransactionRequest: (args) =>
       prepareTransactionRequest(
         client,
@@ -109,7 +182,6 @@ export function globalWalletActions<
         args,
         isPrivyCrossApp,
       ),
-
     signMessage: (args: Omit<SignMessageParameters, 'account'>) =>
       signMessage(client, signerClient, args, isPrivyCrossApp),
     signTransaction: (args) =>
@@ -148,5 +220,11 @@ export function globalWalletActions<
           Account
         >,
       ),
+    toSessionClient: (signer, session) =>
+      toSessionClient({
+        client: client as AbstractClient,
+        signer,
+        session: session,
+      }),
   });
 }

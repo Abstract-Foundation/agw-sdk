@@ -7,6 +7,11 @@ const AccountFactoryAbi = [
         type: 'address',
       },
       {
+        internalType: 'bytes4',
+        name: '_initializerSelector',
+        type: 'bytes4',
+      },
+      {
         internalType: 'address',
         name: '_registry',
         type: 'address',
@@ -18,7 +23,12 @@ const AccountFactoryAbi = [
       },
       {
         internalType: 'address',
-        name: 'deployer',
+        name: '_deployer',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_owner',
         type: 'address',
       },
     ],
@@ -32,12 +42,34 @@ const AccountFactoryAbi = [
   },
   {
     inputs: [],
-    name: 'INITIALIZATION_FAILED',
+    name: 'INVALID_INITIALIZER',
     type: 'error',
   },
   {
     inputs: [],
     name: 'NOT_FROM_DEPLOYER',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+    name: 'OwnableInvalidOwner',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    name: 'OwnableUnauthorizedAccount',
     type: 'error',
   },
   {
@@ -50,7 +82,7 @@ const AccountFactoryAbi = [
         type: 'address',
       },
     ],
-    name: 'ClaveAccountCreated',
+    name: 'AGWAccountCreated',
     type: 'event',
   },
   {
@@ -63,7 +95,7 @@ const AccountFactoryAbi = [
         type: 'address',
       },
     ],
-    name: 'ClaveAccountDeployed',
+    name: 'AGWAccountDeployed',
     type: 'event',
   },
   {
@@ -108,6 +140,25 @@ const AccountFactoryAbi = [
         type: 'address',
       },
     ],
+    name: 'OwnershipTransferStarted',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'previousOwner',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
     name: 'OwnershipTransferred',
     type: 'event',
   },
@@ -123,6 +174,45 @@ const AccountFactoryAbi = [
     ],
     name: 'RegistryChanged',
     type: 'event',
+  },
+  {
+    inputs: [],
+    name: 'acceptOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'accountToDeployer',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'accountAddress',
+        type: 'address',
+      },
+    ],
+    name: 'agwAccountCreated',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [
@@ -144,6 +234,11 @@ const AccountFactoryAbi = [
         name: 'newImplementation',
         type: 'address',
       },
+      {
+        internalType: 'bytes4',
+        name: 'newInitializerSelector',
+        type: 'bytes4',
+      },
     ],
     name: 'changeImplementation',
     outputs: [],
@@ -159,19 +254,6 @@ const AccountFactoryAbi = [
       },
     ],
     name: 'changeRegistry',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'accountAddress',
-        type: 'address',
-      },
-    ],
-    name: 'claveAccountCreated',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -197,7 +279,20 @@ const AccountFactoryAbi = [
         type: 'address',
       },
     ],
-    stateMutability: 'nonpayable',
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'deployer',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -258,7 +353,33 @@ const AccountFactoryAbi = [
   },
   {
     inputs: [],
+    name: 'initializerSelector',
+    outputs: [
+      {
+        internalType: 'bytes4',
+        name: '',
+        type: 'bytes4',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'owner',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'pendingOwner',
     outputs: [
       {
         internalType: 'address',

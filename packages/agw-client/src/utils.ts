@@ -14,7 +14,11 @@ import { abstractTestnet } from 'viem/chains';
 import { type ChainEIP712 } from 'viem/zksync';
 
 import AccountFactoryAbi from './abis/AccountFactory.js';
-import { SMART_ACCOUNT_FACTORY_ADDRESS } from './constants.js';
+import { AGWRegistryAbi } from './abis/AGWRegistryAbi.js';
+import {
+  AGW_REGISTRY_ADDRESS,
+  SMART_ACCOUNT_FACTORY_ADDRESS,
+} from './constants.js';
 import { type Call } from './types/call.js';
 
 // TODO: support Abstract mainnet
@@ -57,6 +61,20 @@ export async function getSmartAccountAddressFromInitialSigner<
   })) as Hex;
 
   return accountAddress;
+}
+
+export async function isAGWAccount<
+  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+>(
+  publicClient: PublicClient<Transport, chain>,
+  address: Address,
+): Promise<boolean> {
+  return await publicClient.readContract({
+    address: AGW_REGISTRY_ADDRESS,
+    abi: AGWRegistryAbi,
+    functionName: 'isAGW',
+    args: [address],
+  });
 }
 
 export async function isSmartAccountDeployed<

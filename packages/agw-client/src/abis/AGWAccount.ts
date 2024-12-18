@@ -1,12 +1,6 @@
 const AGWAccountAbi = [
   {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'batchCaller',
-        type: 'address',
-      },
-    ],
+    inputs: [],
     stateMutability: 'nonpayable',
     type: 'constructor',
   },
@@ -28,6 +22,11 @@ const AGWAccountAbi = [
   {
     inputs: [],
     name: 'BYTES_NOT_EXISTS',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'CALL_FAILED',
     type: 'error',
   },
   {
@@ -87,12 +86,33 @@ const AGWAccountAbi = [
   },
   {
     inputs: [],
+    name: 'INVALID_SALT',
+    type: 'error',
+  },
+  {
+    inputs: [],
     name: 'InvalidInitialization',
     type: 'error',
   },
   {
     inputs: [],
     name: 'MODULE_ERC165_FAIL',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'actualValue',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'expectedValue',
+        type: 'uint256',
+      },
+    ],
+    name: 'MsgValueMismatch',
     type: 'error',
   },
   {
@@ -388,6 +408,23 @@ const AGWAccountAbi = [
     type: 'event',
   },
   {
+    stateMutability: 'payable',
+    type: 'fallback',
+  },
+  {
+    inputs: [],
+    name: 'VERSION',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [
       {
         internalType: 'bytes',
@@ -437,8 +474,43 @@ const AGWAccountAbi = [
     type: 'function',
   },
   {
+    inputs: [
+      {
+        components: [
+          {
+            internalType: 'address',
+            name: 'target',
+            type: 'address',
+          },
+          {
+            internalType: 'bool',
+            name: 'allowFailure',
+            type: 'bool',
+          },
+          {
+            internalType: 'uint256',
+            name: 'value',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bytes',
+            name: 'callData',
+            type: 'bytes',
+          },
+        ],
+        internalType: 'struct Call[]',
+        name: '_calls',
+        type: 'tuple[]',
+      },
+    ],
+    name: 'batchCall',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
     inputs: [],
-    name: 'claveMessageTypeHash',
+    name: 'agwMessageTypeHash',
     outputs: [
       {
         internalType: 'bytes32',
@@ -447,6 +519,41 @@ const AGWAccountAbi = [
       },
     ],
     stateMutability: 'pure',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        components: [
+          {
+            internalType: 'address',
+            name: 'target',
+            type: 'address',
+          },
+          {
+            internalType: 'bool',
+            name: 'allowFailure',
+            type: 'bool',
+          },
+          {
+            internalType: 'uint256',
+            name: 'value',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bytes',
+            name: 'callData',
+            type: 'bytes',
+          },
+        ],
+        internalType: 'struct Call[]',
+        name: '_calls',
+        type: 'tuple[]',
+      },
+    ],
+    name: 'batchCall',
+    outputs: [],
+    stateMutability: 'payable',
     type: 'function',
   },
   {
@@ -725,8 +832,8 @@ const AGWAccountAbi = [
             type: 'bytes32',
           },
         ],
-        internalType: 'struct ERC1271Handler.ClaveMessage',
-        name: 'claveMessage',
+        internalType: 'struct ERC1271Handler.AGWMessage',
+        name: 'agwMessage',
         type: 'tuple',
       },
     ],
@@ -825,7 +932,7 @@ const AGWAccountAbi = [
     ],
     name: 'initialize',
     outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: 'payable',
     type: 'function',
   },
   {

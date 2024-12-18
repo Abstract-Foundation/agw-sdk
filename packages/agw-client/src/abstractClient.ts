@@ -1,5 +1,6 @@
 import {
   type Account,
+  type Address,
   type Client,
   createClient,
   createPublicClient,
@@ -7,6 +8,7 @@ import {
   http,
   type Transport,
 } from 'viem';
+import { toAccount } from 'viem/accounts';
 import { type ChainEIP712 } from 'viem/zksync';
 
 import { getSmartAccountAddressFromInitialSigner } from './utils.js';
@@ -39,6 +41,7 @@ interface CreateAbstractClientParameters {
    * @optional
    */
   transport?: Transport;
+  address?: Address;
   isPrivyCrossApp?: boolean;
 }
 
@@ -51,6 +54,7 @@ export async function createAbstractClient({
   signer,
   chain,
   transport,
+  address,
   isPrivyCrossApp = false,
 }: CreateAbstractClientParameters): Promise<AbstractClient> {
   if (!transport) {
@@ -62,13 +66,15 @@ export async function createAbstractClient({
     transport: http(),
   });
 
-  const smartAccountAddress = await getSmartAccountAddressFromInitialSigner(
-    signer.address,
-    publicClient,
-  );
+  const smartAccountAddress =
+    address ??
+    (await getSmartAccountAddressFromInitialSigner(
+      signer.address,
+      publicClient,
+    ));
 
   const baseClient = createClient({
-    account: smartAccountAddress,
+    account: toAccount(smartAccountAddress),
     chain: chain,
     transport,
   });

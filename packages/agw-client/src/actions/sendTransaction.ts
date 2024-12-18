@@ -2,7 +2,6 @@ import {
   type Account,
   type Client,
   encodeFunctionData,
-  type Hex,
   keccak256,
   type PublicClient,
   type SendTransactionRequest,
@@ -19,7 +18,6 @@ import {
 
 import AccountFactoryAbi from '../abis/AccountFactory.js';
 import {
-  BATCH_CALLER_ADDRESS,
   EOA_VALIDATOR_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
 } from '../constants.js';
@@ -97,7 +95,7 @@ export async function sendTransactionBatch<
   );
   if (!isDeployed) {
     const initialCall = {
-      target: BATCH_CALLER_ADDRESS,
+      target: client.account.address,
       allowFailure: false,
       value: totalValue,
       callData: batchCallData,
@@ -127,7 +125,7 @@ export async function sendTransactionBatch<
     } as any;
   } else {
     batchTransaction = {
-      to: BATCH_CALLER_ADDRESS as Hex,
+      to: client.account.address,
       data: batchCallData,
       value: totalValue,
       paymaster: parameters.paymaster,

@@ -2,7 +2,7 @@ import {
   transformEIP1193Provider,
   validChains,
 } from '@abstract-foundation/agw-client';
-import { toPrivyWalletConnector } from '@privy-io/cross-app-connect';
+import { toPrivyWalletConnector } from '@privy-io/cross-app-connect/rainbow-kit';
 import type { WalletDetailsParams } from '@rainbow-me/rainbowkit';
 import { type CreateConnectorFn } from '@wagmi/core';
 import {

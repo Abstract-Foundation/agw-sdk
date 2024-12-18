@@ -510,7 +510,7 @@ const AGWAccountAbi = [
   },
   {
     inputs: [],
-    name: 'claveMessageTypeHash',
+    name: 'agwMessageTypeHash',
     outputs: [
       {
         internalType: 'bytes32',
@@ -519,6 +519,41 @@ const AGWAccountAbi = [
       },
     ],
     stateMutability: 'pure',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        components: [
+          {
+            internalType: 'address',
+            name: 'target',
+            type: 'address',
+          },
+          {
+            internalType: 'bool',
+            name: 'allowFailure',
+            type: 'bool',
+          },
+          {
+            internalType: 'uint256',
+            name: 'value',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bytes',
+            name: 'callData',
+            type: 'bytes',
+          },
+        ],
+        internalType: 'struct Call[]',
+        name: '_calls',
+        type: 'tuple[]',
+      },
+    ],
+    name: 'batchCall',
+    outputs: [],
+    stateMutability: 'payable',
     type: 'function',
   },
   {
@@ -797,8 +832,8 @@ const AGWAccountAbi = [
             type: 'bytes32',
           },
         ],
-        internalType: 'struct ERC1271Handler.ClaveMessage',
-        name: 'claveMessage',
+        internalType: 'struct ERC1271Handler.AGWMessage',
+        name: 'agwMessage',
         type: 'tuple',
       },
     ],

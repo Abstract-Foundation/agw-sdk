@@ -63,7 +63,7 @@
     "package.json"
   ],
   "peerDependencies": {
-    "@abstract-foundation/agw-client": "^workspace:*",
+    "@abstract-foundation/agw-client": "^0.1.0",
     "@privy-io/cross-app-connect": "^0.0.8",
     "@privy-io/react-auth": "^1.95.2",
     "@tanstack/react-query": "^5",

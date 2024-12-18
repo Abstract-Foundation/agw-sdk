@@ -15,6 +15,7 @@ import AGWAccountAbi from '../abis/AGWAccount.js';
 import SessionKeyValidatorAbi from '../abis/SessionKeyValidator.js';
 import { SESSION_KEY_VALIDATOR_ADDRESS } from '../constants.js';
 import { encodeSession, type SessionConfig } from '../sessions.js';
+import { isSmartAccountDeployed } from '../utils.js';
 import { writeContract } from './writeContract.js';
 
 export interface CreateSessionParameters {
@@ -38,24 +39,16 @@ export async function createSession(
     // parameters
   } = args;
 
-  const validationHooks = await getAction(
-    client,
-    readContract,
-    'readContract',
-  )({
-    address: client.account.address,
-    abi: AGWAccountAbi,
-    functionName: 'listHooks',
-    args: [true],
-  });
-
-  const hasSessionModule = validationHooks.some(
-    (hook) => hook === SESSION_KEY_VALIDATOR_ADDRESS,
+  const isDeployed = await isSmartAccountDeployed(
+    publicClient,
+    client.account.address,
   );
+
+  const hasModule = isDeployed ? await hasSessionModule(client) : false;
 
   let transactionHash: Hash | undefined = undefined;
 
-  if (!hasSessionModule) {
+  if (!hasModule) {
     const encodedSession = encodeSession(session);
     transactionHash = await writeContract(
       client,
@@ -89,4 +82,25 @@ export async function createSession(
   }
 
   return { transactionHash, session };
+}
+
+async function hasSessionModule(
+  client: Client<Transport, ChainEIP712, Account>,
+) {
+  const validationHooks = await getAction(
+    client,
+    readContract,
+    'readContract',
+  )({
+    address: client.account.address,
+    abi: AGWAccountAbi,
+    functionName: 'listHooks',
+    args: [true],
+  });
+
+  const hasSessionModule = validationHooks.some(
+    (hook) => hook === SESSION_KEY_VALIDATOR_ADDRESS,
+  );
+
+  return hasSessionModule;
 }

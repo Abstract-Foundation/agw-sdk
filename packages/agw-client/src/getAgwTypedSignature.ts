@@ -50,12 +50,12 @@ export async function getAgwTypedSignature(
         { name: 'chainId', type: 'uint256' },
         { name: 'verifyingContract', type: 'address' },
       ],
-      ClaveMessage: [{ name: 'signedHash', type: 'bytes32' }],
+      AGWMessage: [{ name: 'signedHash', type: 'bytes32' }],
     },
     message: {
       signedHash: messageHash,
     },
-    primaryType: 'ClaveMessage',
+    primaryType: 'AGWMessage',
   });
 
   const signature = encodeAbiParameters(

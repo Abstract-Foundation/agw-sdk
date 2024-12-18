@@ -98,10 +98,11 @@ export type AbstractWalletActions<
   toSessionClient: (signer: Account, session: SessionConfig) => SessionClient;
 };
 
-export interface SessionClientActions<
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export type SessionClientActions<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
-> {
+> = {
   sendTransaction: <
     const request extends SendTransactionRequest<chain, chainOverride>,
     chainOverride extends ChainEIP712 | undefined = undefined,
@@ -114,7 +115,7 @@ export interface SessionClientActions<
     >,
   ) => Promise<SendTransactionReturnType>;
   writeContract: WalletActions<chain, account>['writeContract'];
-}
+};
 
 export function sessionWalletActions(
   signerClient: WalletClient<Transport, ChainEIP712, Account>,

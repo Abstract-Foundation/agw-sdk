@@ -36,6 +36,7 @@ import { AGW_APP_ID, ICON_URL } from './constants.js';
  */
 function abstractWalletConnector(
   rkDetails?: WalletDetailsParams,
+  testnet = false,
 ): CreateConnectorFn<
   {
     on: <event extends keyof EIP1193EventMap>(
@@ -52,16 +53,29 @@ function abstractWalletConnector(
   Record<string, unknown>
 > {
   return (params) => {
+    const defaultChain = testnet ? abstractTestnet : abstractTestnet; // TODO: add mainnet chain
+    const chains = [...params.chains];
+    const chainIndex = chains.findIndex(
+      (chain) => chain.id === defaultChain.id,
+    );
+    const hasChain = chainIndex !== -1;
+    if (hasChain) {
+      chains.splice(chainIndex, 1);
+    }
+
     const connector = toPrivyWalletConnector({
       iconUrl: ICON_URL,
       id: AGW_APP_ID,
       name: 'Abstract',
-    })(params);
+    })({
+      ...params,
+      chains: [defaultChain, ...chains],
+    });
 
     const getAbstractProvider = async (
       parameters?: { chainId?: number | undefined } | undefined,
     ) => {
-      const chainId = parameters?.chainId ?? abstractTestnet.id;
+      const chainId = parameters?.chainId ?? defaultChain.id;
       const chain = validChains[chainId];
       if (!chain) {
         throw new Error('Unsupported chain');

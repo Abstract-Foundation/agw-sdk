@@ -144,7 +144,7 @@ describe('sendTransactionInternal', () => {
 
       expect(transactionHash).toBe(MOCK_TRANSACTION_HASH);
 
-      expect(signTransaction).to.toHaveBeenCalledWith(
+      expect(signTransaction).toHaveBeenCalledWith(
         baseClient,
         signerClient,
         expect.objectContaining({

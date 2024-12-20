@@ -3,16 +3,25 @@ import {
   validChains,
 } from '@abstract-foundation/agw-client';
 import { toPrivyWalletConnector } from '@privy-io/cross-app-connect/rainbow-kit';
-import type { WalletDetailsParams } from '@rainbow-me/rainbowkit';
+import type { WalletDetailsParams } from '@rainbow-me/rainbowkit/dist/wallets/Wallet.js';
 import { type CreateConnectorFn } from '@wagmi/core';
 import {
   type EIP1193EventMap,
   type EIP1193RequestFn,
   type EIP1474Methods,
+  http,
+  type Transport,
 } from 'viem';
 import { abstractTestnet } from 'viem/chains';
 
 import { AGW_APP_ID, ICON_URL } from './constants.js';
+
+interface AbstractWalletConnectorOptions {
+  /** RainbowKit connector details */
+  rkDetails: WalletDetailsParams;
+  /** Override transports for chains */
+  overrideTransports: Record<number, Transport>;
+}
 
 /**
  * Create a wagmi connector for the Abstract Global Wallet.
@@ -35,7 +44,7 @@ import { AGW_APP_ID, ICON_URL } from './constants.js';
  * });
  */
 function abstractWalletConnector(
-  rkDetails?: WalletDetailsParams,
+  options: Partial<AbstractWalletConnectorOptions> = {},
 ): CreateConnectorFn<
   {
     on: <event extends keyof EIP1193EventMap>(
@@ -51,26 +60,56 @@ function abstractWalletConnector(
   Record<string, unknown>,
   Record<string, unknown>
 > {
+  const { rkDetails, overrideTransports } = options;
+
   return (params) => {
+    const chains = [...params.chains];
+    const chainIndex = chains.findIndex(
+      (chain) => chain.id === abstractTestnet.id,
+    ); // TODO: add mainnet
+    const hasChain = chainIndex !== -1;
+    let defaultChain = params.chains[0];
+    if (hasChain) {
+      const removedChains = chains.splice(chainIndex, 1);
+      defaultChain = removedChains[0] ?? defaultChain;
+    }
+
     const connector = toPrivyWalletConnector({
       iconUrl: ICON_URL,
       id: AGW_APP_ID,
       name: 'Abstract',
-    })(params);
+    })({
+      ...params,
+      chains: [defaultChain, ...chains],
+    });
 
     const getAbstractProvider = async (
       parameters?: { chainId?: number | undefined } | undefined,
     ) => {
-      const chainId = parameters?.chainId ?? abstractTestnet.id;
+      const chainId = parameters?.chainId ?? defaultChain.id;
       const chain = validChains[chainId];
       if (!chain) {
         throw new Error('Unsupported chain');
       }
-      const provider = await connector.getProvider(parameters);
+      const provider = await connector.getProvider({
+        chainId,
+      });
+
+      const providerChainId = await provider.request({
+        method: 'eth_chainId',
+      });
+
+      let transport: Transport | undefined;
+      if (validChains[Number(providerChainId)] === undefined) {
+        // Transport is not overridden but provider is not on a supported chain,
+        // use default http transport
+        transport = overrideTransports?.[chainId] ?? http();
+      }
 
       return transformEIP1193Provider({
         provider,
         chain,
+        transport,
         isPrivyCrossApp: true,
       });
     };

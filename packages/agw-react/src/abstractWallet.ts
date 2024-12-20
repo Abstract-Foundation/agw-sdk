@@ -26,7 +26,10 @@ const abstractWallet = (): Wallet => {
     iconBackground: '#ffffff',
     installed: true,
     shortName: 'Abstract',
-    createConnector: (rkDetails) => abstractWalletConnector(rkDetails),
+    createConnector: (rkDetails) =>
+      abstractWalletConnector({
+        rkDetails,
+      }),
   };
 };
 

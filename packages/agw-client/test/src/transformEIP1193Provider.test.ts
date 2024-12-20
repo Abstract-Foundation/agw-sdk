@@ -13,7 +13,7 @@ import { getGeneralPaymasterInput } from 'viem/zksync';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
 import * as abstractClientModule from '../../src/abstractClient.js';
-import { agwCapablities, SendCallsParams } from '../../src/eip5792.js';
+import { agwCapabilities, SendCallsParams } from '../../src/eip5792.js';
 import { transformEIP1193Provider } from '../../src/transformEIP1193Provider.js';
 import * as utilsModule from '../../src/utils.js';
 import { exampleTypedData } from '../fixtures.js';
@@ -423,7 +423,7 @@ describe('transformEIP1193Provider', () => {
         params: [mockSmartAccount as any],
       });
 
-      expect(result).toBe(agwCapablities);
+      expect(result).toBe(agwCapabilities);
     });
     it('should pass through wallet_getCapabilities to base client when called with external signer', async () => {
       const mockAccounts: Address[] = [

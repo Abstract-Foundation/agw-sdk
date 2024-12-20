@@ -24,7 +24,7 @@ export interface SendCallsParams {
   capabilities?: WalletCapabilities | undefined;
 }
 
-export const agwCapablities: WalletCapabilities = {
+export const agwCapabilities: WalletCapabilities = {
   '0xab5': {
     atomicBatch: {
       supported: true,

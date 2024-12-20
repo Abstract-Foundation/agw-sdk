@@ -15,7 +15,7 @@ import {
 import { toAccount } from 'viem/accounts';
 
 import { createAbstractClient } from './abstractClient.js';
-import { agwCapablities, type SendCallsParams } from './eip5792.js';
+import { agwCapabilities, type SendCallsParams } from './eip5792.js';
 import { getSmartAccountAddressFromInitialSigner } from './utils.js';
 
 interface TransformEIP1193ProviderOptions {
@@ -239,7 +239,7 @@ export function transformEIP1193Provider(
         if (params[0] === account) {
           return await provider.request(e);
         }
-        return agwCapablities;
+        return agwCapabilities;
       }
       default: {
         return await provider.request(e);

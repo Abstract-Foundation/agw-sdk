@@ -15,12 +15,20 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
 
-      - name: Setup Node.js 20
-        uses: actions/setup-node@v3
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
         with:
-          node-version: 20
+          version: 9.4.0
 
-      - name: Install Dependencies
+      - name: Set up node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org/
+          cache: 'pnpm'
+          scope: '@abstract-foundation'
+
+      - name: Install dependencies
         run: pnpm install
 
       - name: Create Release Pull Request

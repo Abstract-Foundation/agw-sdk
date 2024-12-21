@@ -4,6 +4,7 @@ import {
   type Address,
   type Chain,
   type Client,
+  type GetChainIdReturnType,
   type PrepareTransactionRequestReturnType,
   type PublicClient,
   type SendTransactionRequest,
@@ -17,6 +18,7 @@ import {
   type WalletClient,
   type WriteContractParameters,
 } from 'viem';
+import { getChainId } from 'viem/actions';
 import {
   type ChainEIP712,
   type Eip712WalletActions,
@@ -60,6 +62,7 @@ export type AbstractWalletActions<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
 > = Eip712WalletActions<chain, account> & {
+  getChainId: () => Promise<GetChainIdReturnType>;
   createSession: (
     args: CreateSessionParameters,
   ) => Promise<CreateSessionReturnType>;
@@ -155,6 +158,7 @@ export function globalWalletActions<
   return (
     client: Client<Transport, ChainEIP712, Account>,
   ): AbstractWalletActions<Chain, Account> => ({
+    getChainId: () => getChainId(client),
     createSession: (args) =>
       createSession(client, signerClient, publicClient, args, isPrivyCrossApp),
     revokeSessions: (args) =>

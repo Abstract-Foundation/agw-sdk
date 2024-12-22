@@ -3,7 +3,7 @@ The Abstract Global Wallet SDK is a toolkit for developers to integrate the Abst
 
 ## Abstract Global Wallet (AGW)
 
-[Abstract Global Wallet (AGW)](https://docs.abs.xyz/overview) is a cross-application [smart contract wallet](https://docs.abs.xyz/how-abstract-works/native-account-abstraction/smart-contract-wallets) that users can be used to interact with any application built on Abstract, powered by Abstract's [native account abstraction](https://docs.abs.xyz/how-abstract-works/native-account-abstraction).
+[Abstract Global Wallet (AGW)](https://docs.abs.xyz/overview) is a cross-application [smart contract wallet](https://docs.abs.xyz/how-abstract-works/native-account-abstraction/smart-contract-wallets) that allows users to interact with any application built on Abstract. It is powered by Abstract's [native account abstraction](https://docs.abs.xyz/how-abstract-works/native-account-abstraction).
 
 AGW allows users to sign up once using familiar login methods (such as email, social accounts, passkeys, and more), and then use this account to interact with *any* application on Abstract.
 

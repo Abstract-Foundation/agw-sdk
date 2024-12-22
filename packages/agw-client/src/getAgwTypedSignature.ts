@@ -13,7 +13,7 @@ import {
   type Transport,
   zeroAddress,
 } from 'viem';
-import { getCode, readContract, signTypedData } from 'viem/actions';
+import { getCode, signTypedData } from 'viem/actions';
 import type { ChainEIP712 } from 'viem/chains';
 
 import AccountFactoryAbi from './abis/AccountFactory.js';

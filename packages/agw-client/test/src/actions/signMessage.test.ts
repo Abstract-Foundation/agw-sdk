@@ -11,9 +11,16 @@ import {
   serializeErc6492Signature,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
+import { getCode } from 'viem/actions';
 import { ChainEIP712 } from 'viem/zksync';
 import { describe, expect, it, vi } from 'vitest';
-
+vi.mock('viem/actions', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...(actual as object),
+    getCode: vi.fn(),
+  };
+});
 import AccountFactoryAbi from '../../../src/abis/AccountFactory.js';
 import { signMessage } from '../../../src/actions/signMessage.js';
 import {
@@ -56,7 +63,21 @@ signerClient.request = (async ({ method, params }) => {
 }) as EIP1193RequestFn;
 
 describe('signMessage', async () => {
-  it('should transform personal_sign to typed signature for smart account', async () => {
+  it('should transform personal_sign to typed signature for deployed smart account', async () => {
+    vi.mocked(getCode).mockResolvedValue('0xababab');
+    const expectedSignature = encodeAbiParameters(
+      parseAbiParameters(['bytes', 'address']),
+      [RAW_SIGNATURE, EOA_VALIDATOR_ADDRESS],
+    );
+
+    const signedMessage = await signMessage(baseClient, signerClient, {
+      message: 'Hello world',
+    });
+
+    expect(signedMessage).toBe(expectedSignature);
+  });
+  it('should transform personal_sign to ERC-6492 typed signature for undeployed smart account', async () => {
+    vi.mocked(getCode).mockResolvedValue(undefined);
     const expectedSignature = serializeErc6492Signature({
       address: SMART_ACCOUNT_FACTORY_ADDRESS,
       signature: encodeAbiParameters(parseAbiParameters(['bytes', 'address']), [

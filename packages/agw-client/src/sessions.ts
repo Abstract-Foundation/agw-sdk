@@ -8,7 +8,7 @@ import {
   keccak256,
 } from 'viem';
 
-import SessionKeyValidatorAbi from './abis/SessionKeyValidator.js';
+import { SessionKeyValidatorAbi } from './abis/SessionKeyValidator.js';
 
 export enum LimitType {
   Unlimited = 0,

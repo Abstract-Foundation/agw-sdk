@@ -8,7 +8,7 @@ import {
 } from 'viem';
 import type { ChainEIP712 } from 'viem/chains';
 
-import SessionKeyValidatorAbi from '../abis/SessionKeyValidator.js';
+import { SessionKeyValidatorAbi } from '../abis/SessionKeyValidator.js';
 import { SESSION_KEY_VALIDATOR_ADDRESS } from '../constants.js';
 import { getSessionHash, type SessionConfig } from '../sessions.js';
 import { writeContract } from './writeContract.js';

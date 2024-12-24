@@ -12,7 +12,7 @@ import type { ChainEIP712 } from 'viem/chains';
 import { getAction } from 'viem/utils';
 
 import AGWAccountAbi from '../abis/AGWAccount.js';
-import SessionKeyValidatorAbi from '../abis/SessionKeyValidator.js';
+import { SessionKeyValidatorAbi } from '../abis/SessionKeyValidator.js';
 import { SESSION_KEY_VALIDATOR_ADDRESS } from '../constants.js';
 import { encodeSession, type SessionConfig } from '../sessions.js';
 import { isSmartAccountDeployed } from '../utils.js';

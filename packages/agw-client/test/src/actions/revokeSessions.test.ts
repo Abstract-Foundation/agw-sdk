@@ -28,7 +28,7 @@ vi.mock('viem/actions', () => ({
   readContract: vi.fn(),
 }));
 
-import SessionKeyValidatorAbi from '../../../src/abis/SessionKeyValidator.js';
+import { SessionKeyValidatorAbi } from '../../../src/abis/SessionKeyValidator.js';
 import { revokeSessions } from '../../../src/actions/revokeSessions.js';
 import { sendTransaction } from '../../../src/actions/sendTransaction.js';
 import {

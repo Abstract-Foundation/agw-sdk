@@ -1,4 +1,4 @@
-const SessionKeyValidatorAbi = [
+export const SessionKeyValidatorAbi = [
   {
     anonymous: false,
     inputs: [
@@ -1144,5 +1144,3 @@ const SessionKeyValidatorAbi = [
     type: 'function',
   },
 ] as const;
-
-export default SessionKeyValidatorAbi;

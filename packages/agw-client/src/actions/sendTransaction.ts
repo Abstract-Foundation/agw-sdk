@@ -41,14 +41,15 @@ export async function sendTransactionBatch<
   parameters: SendTransactionBatchParameters<request>,
   isPrivyCrossApp = false,
 ): Promise<SendTransactionReturnType> {
-  if (parameters.calls.length === 0) {
+  const { calls, paymaster, paymasterInput, ...rest } = parameters;
+  if (calls.length === 0) {
     throw new Error('No calls provided');
   }
   if (isPrivyCrossApp) {
     return await sendPrivyTransaction(client, parameters);
   }
 
-  const calls: Call[] = parameters.calls.map((tx) => {
+  const batchCalls: Call[] = parameters.calls.map((tx) => {
     if (!tx.to) throw new Error('Transaction target (to) is required');
     return {
       target: tx.to,
@@ -78,11 +79,11 @@ export async function sendTransactionBatch<
         outputs: [],
       },
     ],
-    args: [calls],
+    args: [batchCalls],
   });
 
   // Get cumulative value passed in
-  const totalValue = calls.reduce(
+  const totalValue = batchCalls.reduce(
     (sum, call) => sum + BigInt(call.value),
     BigInt(0),
   );
@@ -119,8 +120,8 @@ export async function sendTransactionBatch<
       to: SMART_ACCOUNT_FACTORY_ADDRESS,
       data: deploymentCalldata,
       value: totalValue,
-      paymaster: parameters.paymaster,
-      paymasterInput: parameters.paymasterInput,
+      paymaster: paymaster,
+      paymasterInput: paymasterInput,
       type: 'eip712',
     } as any;
   } else {
@@ -128,8 +129,8 @@ export async function sendTransactionBatch<
       to: client.account.address,
       data: batchCallData,
       value: totalValue,
-      paymaster: parameters.paymaster,
-      paymasterInput: parameters.paymasterInput,
+      paymaster: paymaster,
+      paymasterInput: paymasterInput,
       type: 'eip712',
     } as any;
   }
@@ -138,7 +139,10 @@ export async function sendTransactionBatch<
     client,
     signerClient,
     publicClient,
-    batchTransaction,
+    {
+      ...batchTransaction,
+      ...rest,
+    },
     EOA_VALIDATOR_ADDRESS,
     !isDeployed,
   );

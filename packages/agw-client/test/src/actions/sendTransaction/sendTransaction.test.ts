@@ -9,7 +9,7 @@ import {
 } from 'viem';
 import { toAccount } from 'viem/accounts';
 import { ChainEIP712, ZksyncTransactionRequestEIP712 } from 'viem/zksync';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import AccountFactoryAbi from '../../../../src/abis/AccountFactory.js';
 import {
@@ -307,4 +307,91 @@ describe('sendTransactionBatch', () => {
       expect(transactionHash).toBe('0xmockedTransactionHash');
     },
   );
+
+  it('should pass through additional args to sendTransactionInternal', async () => {
+    vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
+    vi.mocked(getInitializerCalldata).mockReturnValue(
+      '0xmockedInitializerCallData',
+    );
+    (encodeFunctionData as any).mockReturnValueOnce('0xbatchCalldata');
+
+    const expectedCalls = [
+      {
+        target: transaction1.to,
+        allowFailure: false,
+        value: BigInt(0),
+        callData: transaction1.data,
+      },
+      {
+        target: transaction2.to,
+        allowFailure: false,
+        value: BigInt(1000),
+        callData: transaction2.data,
+      },
+    ];
+
+    const batchCallABI = [
+      {
+        name: 'batchCall',
+        type: 'function',
+        inputs: [
+          {
+            type: 'tuple[]',
+            name: 'calls',
+            components: [
+              { name: 'target', type: 'address' },
+              { name: 'allowFailure', type: 'bool' },
+              { name: 'value', type: 'uint256' },
+              { name: 'callData', type: 'bytes' },
+            ],
+          },
+        ],
+        outputs: [],
+      },
+    ];
+
+    const transactionHash = await sendTransactionBatch(
+      baseClient,
+      signerClient,
+      publicClient,
+      {
+        calls: [transaction1, transaction2],
+        paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
+        paymasterInput: '0xabc',
+        gas: 1000000n,
+        maxFeePerGas: 100000000000n,
+        maxPriorityFeePerGas: 100000000000n,
+      } as any,
+    );
+
+    expect(encodeFunctionData).toHaveBeenCalledOnce();
+
+    const firstEncodeFunctionDataCall = (
+      encodeFunctionData as any
+    ).mock.calls.find((call) => !call[0].functionName);
+    if (firstEncodeFunctionDataCall) {
+      expect(firstEncodeFunctionDataCall[0].abi).toEqual(batchCallABI);
+      expect(firstEncodeFunctionDataCall[0].args).toEqual([expectedCalls]);
+    }
+
+    expect(sendTransactionInternal).toHaveBeenCalledWith(
+      baseClient,
+      signerClient,
+      publicClient,
+      expect.objectContaining({
+        to: address.smartAccountAddress,
+        data: '0xbatchCalldata',
+        type: 'eip712',
+        paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
+        paymasterInput: '0xabc',
+        value: BigInt(1000),
+        gas: 1000000n,
+        maxFeePerGas: 100000000000n,
+        maxPriorityFeePerGas: 100000000000n,
+      }),
+      EOA_VALIDATOR_ADDRESS,
+      false,
+    );
+    expect(transactionHash).toBe('0xmockedTransactionHash');
+  });
 });

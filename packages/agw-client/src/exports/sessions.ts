@@ -1,3 +1,4 @@
+import { SessionKeyValidatorAbi } from '../abis/SessionKeyValidator.js';
 import {
   createSessionClient,
   type SessionClient,
@@ -30,6 +31,7 @@ export {
   LimitZero,
   type SessionClient,
   type SessionConfig,
+  SessionKeyValidatorAbi,
   type SessionState,
   type SessionStatus,
   toSessionClient,

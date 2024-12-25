@@ -1,5 +1,12 @@
 # @abstract-foundation/agw-client
 
+## 0.1.2
+
+### Patch Changes
+
+- 70bd5be: Add hook for createSession
+- 1859431: Allow passing through additional transaction parameters for sendTransactionBatch
+
 ## 0.1.1
 
 ### Patch Changes

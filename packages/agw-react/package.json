@@ -1,7 +1,7 @@
 {
   "name": "@abstract-foundation/agw-react",
   "description": "Abstract Global Wallet React Components",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -63,7 +63,7 @@
     "package.json"
   ],
   "peerDependencies": {
-    "@abstract-foundation/agw-client": "^0.1.1",
+    "@abstract-foundation/agw-client": "^0.1.2",
     "@privy-io/cross-app-connect": "^0.1.2",
     "@privy-io/react-auth": "^1.97.0",
     "@tanstack/react-query": "^5",

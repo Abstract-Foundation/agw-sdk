@@ -8,21 +8,9 @@
     "url": "https://github.com/abstract-foundation/agw-sdk.git",
     "directory": "packages/agw-client"
   },
-  "scripts": {
-    "test": "vitest -c ./test/vitest.config.ts --disable-console-intercept",
-    "coverage": "vitest run --coverage -c ./test/vitest.config.ts",
-    "build": "pnpm run clean && pnpm run build:esm+types && pnpm run build:cjs",
-    "build:esm+types": "tsc --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types && printf '{\"type\":\"module\"}' > ./dist/esm/package.json",
-    "build:cjs": "tsc -p tsconfig.cjs.json && printf '{\"type\":\"commonjs\"}' > ./dist/cjs/package.json",
-    "clean": "rm -rf dist tsconfig.tsbuildinfo",
-    "typecheck": "tsc --noEmit",
-    "debug": "tsc-watch --sourceMap true --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types",
-    "test:build": "publint && attw --pack --ignore-rules false-cjs"
-  },
   "main": "./dist/cjs/exports/index.js",
   "module": "./dist/esm/exports/index.js",
   "types": "./dist/types/exports/index.d.ts",
-  "typings": "./dist/types/exports/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/types/exports/index.d.ts",
@@ -55,10 +43,26 @@
     "src",
     "package.json"
   ],
+  "scripts": {
+    "test": "vitest -c ./test/vitest.config.ts --disable-console-intercept",
+    "coverage": "vitest run --coverage -c ./test/vitest.config.ts",
+    "build": "pnpm run clean && pnpm run build:esm+types && pnpm run build:cjs",
+    "build:esm+types": "tsc --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types && printf '{\"type\":\"module\"}' > ./dist/esm/package.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json && printf '{\"type\":\"commonjs\"}' > ./dist/cjs/package.json",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "debug": "tsc-watch --sourceMap true --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types",
+    "test:build": "publint && attw --pack --ignore-rules false-cjs"
+  },
   "peerDependencies": {
     "abitype": "^1.0.0",
     "typescript": ">=5.0.4",
     "viem": "^2.21.26"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/node": "^22.5.5",
@@ -66,11 +70,6 @@
     "prool": "^0.0.16",
     "viem": "^2.21.26",
     "vitest": "^2.1.1"
-  },
-  "peerDependenciesMeta": {
-    "typescript": {
-      "optional": true
-    }
   },
   "keywords": [
     "eth",

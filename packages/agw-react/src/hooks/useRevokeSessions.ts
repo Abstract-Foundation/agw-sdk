@@ -17,6 +17,17 @@ export type RevokeSessionsArgs = {
 export const useRevokeSessions = () => {
   const { writeContract, writeContractAsync, ...writeContractRest } =
     useWriteContract();
+  const getSessionHashes = (
+    sessions: SessionConfig | Hash | (SessionConfig | Hash)[],
+  ): Hash[] => {
+    return typeof sessions === 'string'
+      ? [sessions as Hash]
+      : Array.isArray(sessions)
+        ? sessions.map((session) =>
+            typeof session === 'string' ? session : getSessionHash(session),
+          )
+        : [getSessionHash(sessions)];
+  };
 
   return {
     revokeSessions: (params: RevokeSessionsArgs) => {
@@ -44,15 +55,3 @@ export const useRevokeSessions = () => {
     ...writeContractRest,
   };
 };
-
-function getSessionHashes(
-  sessions: SessionConfig | Hash | (SessionConfig | Hash)[],
-): Hash[] {
-  return typeof sessions === 'string'
-    ? [sessions as Hash]
-    : Array.isArray(sessions)
-      ? sessions.map((session) =>
-          typeof session === 'string' ? session : getSessionHash(session),
-        )
-      : [getSessionHash(sessions)];
-}

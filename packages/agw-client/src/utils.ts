@@ -27,19 +27,42 @@ export const VALID_CHAINS: Record<number, Chain> = {
 };
 
 export function convertBigIntToString(value: any): any {
-  if (typeof value === 'bigint') {
-    return value.toString();
-  } else if (Array.isArray(value)) {
-    return value.map(convertBigIntToString);
-  } else if (typeof value === 'object' && value !== null) {
-    return Object.fromEntries(
-      Object.entries(value).map(([key, val]) => [
-        key,
-        convertBigIntToString(val),
-      ]),
-    );
+  const stack: any[] = [value];
+  const resultStack: any[] = [];
+
+  while (stack.length > 0) {
+    const current = stack.pop();
+
+    if (typeof current === 'bigint') {
+      resultStack.push(current.toString());
+    } else if (Array.isArray(current)) {
+      for (let i = current.length - 1; i >= 0; i--) {
+        stack.push(current[i]);
+      }
+      resultStack.push(current);
+    } else if (typeof current === 'object' && current !== null) {
+      for (const [key, val] of Object.entries(current)) {
+        stack.push({ key, val });
+      }
+      resultStack.push(current);
+    } else {
+      resultStack.push(current);
+    }
   }
-  return value;
+  const finalResult = resultStack.map(item => {
+    if (Array.isArray(item)) {
+      return item.map(val => (typeof val === 'bigint' ? val.toString() : val));
+    } else if (typeof item === 'object' && item !== null) {
+      return Object.fromEntries(
+        Object.entries(item).map(([key, val]) => [
+          key,
+          typeof val === 'bigint' ? val.toString() : val,
+        ]),
+      );
+    }
+    return item;
+  });
+  return finalResult[finalResult.length - 1];
 }
 
 export async function getSmartAccountAddressFromInitialSigner<

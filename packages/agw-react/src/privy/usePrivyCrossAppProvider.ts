@@ -127,7 +127,13 @@ export const usePrivyCrossAppProvider = ({
       const address = getAddressFromUser(contextUser);
       return address ? [address] : [];
     },
-    [user, authenticated, ready, loginWithCrossAppAccount, linkCrossAppAccount],
+    [
+      user,
+      authenticated,
+      privyReady,
+      loginWithCrossAppAccount,
+      linkCrossAppAccount,
+    ],
   );
 
   const eventListeners = new Map<string, ((...args: any[]) => void)[]>();

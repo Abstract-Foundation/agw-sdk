@@ -1,5 +1,12 @@
 # @abstract-foundation/web3-react-agw
 
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies [cdecfd6]
+  - @abstract-foundation/agw-client@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes

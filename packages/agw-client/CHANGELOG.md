@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 0.1.3
+
+### Patch Changes
+
+- cdecfd6: Fix incorrect package import from sessions
+
 ## 0.1.2
 
 ### Patch Changes

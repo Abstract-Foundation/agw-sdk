@@ -49,7 +49,7 @@ export const usePrivyCrossAppProvider = ({
     signMessage,
     signTypedData,
   } = useCrossAppAccounts();
-  const { user, authenticated, ready } = usePrivy();
+  const { user, authenticated, ready: privyReady } = usePrivy();
 
   const passthroughMethods = {
     web3_clientVersion: true,
@@ -144,7 +144,13 @@ export const usePrivyCrossAppProvider = ({
         return [];
       }
     },
-    [user, authenticated, ready, loginWithCrossAppAccount, linkCrossAppAccount],
+    [
+      user,
+      authenticated,
+      privyReady,
+      loginWithCrossAppAccount,
+      linkCrossAppAccount,
+    ],
   );
 
   const eventListeners = new Map<string, ((...args: any[]) => void)[]>();
@@ -225,6 +231,18 @@ export const usePrivyCrossAppProvider = ({
       request: handleRequest as EIP1193RequestFn<EIP1474Methods>,
     };
   }, [handleRequest]);
+
+  const ready = useMemo(() => {
+    return (
+      privyReady &&
+      user &&
+      authenticated &&
+      user.linkedAccounts.some(
+        (account) =>
+          account.type === 'cross_app' && account.providerApp.id === AGW_APP_ID,
+      )
+    );
+  }, [privyReady, user, authenticated]);
 
   return {
     ready,

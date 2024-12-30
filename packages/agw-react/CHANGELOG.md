@@ -1,5 +1,13 @@
 # @abstract-foundation/agw-react
 
+## 0.1.4
+
+### Patch Changes
+
+- cdecfd6: Fix incorrect package import from sessions
+- Updated dependencies [cdecfd6]
+  - @abstract-foundation/agw-client@0.1.3
+
 ## 0.1.3
 
 ### Patch Changes

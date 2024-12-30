@@ -1,5 +1,13 @@
 # @abstract-foundation/agw-react
 
+## 0.1.3
+
+### Patch Changes
+
+- a847956: Add useRevokeSessions hook
+- 6550375: Make privy ready check more aggressive to prevent empty wagmi context
+- 27ab46d: Update privy cross app flow to return both smart account and signer addresses
+
 ## 0.1.2
 
 ### Patch Changes

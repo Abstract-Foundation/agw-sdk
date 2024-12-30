@@ -37,7 +37,7 @@ export const useRevokeSessions = () => {
         address: sessionKeyValidatorAddress,
         abi: SessionKeyValidatorAbi,
         functionName: 'revokeKeys',
-        args: sessionHashes,
+        args: [sessionHashes],
         ...(rest as any),
       });
     },

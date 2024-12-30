@@ -22,6 +22,11 @@ import {
 
 import { AGW_APP_ID } from '../constants.js';
 
+interface PrivyUserWallets {
+  signer?: Address | undefined;
+  smartAccount?: Address | undefined;
+}
+
 type RpcMethodNames<rpcSchema extends RpcSchema> =
   rpcSchema[keyof rpcSchema] extends { Method: string }
     ? rpcSchema[keyof rpcSchema]['Method']
@@ -96,17 +101,25 @@ export const usePrivyCrossAppProvider = ({
     transport,
   });
 
-  const getAddressFromUser = (user: User | null): Address | undefined => {
+  const getAddressesFromUser = (user: User | null): PrivyUserWallets => {
     if (!user) {
-      return undefined;
+      return {
+        smartAccount: undefined,
+        signer: undefined,
+      };
     }
     const crossAppAccount = user.linkedAccounts.find(
       (account) =>
         account.type === 'cross_app' && account.providerApp.id === AGW_APP_ID,
     ) as CrossAppAccount | undefined;
 
-    const address = crossAppAccount?.smartWallets?.[0]?.address;
-    return address ? (address as Address) : undefined;
+    const smartAccount = crossAppAccount?.smartWallets?.[0]?.address;
+    const signer = crossAppAccount?.embeddedWallets?.[0]?.address;
+
+    return {
+      smartAccount: smartAccount ? (smartAccount as Address) : undefined,
+      signer: signer ? (signer as Address) : undefined,
+    };
   };
 
   const getAccounts = useCallback(
@@ -124,8 +137,12 @@ export const usePrivyCrossAppProvider = ({
           contextUser = await linkCrossAppAccount({ appId: AGW_APP_ID });
         }
       }
-      const address = getAddressFromUser(contextUser);
-      return address ? [address] : [];
+      const { signer, smartAccount } = getAddressesFromUser(contextUser);
+      if (signer && smartAccount) {
+        return [smartAccount, signer];
+      } else {
+        return [];
+      }
     },
     [user, authenticated, ready, loginWithCrossAppAccount, linkCrossAppAccount],
   );

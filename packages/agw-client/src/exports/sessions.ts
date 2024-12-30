@@ -15,6 +15,7 @@ import type {
 } from '../sessions.js';
 import {
   ConstraintCondition,
+  getSessionHash,
   LimitType,
   LimitUnlimited,
   LimitZero,
@@ -25,6 +26,7 @@ export {
   type Constraint,
   ConstraintCondition,
   createSessionClient,
+  getSessionHash,
   type Limit,
   LimitType,
   LimitUnlimited,

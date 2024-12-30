@@ -1,6 +1,6 @@
 import { sessionKeyValidatorAddress } from '@abstract-foundation/agw-client/constants';
-import { getSessionHash } from '@abstract-foundation/agw-client/dist/types/sessions';
 import {
+  getSessionHash,
   type SessionConfig,
   SessionKeyValidatorAbi,
 } from '@abstract-foundation/agw-client/sessions';

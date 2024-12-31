@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-react
 
+## 0.1.5
+
+### Patch Changes
+
+- ddb763e: Fix query running before dependency is complete
+
 ## 0.1.4
 
 ### Patch Changes

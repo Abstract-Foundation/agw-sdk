@@ -5,13 +5,16 @@ import { custom, useChains } from 'wagmi';
 import { useGlobalWalletSignerClient } from './useGlobalWalletSignerClient.js';
 
 export const useAbstractClient = () => {
-  const { data: signer } = useGlobalWalletSignerClient();
+  const { data: signer, status, error } = useGlobalWalletSignerClient();
   const [chain] = useChains();
 
   return useQuery({
     gcTime: 0,
     queryKey: ['abstractClient'],
-    queryFn: () => {
+    queryFn: async () => {
+      if (error) {
+        throw error;
+      }
       if (!signer) {
         throw new Error('No signer found');
       }
@@ -25,5 +28,6 @@ export const useAbstractClient = () => {
 
       return client;
     },
+    enabled: status !== 'pending',
   });
 };

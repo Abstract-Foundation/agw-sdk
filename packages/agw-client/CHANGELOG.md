@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 0.1.5
+
+### Patch Changes
+
+- 5e15f01: Add new valid chain id
+
 ## 0.1.4
 
 ### Patch Changes

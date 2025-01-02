@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 0.1.4
+
+### Patch Changes
+
+- f72546d: Update useCreateSession to add module if not installed
+
 ## 0.1.3
 
 ### Patch Changes

@@ -23,7 +23,7 @@ import {
   type AssertEip712RequestParameters,
 } from '../eip712.js';
 import { AccountNotFoundError } from '../errors/account.js';
-import { validChains } from '../exports/index.js';
+import { VALID_CHAINS } from '../utils.js';
 import { transformHexValues } from '../utils.js';
 
 export async function signTransaction<
@@ -69,7 +69,7 @@ export async function signTransaction<
     ...(transaction as AssertEip712RequestParameters),
   });
 
-  if (!chain || validChains[chain.id] === undefined) {
+  if (!chain || VALID_CHAINS[chain.id] === undefined) {
     throw new BaseError('Invalid chain specified');
   }
 

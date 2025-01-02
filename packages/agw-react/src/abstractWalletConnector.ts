@@ -12,7 +12,6 @@ import {
   http,
   type Transport,
 } from 'viem';
-import { abstractTestnet } from 'viem/chains';
 
 import { AGW_APP_ID, ICON_URL } from './constants.js';
 
@@ -64,14 +63,16 @@ function abstractWalletConnector(
 
   return (params) => {
     const chains = [...params.chains];
-    const chainIndex = chains.findIndex(
-      (chain) => chain.id === abstractTestnet.id,
-    ); // TODO: add mainnet
-    const hasChain = chainIndex !== -1;
     let defaultChain = params.chains[0];
-    if (hasChain) {
-      const removedChains = chains.splice(chainIndex, 1);
-      defaultChain = removedChains[0] ?? defaultChain;
+    const validChainIds = Object.keys(validChains).map(Number).sort();
+    for (const chainId of validChainIds) {
+      const chainIndex = chains.findIndex((chain) => chain.id === chainId);
+      const hasChain = chainIndex !== -1;
+      if (hasChain) {
+        const removedChains = chains.splice(chainIndex, 1);
+        defaultChain = removedChains[0] ?? defaultChain;
+        break;
+      }
     }
 
     const connector = toPrivyWalletConnector({

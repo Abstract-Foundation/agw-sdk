@@ -24,6 +24,7 @@ import { type Call } from './types/call.js';
 // TODO: support Abstract mainnet
 export const VALID_CHAINS: Record<number, Chain> = {
   [abstractTestnet.id]: abstractTestnet,
+  [2741]: { id: 2741 } as Chain,
 };
 
 export function convertBigIntToString(value: any): any {

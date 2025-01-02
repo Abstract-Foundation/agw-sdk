@@ -1,5 +1,13 @@
 # @abstract-foundation/agw-react
 
+## 0.1.6
+
+### Patch Changes
+
+- f72546d: Update useCreateSession to add module if not installed
+- Updated dependencies [f72546d]
+  - @abstract-foundation/agw-client@0.1.4
+
 ## 0.1.5
 
 ### Patch Changes

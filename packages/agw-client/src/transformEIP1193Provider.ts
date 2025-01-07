@@ -222,10 +222,14 @@ export function transformEIP1193Provider(
         });
       }
       case 'wallet_getCallsStatus': {
-        return await provider.request({
+        const receipt = await provider.request({
           method: 'eth_getTransactionReceipt',
           params,
         });
+        return {
+          status: receipt?.status === undefined ? 'PENDING' : 'CONFIRMED',
+          receipts: [receipt],
+        };
       }
       case 'wallet_showCallsStatus': {
         // not implemented

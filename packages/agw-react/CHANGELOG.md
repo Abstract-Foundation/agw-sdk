@@ -1,5 +1,13 @@
 # @abstract-foundation/agw-react
 
+## 0.1.8
+
+### Patch Changes
+
+- d9e4c71: Don't override privy login options if they are provided
+- Updated dependencies [599ecf4]
+  - @abstract-foundation/agw-client@0.1.6
+
 ## 0.1.6
 
 ### Patch Changes

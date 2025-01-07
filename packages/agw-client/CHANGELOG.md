@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 0.1.6
+
+### Patch Changes
+
+- 599ecf4: Fix EIP-5792 return type on wallet_getCallsStatus
+
 ## 0.1.5
 
 ### Patch Changes

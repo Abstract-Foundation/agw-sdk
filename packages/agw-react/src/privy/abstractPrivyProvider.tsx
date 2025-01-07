@@ -12,7 +12,7 @@ import { createConfig, http, WagmiProvider } from 'wagmi';
 import { AGW_APP_ID } from '../constants.js';
 import { InjectWagmiConnector } from './injectWagmiConnector.js';
 
-const privyAppLoginMethod: LoginMethodOrderOption = `privy:${AGW_APP_ID}`;
+export const agwAppLoginMethod: LoginMethodOrderOption = `privy:${AGW_APP_ID}`;
 
 /**
  * Configuration options for the AbstractPrivyProvider.
@@ -44,34 +44,17 @@ export const AbstractPrivyProvider = ({
   });
   const queryClient = new QueryClient();
 
+  // if no login methods and order are provided, set the default login method to the privy app login method
   if (!props.config) {
     props.config = {
       loginMethodsAndOrder: {
-        primary: [privyAppLoginMethod],
+        primary: [agwAppLoginMethod],
       },
     };
   } else if (!props.config.loginMethodsAndOrder) {
     props.config.loginMethodsAndOrder = {
-      primary: [privyAppLoginMethod],
+      primary: [agwAppLoginMethod],
     };
-  } else {
-    if (
-      // check if the privy app login method is in the primary or overflow list
-      !(
-        props.config.loginMethodsAndOrder.primary.includes(
-          privyAppLoginMethod,
-        ) ||
-        (props.config.loginMethodsAndOrder.overflow &&
-          props.config.loginMethodsAndOrder.overflow.includes(
-            privyAppLoginMethod,
-          ))
-      )
-    ) {
-      props.config.loginMethodsAndOrder.primary = [
-        privyAppLoginMethod,
-        ...props.config.loginMethodsAndOrder.primary,
-      ];
-    }
   }
   return (
     <PrivyProvider {...props}>

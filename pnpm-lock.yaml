@@ -81,6 +81,9 @@ importers:
 
   packages/agw-react:
     dependencies:
+      '@abstract-foundation/agw-client':
+        specifier: workspace:*
+        version: link:../agw-client
       '@tanstack/react-query':
         specifier: ^5
         version: 5.56.2(react@18.3.1)
@@ -94,9 +97,6 @@ importers:
         specifier: ^2
         version: 2.12.13(@tanstack/query-core@5.56.2)(@tanstack/react-query@5.56.2(react@18.3.1))(@types/react@18.3.9)(bufferutil@4.0.8)(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react-native@0.75.3(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.3.9)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.6.2)(utf-8-validate@5.0.10))(react@18.3.1)(rollup@4.22.4)(typescript@5.6.2)(utf-8-validate@5.0.10)(viem@2.21.32(bufferutil@4.0.8)(typescript@5.6.2)(utf-8-validate@5.0.10)(zod@3.23.8))(zod@3.23.8)
     devDependencies:
-      '@abstract-foundation/agw-client':
-        specifier: workspace:*
-        version: link:../agw-client
       '@privy-io/cross-app-connect':
         specifier: ^0.1.2
         version: 0.1.2(nwhrqtd3fbn2c6jbqidt4s3kpi)

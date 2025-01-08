@@ -20,14 +20,12 @@ import { isSmartAccountDeployed } from '../../../src/utils.js';
 import { anvilAbstractTestnet } from '../../anvil.js';
 import { address } from '../../constants.js';
 vi.mock('../../../src/utils.js');
-vi.mock('../../../src/actions/sendTransaction', () => ({
-  sendTransaction: vi.fn(),
-}));
 
-import { readContract } from 'viem/actions';
+import { readContract, writeContract } from 'viem/actions';
 
 vi.mock('viem/actions', () => ({
   readContract: vi.fn(),
+  writeContract: vi.fn(),
 }));
 
 import AGWAccountAbi from '../../../src/abis/AGWAccount.js';
@@ -64,7 +62,7 @@ beforeEach(() => {
 
 test('should create a session with module already installed', async () => {
   vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
-  vi.mocked(sendTransaction).mockResolvedValue('0xmockedTransactionHash');
+  vi.mocked(writeContract).mockResolvedValue('0xmockedTransactionHash');
   vi.mocked(readContract).mockResolvedValue([SESSION_KEY_VALIDATOR_ADDRESS]);
 
   const session: SessionConfig = {
@@ -79,22 +77,16 @@ test('should create a session with module already installed', async () => {
     },
   };
 
-  const { transactionHash } = await createSession(
-    baseClient,
-    signerClient,
-    publicClient,
-    {
-      session,
-    },
-    false,
-  );
+  const { transactionHash } = await createSession(baseClient, publicClient, {
+    session,
+  });
 
   expect(transactionHash).toBe('0xmockedTransactionHash');
 });
 
 test('should add module and create a session with contract not deployed', async () => {
   vi.mocked(isSmartAccountDeployed).mockResolvedValue(false);
-  vi.mocked(sendTransaction).mockResolvedValue('0xmockedTransactionHash');
+  vi.mocked(writeContract).mockResolvedValue('0xmockedTransactionHash');
   vi.mocked(readContract).mockResolvedValue([]);
 
   const session: SessionConfig = {
@@ -109,41 +101,23 @@ test('should add module and create a session with contract not deployed', async 
     },
   };
 
-  const { transactionHash } = await createSession(
-    baseClient,
-    signerClient,
-    publicClient,
-    {
-      session,
-    },
-    false,
-  );
+  const { transactionHash } = await createSession(baseClient, publicClient, {
+    session,
+  });
 
   expect(transactionHash).toBe('0xmockedTransactionHash');
 
-  expect(sendTransaction).toHaveBeenCalledWith(
-    baseClient,
-    signerClient,
-    publicClient,
-    {
-      account: baseClient.account,
-      chain: anvilAbstractTestnet.chain as ChainEIP712,
-      to: address.smartAccountAddress,
-      data: encodeFunctionData({
-        abi: AGWAccountAbi,
-        functionName: 'addModule',
-        args: [
-          concatHex([SESSION_KEY_VALIDATOR_ADDRESS, encodeSession(session)]),
-        ],
-      }),
-    },
-    false,
-  );
+  expect(writeContract).toHaveBeenCalledWith(baseClient, {
+    address: address.smartAccountAddress,
+    abi: AGWAccountAbi,
+    functionName: 'addModule',
+    args: [concatHex([SESSION_KEY_VALIDATOR_ADDRESS, encodeSession(session)])],
+  });
 });
 
 test('should add module and create a session with module not installed', async () => {
   vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
-  vi.mocked(sendTransaction).mockResolvedValue('0xmockedTransactionHash');
+  vi.mocked(writeContract).mockResolvedValue('0xmockedTransactionHash');
   vi.mocked(readContract).mockResolvedValue([]);
 
   const session: SessionConfig = {
@@ -158,34 +132,17 @@ test('should add module and create a session with module not installed', async (
     },
   };
 
-  const { transactionHash } = await createSession(
-    baseClient,
-    signerClient,
-    publicClient,
-    {
-      session,
-    },
-    false,
-  );
+  const { transactionHash } = await createSession(baseClient, publicClient, {
+    session,
+  });
 
   expect(transactionHash).toBe('0xmockedTransactionHash');
 
-  expect(sendTransaction).toHaveBeenCalledWith(
-    baseClient,
-    signerClient,
-    publicClient,
-    {
-      account: baseClient.account,
-      chain: anvilAbstractTestnet.chain as ChainEIP712,
-      to: address.smartAccountAddress,
-      data: encodeFunctionData({
-        abi: AGWAccountAbi,
-        functionName: 'addModule',
-        args: [
-          concatHex([SESSION_KEY_VALIDATOR_ADDRESS, encodeSession(session)]),
-        ],
-      }),
-    },
-    false,
-  );
+  expect(writeContract).toHaveBeenCalledWith(baseClient, {
+    address: address.smartAccountAddress,
+    abi: AGWAccountAbi,
+    functionName: 'addModule',
+
+    args: [concatHex([SESSION_KEY_VALIDATOR_ADDRESS, encodeSession(session)])],
+  });
 });

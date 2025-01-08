@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 0.1.7
+
+### Patch Changes
+
+- f3db70c: Fixed an issue that would occur in session key actions when creating an Abstract Client using the account and provider from another client as the signer
+
 ## 0.1.6
 
 ### Patch Changes

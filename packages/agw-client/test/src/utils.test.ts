@@ -53,6 +53,17 @@ describe('convertBigIntToString', () => {
 });
 
 describe('getSmartAccountAddressFromInitialSigner', () => {
+  it('should throw an error if initial signer is undefined', async () => {
+    const publicClient = {
+      readContract: vi.fn().mockResolvedValue(address.smartAccountAddress),
+    };
+    expect(
+      getSmartAccountAddressFromInitialSigner(undefined!, publicClient as any),
+    ).rejects.toThrowError(
+      'Initial signer is required to get smart account address',
+    );
+  });
+
   it('should return the smart account address', () => {
     const initialSigner = address.signerAddress;
     const publicClient = {

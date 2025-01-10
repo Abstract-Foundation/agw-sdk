@@ -49,6 +49,9 @@ export async function getSmartAccountAddressFromInitialSigner<
   initialSigner: Address,
   publicClient: PublicClient<Transport, chain>,
 ): Promise<Hex> {
+  if (initialSigner === undefined) {
+    throw new Error('Initial signer is required to get smart account address');
+  }
   // Generate salt based off address
   const addressBytes = toBytes(initialSigner);
   const salt = keccak256(addressBytes);

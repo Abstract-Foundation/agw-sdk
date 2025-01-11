@@ -22,6 +22,17 @@ import {
 
 import { AGW_APP_ID } from '../constants.js';
 
+// Define ProviderRpcError locally since it's not exported from agw-client
+class ProviderRpcError extends Error {
+  constructor(
+    public code: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = 'ProviderRpcError';
+  }
+}
+
 interface PrivyUserWallets {
   signer?: Address | undefined;
   smartAccount?: Address | undefined;
@@ -49,7 +60,7 @@ export const usePrivyCrossAppProvider = ({
     signMessage,
     signTypedData,
   } = useCrossAppAccounts();
-  const { user, authenticated, ready: privyReady } = usePrivy();
+  const { user, authenticated, ready: privyReady, logout } = usePrivy();
 
   const passthroughMethods = {
     web3_clientVersion: true,
@@ -172,9 +183,14 @@ export const usePrivyCrossAppProvider = ({
         case 'wallet_switchEthereumChain':
           // TODO: do we need to do anything here?
           return null;
-        case 'wallet_revokePermissions':
-          // TODO: do we need to do anything here?
-          return null;
+        case 'wallet_revokePermissions': {
+          try {
+            await logout?.();
+            return null;
+          } catch (error) {
+            throw new ProviderRpcError(4001, 'User rejected the request.');
+          }
+        }
         case 'eth_signTransaction':
           throw new Error('eth_signTransaction is not supported');
         case 'eth_sendTransaction': {

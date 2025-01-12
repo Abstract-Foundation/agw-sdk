@@ -3,7 +3,6 @@ import {
   type Address,
   encodeFunctionData,
   type Hash,
-  type Hex,
   keccak256,
   type PublicClient,
   toBytes,
@@ -11,7 +10,7 @@ import {
   type WalletClient,
   zeroAddress,
 } from 'viem';
-import type { ChainEIP712 } from 'viem/chains';
+import type { ChainEIP712, TransactionRequestEIP712 } from 'viem/chains';
 
 import AccountFactoryAbi from '../abis/AccountFactory.js';
 import {
@@ -24,13 +23,11 @@ import {
   isSmartAccountDeployed,
 } from '../utils.js';
 
-export interface DeployAccountParameters {
+export type DeployAccountParameters = {
   walletClient: WalletClient<Transport, ChainEIP712, Account>;
   publicClient: PublicClient<Transport, ChainEIP712>;
   initialSignerAddress?: Address;
-  paymaster?: Address;
-  paymasterInput?: Hex;
-}
+} & Omit<TransactionRequestEIP712, 'data' | 'from' | 'to' | 'value' | 'type'>;
 
 export interface DeployAccountReturnType {
   smartAccountAddress: Address;
@@ -40,13 +37,7 @@ export interface DeployAccountReturnType {
 export async function deployAccount(
   params: DeployAccountParameters,
 ): Promise<DeployAccountReturnType> {
-  const {
-    initialSignerAddress,
-    walletClient,
-    publicClient,
-    paymaster,
-    paymasterInput,
-  } = params;
+  const { initialSignerAddress, walletClient, publicClient, ...rest } = params;
 
   const initialSigner = initialSignerAddress ?? walletClient.account.address;
 
@@ -81,8 +72,7 @@ export async function deployAccount(
       account: walletClient.account,
       to: SMART_ACCOUNT_FACTORY_ADDRESS,
       data: deploymentCalldata,
-      paymaster,
-      paymasterInput,
+      ...rest,
     });
   }
 

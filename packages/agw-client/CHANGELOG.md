@@ -1,5 +1,12 @@
 # @abstract-foundation/agw-client
 
+## 0.1.8
+
+### Patch Changes
+
+- d64523c: Use gas estimation from zks_estimateFee instead of making a separate call for eth_estimateGas
+- 46fd96b: Fix getSmartAccountAddressFromInitialSigner to throw if initial signer is undefined
+
 ## 0.1.7
 
 ### Patch Changes

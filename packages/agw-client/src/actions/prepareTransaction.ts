@@ -314,6 +314,7 @@ export async function prepareTransactionRequest<
     });
   }
 
+  let gasFromFeeEstimation: bigint | undefined;
   if (parameters.includes('fees')) {
     if (
       typeof request.maxFeePerGas === 'undefined' ||
@@ -346,6 +347,7 @@ export async function prepareTransactionRequest<
         );
         maxFeePerGas = feeEstimation.maxFeePerGas;
         maxPriorityFeePerGas = feeEstimation.maxPriorityFeePerGas;
+        gasFromFeeEstimation = feeEstimation.gasLimit;
       }
 
       if (
@@ -359,10 +361,15 @@ export async function prepareTransactionRequest<
 
       request.maxPriorityFeePerGas = maxPriorityFeePerGas;
       request.maxFeePerGas = maxFeePerGas;
+      request.gas = gasFromFeeEstimation;
     }
   }
 
-  if (parameters.includes('gas') && typeof gas === 'undefined')
+  if (
+    parameters.includes('gas') &&
+    typeof gas === 'undefined' &&
+    gasFromFeeEstimation === undefined // if gas was set by fee estimation, don't estimate again
+  )
     request.gas = await getAction(
       client,
       estimateGas,

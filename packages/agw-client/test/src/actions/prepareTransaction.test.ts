@@ -20,7 +20,8 @@ import { address } from '../../constants.js';
 
 const RAW_SIGNATURE =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-const MOCK_GAS_LIMIT = 158774n;
+const MOCK_ETH_ESTIMATE_GAS_LIMIT = 158774n;
+const MOCK_ZKS_ESTIMATE_GAS_LIMIT = 1403904n;
 const MOCK_FEE_PER_GAS = 250000001n;
 const MOCK_NONCE = 34;
 
@@ -35,7 +36,7 @@ const baseClientRequestSpy = vi.fn(async ({ method, params }) => {
     return anvilAbstractTestnet.chain.id;
   }
   if (method === 'eth_estimateGas') {
-    return MOCK_GAS_LIMIT;
+    return MOCK_ETH_ESTIMATE_GAS_LIMIT;
   }
   return anvilAbstractTestnet.getClient().request({ method, params } as any);
 });
@@ -63,7 +64,7 @@ const publicClient = createPublicClient({
 publicClient.request = (async ({ method, params }) => {
   if (method === 'zks_estimateFee') {
     return {
-      gas_limit: '0x156c00',
+      gas_limit: toHex(MOCK_ZKS_ESTIMATE_GAS_LIMIT),
       gas_per_pubdata_limit: '0x143b',
       max_fee_per_gas: toHex(MOCK_FEE_PER_GAS),
       max_priority_fee_per_gas: '0x0',
@@ -98,7 +99,7 @@ test('minimum', async () => {
     chain: anvilAbstractTestnet.chain,
     from: address.smartAccountAddress,
     chainId: anvilAbstractTestnet.chain.id,
-    gas: MOCK_GAS_LIMIT,
+    gas: MOCK_ZKS_ESTIMATE_GAS_LIMIT,
     nonce: MOCK_NONCE,
     maxFeePerGas: MOCK_FEE_PER_GAS,
     maxPriorityFeePerGas: 0n,
@@ -121,7 +122,7 @@ test('is initial transaction', async () => {
     from: address.signerAddress,
     chain: anvilAbstractTestnet.chain,
     chainId: anvilAbstractTestnet.chain.id,
-    gas: MOCK_GAS_LIMIT,
+    gas: MOCK_ZKS_ESTIMATE_GAS_LIMIT,
     nonce: MOCK_NONCE,
     maxFeePerGas: MOCK_FEE_PER_GAS,
     maxPriorityFeePerGas: 0n,
@@ -146,7 +147,7 @@ test('with fees', async () => {
     chain: anvilAbstractTestnet.chain,
     from: address.smartAccountAddress,
     chainId: anvilAbstractTestnet.chain.id,
-    gas: MOCK_GAS_LIMIT,
+    gas: MOCK_ETH_ESTIMATE_GAS_LIMIT,
     nonce: MOCK_NONCE,
     maxFeePerGas: 10000n,
     maxPriorityFeePerGas: 0n,
@@ -171,7 +172,7 @@ test('to contract deployer', async () => {
     chain: anvilAbstractTestnet.chain,
     from: address.smartAccountAddress,
     chainId: anvilAbstractTestnet.chain.id,
-    gas: MOCK_GAS_LIMIT,
+    gas: MOCK_ETH_ESTIMATE_GAS_LIMIT,
     nonce: MOCK_NONCE,
     maxFeePerGas: 25000000n, // Default fee for contract deployments
     maxPriorityFeePerGas: 0n,
@@ -192,7 +193,7 @@ test('with chainId but not chain', async () => {
     ...transaction,
     from: address.smartAccountAddress,
     chainId: anvilAbstractTestnet.chain.id,
-    gas: MOCK_GAS_LIMIT,
+    gas: MOCK_ZKS_ESTIMATE_GAS_LIMIT,
     nonce: MOCK_NONCE,
     maxFeePerGas: MOCK_FEE_PER_GAS,
     maxPriorityFeePerGas: 0n,
@@ -210,7 +211,7 @@ test('with no chainId or chain', async () => {
     ...transaction,
     from: address.smartAccountAddress,
     chainId: anvilAbstractTestnet.chain.id,
-    gas: MOCK_GAS_LIMIT,
+    gas: MOCK_ZKS_ESTIMATE_GAS_LIMIT,
     nonce: MOCK_NONCE,
     maxFeePerGas: MOCK_FEE_PER_GAS,
     maxPriorityFeePerGas: 0n,

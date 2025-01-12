@@ -22,10 +22,11 @@ vi.mock('../../../src/actions/sendTransaction', () => ({
   sendTransaction: vi.fn(),
 }));
 
-import { readContract } from 'viem/actions';
+import { readContract, writeContract } from 'viem/actions';
 
 vi.mock('viem/actions', () => ({
   readContract: vi.fn(),
+  writeContract: vi.fn(),
 }));
 
 import { SessionKeyValidatorAbi } from '../../../src/abis/SessionKeyValidator.js';
@@ -63,7 +64,7 @@ beforeEach(() => {
 describe('revokeSessions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(sendTransaction).mockResolvedValue('0xmockedTransactionHash');
+    vi.mocked(writeContract).mockResolvedValue('0xmockedTransactionHash');
   });
 
   afterEach(() => {
@@ -150,15 +151,9 @@ describe('revokeSessions', () => {
     }) => {
       vi.mocked(readContract).mockResolvedValue([]);
 
-      const { transactionHash } = await revokeSessions(
-        baseClient,
-        signerClient,
-        publicClient,
-        {
-          session,
-        },
-        false,
-      );
+      const { transactionHash } = await revokeSessions(baseClient, {
+        session,
+      });
 
       const sessionHashes: `0x${string}`[] =
         typeof session === 'string'
@@ -174,22 +169,12 @@ describe('revokeSessions', () => {
 
       expect(transactionHash).toBe('0xmockedTransactionHash');
 
-      expect(sendTransaction).toHaveBeenCalledWith(
-        baseClient,
-        signerClient,
-        publicClient,
-        {
-          account: baseClient.account,
-          chain: anvilAbstractTestnet.chain as ChainEIP712,
-          to: SESSION_KEY_VALIDATOR_ADDRESS,
-          data: encodeFunctionData({
-            abi: SessionKeyValidatorAbi,
-            functionName: 'revokeKeys',
-            args: [sessionHashes],
-          }),
-        },
-        false,
-      );
+      expect(writeContract).toHaveBeenCalledWith(baseClient, {
+        address: SESSION_KEY_VALIDATOR_ADDRESS,
+        abi: SessionKeyValidatorAbi,
+        args: [sessionHashes],
+        functionName: 'revokeKeys',
+      });
     },
   );
 });

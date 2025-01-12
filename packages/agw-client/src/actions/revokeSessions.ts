@@ -1,20 +1,23 @@
 import {
   type Account,
+  type Address,
   type Client,
   type Hash,
-  type PublicClient,
+  type Hex,
   type Transport,
-  type WalletClient,
 } from 'viem';
+import { writeContract } from 'viem/actions';
 import type { ChainEIP712 } from 'viem/chains';
+import { getAction } from 'viem/utils';
 
 import { SessionKeyValidatorAbi } from '../abis/SessionKeyValidator.js';
 import { SESSION_KEY_VALIDATOR_ADDRESS } from '../constants.js';
 import { getSessionHash, type SessionConfig } from '../sessions.js';
-import { writeContract } from './writeContract.js';
 
 export interface RevokeSessionsParameters {
   session: SessionConfig | Hash | (SessionConfig | Hash)[];
+  paymaster?: Address;
+  paymasterInput?: Hex;
 }
 export interface RevokeSessionsReturnType {
   transactionHash: Hash | undefined;
@@ -22,12 +25,9 @@ export interface RevokeSessionsReturnType {
 
 export async function revokeSessions(
   client: Client<Transport, ChainEIP712, Account>,
-  signerClient: WalletClient<Transport, ChainEIP712, Account>,
-  publicClient: PublicClient<Transport, ChainEIP712>,
   args: RevokeSessionsParameters,
-  isPrivyCrossApp = false,
 ): Promise<RevokeSessionsReturnType> {
-  const { session } = args;
+  const { session, ...rest } = args;
 
   const sessionHashes =
     typeof session === 'string'
@@ -36,20 +36,17 @@ export async function revokeSessions(
         ? session.map(sessionHash)
         : [getSessionHash(session)];
 
-  const transactionHash = await writeContract(
+  const transactionHash = await getAction(
     client,
-    signerClient,
-    publicClient,
-    {
-      account: client.account,
-      chain: client.chain,
-      address: SESSION_KEY_VALIDATOR_ADDRESS,
-      abi: SessionKeyValidatorAbi,
-      functionName: 'revokeKeys',
-      args: [sessionHashes],
-    },
-    isPrivyCrossApp,
-  );
+    writeContract,
+    'writeContract',
+  )({
+    address: SESSION_KEY_VALIDATOR_ADDRESS,
+    abi: SessionKeyValidatorAbi,
+    functionName: 'revokeKeys',
+    args: [sessionHashes],
+    ...rest,
+  } as any);
 
   return { transactionHash };
 }

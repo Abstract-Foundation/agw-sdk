@@ -139,7 +139,7 @@ describe('signTypedData', async () => {
       encodeAbiParameters(parseAbiParameters(['bytes', 'address', 'bytes[]']), [
         RAW_SIGNATURE,
         EOA_VALIDATOR_ADDRESS,
-        [],
+        ['0x'],
       ]),
     );
   });

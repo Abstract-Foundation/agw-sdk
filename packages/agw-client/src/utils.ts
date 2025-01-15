@@ -9,6 +9,7 @@ import {
   type PublicClient,
   toBytes,
   type Transport,
+  type TypedDataDefinition,
 } from 'viem';
 import { abstractTestnet } from 'viem/chains';
 import { type ChainEIP712 } from 'viem/zksync';
@@ -19,6 +20,7 @@ import {
   AGW_REGISTRY_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
 } from './constants.js';
+import { isEIP712Transaction } from './eip712.js';
 import { type Call } from './types/call.js';
 
 // TODO: support Abstract mainnet
@@ -139,4 +141,13 @@ export function transformHexValues(transaction: any, keys: string[]) {
       transaction[key] = fromHex(transaction[key], 'bigint');
     }
   }
+}
+
+export function isEip712TypedData(typedData: TypedDataDefinition): boolean {
+  return (
+    typedData.message &&
+    typedData.domain?.name === 'zkSync' &&
+    typedData.domain.version === '2' &&
+    isEIP712Transaction(typedData.message)
+  );
 }

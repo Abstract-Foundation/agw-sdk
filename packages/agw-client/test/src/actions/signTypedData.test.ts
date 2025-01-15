@@ -32,6 +32,7 @@ import AccountFactoryAbi from '../../../src/abis/AccountFactory.js';
 import { signTypedData } from '../../../src/actions/signTypedData.js';
 import {
   EOA_VALIDATOR_ADDRESS,
+  SESSION_KEY_VALIDATOR_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
 } from '../../../src/constants.js';
 import { getInitializerCalldata } from '../../../src/utils.js';
@@ -58,7 +59,9 @@ const baseClientRequestSpy = vi.fn(async ({ method, params }) => {
       )
     ) {
       console.log('returning listHooks');
-      return encodeAbiParameters(parseAbiParameters(['address[]']), [[]]);
+      return encodeAbiParameters(parseAbiParameters(['address[]']), [
+        [SESSION_KEY_VALIDATOR_ADDRESS],
+      ]);
     }
   }
   return anvilAbstractTestnet.getClient().request({ method, params } as any);

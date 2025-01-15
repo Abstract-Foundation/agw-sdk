@@ -1,4 +1,11 @@
-import { fromHex, toBytes, zeroAddress } from 'viem';
+import {
+  Address,
+  fromHex,
+  Hex,
+  toBytes,
+  toFunctionSelector,
+  zeroAddress,
+} from 'viem';
 import {
   createClient,
   createWalletClient,
@@ -36,8 +43,23 @@ const RAW_SIGNATURE =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
 const baseClientRequestSpy = vi.fn(async ({ method, params }) => {
+  console.log('method', method);
   if (method === 'privy_signSmartWalletTypedData') {
     return RAW_SIGNATURE;
+  } else if (method === 'eth_call') {
+    const callParams = params as {
+      to: Address;
+      data: Hex;
+    }[];
+    if (
+      callParams[0].to === address.smartAccountAddress &&
+      callParams[0].data.startsWith(
+        toFunctionSelector('function listHooks(bool)'),
+      )
+    ) {
+      console.log('returning listHooks');
+      return encodeAbiParameters(parseAbiParameters(['address[]']), [[]]);
+    }
   }
   return anvilAbstractTestnet.getClient().request({ method, params } as any);
 });

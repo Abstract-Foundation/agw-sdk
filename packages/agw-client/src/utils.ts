@@ -8,14 +8,10 @@ import {
   keccak256,
   type PublicClient,
   toBytes,
-  toHex,
   type Transport,
   type TypedDataDefinition,
 } from 'viem';
-import {
-  abstractTestnet,
-  type ZksyncEIP712TransactionSignable,
-} from 'viem/chains';
+import { abstractTestnet } from 'viem/chains';
 import { type ChainEIP712 } from 'viem/zksync';
 
 import AccountFactoryAbi from './abis/AccountFactory.js';

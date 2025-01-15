@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.0.0
+
+### Major Changes
+
+- a674404: Finalize contract deployment addresses and adjust session types
+
 ## 0.1.8
 
 ### Patch Changes

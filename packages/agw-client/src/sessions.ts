@@ -116,9 +116,11 @@ export enum SessionStatus {
   NotInitialized = 0,
   Active = 1,
   Closed = 2,
+  Expired = 3,
 }
 
 export interface SessionState {
+  expiresAt: bigint;
   status: SessionStatus;
   feesRemaining: bigint;
   transferValue: {

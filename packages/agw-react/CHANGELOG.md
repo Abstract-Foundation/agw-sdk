@@ -1,5 +1,16 @@
 # @abstract-foundation/agw-react
 
+## 1.0.0
+
+### Major Changes
+
+- a674404: Finalize contract deployment addresses and adjust session types
+
+### Patch Changes
+
+- Updated dependencies [a674404]
+  - @abstract-foundation/agw-client@1.0.0
+
 ## 0.1.10
 
 ### Patch Changes

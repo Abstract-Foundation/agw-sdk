@@ -361,7 +361,10 @@ export async function prepareTransactionRequest<
 
       request.maxPriorityFeePerGas = maxPriorityFeePerGas;
       request.maxFeePerGas = maxFeePerGas;
-      request.gas = gasFromFeeEstimation;
+      // set gas to gasFromFeeEstimation if gas is not already set
+      if (typeof gas === 'undefined') {
+        request.gas = gasFromFeeEstimation;
+      }
     }
   }
 

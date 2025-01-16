@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.0.1
+
+### Patch Changes
+
+- 1480d43: Fixes prepareTransaction action so it does not override a manual gas value passed in
+
 ## 1.0.0
 
 ### Major Changes

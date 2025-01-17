@@ -1,5 +1,31 @@
 # @abstract-foundation/web3-react-agw
 
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies [1480d43]
+  - @abstract-foundation/agw-client@1.0.1
+
+## 1.0.0
+
+### Major Changes
+
+- a674404: Finalize contract deployment addresses and adjust session types
+
+### Patch Changes
+
+- Updated dependencies [a674404]
+  - @abstract-foundation/agw-client@1.0.0
+
+## 0.1.8
+
+### Patch Changes
+
+- Updated dependencies [d64523c]
+- Updated dependencies [46fd96b]
+  - @abstract-foundation/agw-client@0.1.8
+
 ## 0.1.7
 
 ### Patch Changes

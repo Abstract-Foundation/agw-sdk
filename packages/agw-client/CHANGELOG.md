@@ -1,5 +1,24 @@
 # @abstract-foundation/agw-client
 
+## 1.0.1
+
+### Patch Changes
+
+- 1480d43: Fixes prepareTransaction action so it does not override a manual gas value passed in
+
+## 1.0.0
+
+### Major Changes
+
+- a674404: Finalize contract deployment addresses and adjust session types
+
+## 0.1.8
+
+### Patch Changes
+
+- d64523c: Use gas estimation from zks_estimateFee instead of making a separate call for eth_estimateGas
+- 46fd96b: Fix getSmartAccountAddressFromInitialSigner to throw if initial signer is undefined
+
 ## 0.1.7
 
 ### Patch Changes

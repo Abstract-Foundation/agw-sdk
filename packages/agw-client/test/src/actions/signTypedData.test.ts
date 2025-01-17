@@ -1,4 +1,11 @@
-import { fromHex, toBytes, zeroAddress } from 'viem';
+import {
+  Address,
+  fromHex,
+  Hex,
+  toBytes,
+  toFunctionSelector,
+  zeroAddress,
+} from 'viem';
 import {
   createClient,
   createWalletClient,
@@ -25,6 +32,7 @@ import AccountFactoryAbi from '../../../src/abis/AccountFactory.js';
 import { signTypedData } from '../../../src/actions/signTypedData.js';
 import {
   EOA_VALIDATOR_ADDRESS,
+  SESSION_KEY_VALIDATOR_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
 } from '../../../src/constants.js';
 import { getInitializerCalldata } from '../../../src/utils.js';
@@ -36,8 +44,25 @@ const RAW_SIGNATURE =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
 const baseClientRequestSpy = vi.fn(async ({ method, params }) => {
+  console.log('method', method);
   if (method === 'privy_signSmartWalletTypedData') {
     return RAW_SIGNATURE;
+  } else if (method === 'eth_call') {
+    const callParams = params as {
+      to: Address;
+      data: Hex;
+    }[];
+    if (
+      callParams[0].to === address.smartAccountAddress &&
+      callParams[0].data.startsWith(
+        toFunctionSelector('function listHooks(bool)'),
+      )
+    ) {
+      console.log('returning listHooks');
+      return encodeAbiParameters(parseAbiParameters(['address[]']), [
+        [SESSION_KEY_VALIDATOR_ADDRESS],
+      ]);
+    }
   }
   return anvilAbstractTestnet.getClient().request({ method, params } as any);
 });
@@ -114,7 +139,7 @@ describe('signTypedData', async () => {
       encodeAbiParameters(parseAbiParameters(['bytes', 'address', 'bytes[]']), [
         RAW_SIGNATURE,
         EOA_VALIDATOR_ADDRESS,
-        [],
+        ['0x'],
       ]),
     );
   });

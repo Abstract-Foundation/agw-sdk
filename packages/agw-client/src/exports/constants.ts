@@ -1,6 +1,7 @@
 import AGWAccountAbi from '../abis/AGWAccount.js';
 import {
   AGW_REGISTRY_ADDRESS,
+  BRIDGEHUB_ADDRESS,
   CANONICAL_DELEGATE_REGISTRY_ADDRESS,
   CANONICAL_EXCLUSIVE_DELEGATE_RESOLVER_ADDRESS,
   EOA_VALIDATOR_ADDRESS,
@@ -11,6 +12,7 @@ import {
 export {
   AGWAccountAbi as AGWAccountAbi,
   AGW_REGISTRY_ADDRESS as agwRegistryAddress,
+  BRIDGEHUB_ADDRESS as bridgehubAddress,
   CANONICAL_DELEGATE_REGISTRY_ADDRESS as delegateRegistryAddress,
   CANONICAL_EXCLUSIVE_DELEGATE_RESOLVER_ADDRESS as exclusiveDelegateResolverAddress,
   SESSION_KEY_VALIDATOR_ADDRESS as sessionKeyValidatorAddress,

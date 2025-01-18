@@ -193,7 +193,7 @@ export const getPeriodIdsForTransaction = (args: {
     );
   };
 
-  const isContractCall = !!args.selector;
+  const isContractCall = !!args.selector && args.selector.length >= 10;
   const policy: TransferPolicy | CallPolicy | undefined = isContractCall
     ? findCallPolicy()
     : findTransferPolicy();

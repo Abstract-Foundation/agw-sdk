@@ -57,7 +57,7 @@ const publicClient = createPublicClient({
 const transaction1: ZksyncTransactionRequestEIP712 = {
   to: '0x5432100000000000000000000000000000000000',
   from: '0x0000000000000000000000000000000000000000',
-  data: '0x1234578',
+  data: '0x01234578',
   paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
   paymasterInput: '0xabc',
 };
@@ -78,7 +78,7 @@ const session: SessionConfig = {
   },
   callPolicies: [
     {
-      selector: '0x1234578',
+      selector: '0x01234578',
       target: '0x5432100000000000000000000000000000000000',
       constraints: [],
       maxValuePerUse: 0n,
@@ -100,7 +100,7 @@ const session2: SessionConfig = {
   transferPolicies: [
     {
       maxValuePerUse: parseEther('1'),
-      target: '0x0000000000000000000000000000000000000101',
+      target: transaction2.to,
       valueLimit: {
         limit: parseEther('1'),
         limitType: LimitType.Lifetime,

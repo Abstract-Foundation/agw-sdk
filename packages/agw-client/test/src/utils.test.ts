@@ -103,7 +103,7 @@ describe('isSmartAccountDeployed', () => {
 
   it('should return false if smart account is not deployed', async () => {
     const publicClient = {
-      getCode: vi.fn().mockResolvedValue(null),
+      getCode: vi.fn().mockResolvedValue(undefined),
     };
     const smartAccountAddress = address.smartAccountAddress;
     expect(

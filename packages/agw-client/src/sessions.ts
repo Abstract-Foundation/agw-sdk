@@ -171,7 +171,7 @@ export const getPeriodIdsForTransaction = (args: {
   timestamp?: bigint;
 }) => {
   const timestamp = args.timestamp || BigInt(Math.floor(Date.now() / 1000));
-  const target = getAddress(args.target.toLowerCase());
+  const target = getAddress(args.target);
 
   const getId = (limit: Limit): bigint => {
     if (limit.limitType === LimitType.Allowance) {
@@ -182,12 +182,14 @@ export const getPeriodIdsForTransaction = (args: {
 
   const findTransferPolicy = () => {
     return args.sessionConfig.transferPolicies.find(
-      (policy) => policy.target === target,
+      (policy) => policy.target.toLowerCase() === target.toLowerCase(),
     );
   };
   const findCallPolicy = () => {
     return args.sessionConfig.callPolicies.find(
-      (policy) => policy.target === target && policy.selector == args.selector,
+      (policy) =>
+        policy.target.toLowerCase() === target.toLowerCase() &&
+        policy.selector == args.selector,
     );
   };
 

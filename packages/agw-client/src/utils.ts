@@ -89,15 +89,10 @@ export async function isSmartAccountDeployed<
   publicClient: PublicClient<Transport, chain>,
   address: Hex,
 ): Promise<boolean> {
-  try {
-    const bytecode = await publicClient.getCode({
-      address: address,
-    });
-    return bytecode !== null && bytecode !== '0x' && bytecode !== undefined;
-  } catch (error) {
-    console.error('Error checking address:', error);
-    return false;
-  }
+  const bytecode = await publicClient.getCode({
+    address: address,
+  });
+  return bytecode !== null && bytecode !== '0x' && bytecode !== undefined;
 }
 
 export function getInitializerCalldata(

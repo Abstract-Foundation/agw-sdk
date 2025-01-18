@@ -64,7 +64,7 @@ export async function signTransaction<
   const fromAccount = useSignerAddress ? signerClient.account : smartAccount;
 
   assertEip712Request({
-    account: smartAccount,
+    account: fromAccount,
     chain,
     ...(transaction as AssertEip712RequestParameters),
   });

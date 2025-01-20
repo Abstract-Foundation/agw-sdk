@@ -18,6 +18,7 @@ import {
   type WalletClient,
   type WriteContractParameters,
 } from 'viem';
+import { parseAccount } from 'viem/accounts';
 import { getChainId } from 'viem/actions';
 import {
   type ChainEIP712,
@@ -42,6 +43,8 @@ import {
   getLinkedAgw,
   type GetLinkedAgwParameters,
   type GetLinkedAgwReturnType,
+  isLinkedAccount,
+  type IsLinkedAccountParameters,
 } from './actions/getLinkedAgw.js';
 import {
   linkToAgw,
@@ -81,6 +84,7 @@ export type AbstractWalletActions<
   getLinkedAccounts: (
     args: GetLinkedAccountsParameters,
   ) => Promise<GetLinkedAccountsReturnType>;
+  isLinkedAccount: (args: IsLinkedAccountParameters) => Promise<boolean>;
   createSession: (
     args: CreateSessionParameters,
   ) => Promise<CreateSessionReturnType>;
@@ -140,6 +144,7 @@ export type SessionClientActions<
 
 export interface LinkableWalletActions {
   linkToAgw: (args: LinkToAgwParameters) => Promise<LinkToAgwReturnType>;
+  getLinkedAgw: () => Promise<GetLinkedAgwReturnType>;
 }
 
 export interface LinkablePublicActions {
@@ -191,6 +196,7 @@ export function globalWalletActions<
   ): AbstractWalletActions<Chain, Account> => ({
     getChainId: () => getChainId(client),
     getLinkedAccounts: (args) => getLinkedAccounts(client, args),
+    isLinkedAccount: (args) => isLinkedAccount(client, args),
     createSession: (args) => createSession(client, publicClient, args),
     revokeSessions: (args) => revokeSessions(client, args),
     prepareAbstractTransactionRequest: (args) =>
@@ -268,6 +274,8 @@ export function linkableWalletActions() {
     client: WalletClient<Transport, Chain, Account>,
   ): LinkableWalletActions => ({
     linkToAgw: (args) => linkToAgw(client, args),
+    getLinkedAgw: () =>
+      getLinkedAgw(client, { address: parseAccount(client.account).address }),
   });
 }
 

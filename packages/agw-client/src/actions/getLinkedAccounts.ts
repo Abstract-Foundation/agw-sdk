@@ -17,18 +17,18 @@ import {
   CANONICAL_EXCLUSIVE_DELEGATE_RESOLVER_ADDRESS,
 } from '../constants.js';
 
-export interface GetLinkedAgwReturnType {
+export interface GetLinkedAccountsReturnType {
   linkedAccounts: Address[];
 }
 
-export interface GetLinkedAgwParameters {
+export interface GetLinkedAccountsParameters {
   agwAddress: Address;
 }
 
-export async function getLinkedAgw(
+export async function getLinkedAccounts(
   client: Client<Transport, ChainEIP712, Account>,
-  parameters: GetLinkedAgwParameters,
-): Promise<GetLinkedAgwReturnType> {
+  parameters: GetLinkedAccountsParameters,
+): Promise<GetLinkedAccountsReturnType> {
   const { agwAddress } = parameters;
 
   if (!isAddress(agwAddress, { strict: false })) {

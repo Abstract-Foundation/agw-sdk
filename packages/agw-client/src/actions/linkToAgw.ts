@@ -28,14 +28,14 @@ import {
 import { AccountNotFoundError } from '../errors/account.js';
 import { VALID_CHAINS } from '../utils.js';
 
-interface LinkToAgwParameters {
+export interface LinkToAgwParameters {
   agwAddress: Address;
   enabled: boolean;
   l2Chain: Chain;
   account?: Account;
 }
 
-interface LinkToAgwReturnType {
+export interface LinkToAgwReturnType {
   l1TransactionHash: Hash;
   getL2TransactionHash: () => Promise<Hash>;
 }

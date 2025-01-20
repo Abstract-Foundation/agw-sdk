@@ -9,3 +9,7 @@ export {
   isAGWAccount,
   VALID_CHAINS as validChains,
 } from '../utils.js';
+export {
+  linkablePublicActions,
+  linkableWalletActions,
+} from '../walletActions.js';

@@ -52,7 +52,10 @@ import { sendTransactionForSession } from './actions/sendTransactionForSession.j
 import { signMessage } from './actions/signMessage.js';
 import { signTransaction } from './actions/signTransaction.js';
 import { signTransactionForSession } from './actions/signTransactionForSession.js';
-import { signTypedData } from './actions/signTypedData.js';
+import {
+  signTypedData,
+  signTypedDataForSession,
+} from './actions/signTypedData.js';
 import { writeContract } from './actions/writeContract.js';
 import { writeContractForSession } from './actions/writeContractForSession.js';
 import { EOA_VALIDATOR_ADDRESS } from './constants.js';
@@ -124,6 +127,7 @@ export type SessionClientActions<
     args: SignEip712TransactionParameters<chain, account, chainOverride>,
   ) => Promise<SignTransactionReturnType>;
   writeContract: WalletActions<chain, account>['writeContract'];
+  signTypedData: WalletActions<chain, account>['signTypedData'];
 };
 
 export function sessionWalletActions(
@@ -158,6 +162,8 @@ export function sessionWalletActions(
         args,
         session,
       ),
+    signTypedData: (args) =>
+      signTypedDataForSession(client, signerClient, args as any, session),
   });
 }
 

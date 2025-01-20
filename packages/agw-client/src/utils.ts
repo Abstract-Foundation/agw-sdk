@@ -1,5 +1,6 @@
 import {
   type Address,
+  BaseError,
   type Chain,
   encodeFunctionData,
   fromHex,
@@ -8,11 +9,17 @@ import {
   keccak256,
   type PublicClient,
   toBytes,
+  toHex,
   type Transport,
   type TypedDataDefinition,
+  type UnionRequiredBy,
 } from 'viem';
+import { parseAccount } from 'viem/accounts';
 import { abstractTestnet } from 'viem/chains';
-import { type ChainEIP712 } from 'viem/zksync';
+import {
+  type ChainEIP712,
+  type SignEip712TransactionParameters,
+} from 'viem/zksync';
 
 import AccountFactoryAbi from './abis/AccountFactory.js';
 import { AGWRegistryAbi } from './abis/AGWRegistryAbi.js';
@@ -142,7 +149,52 @@ export function isEip712TypedData(typedData: TypedDataDefinition): boolean {
   return (
     typedData.message &&
     typedData.domain?.name === 'zkSync' &&
-    typedData.domain.version === '2' &&
+    typedData.domain?.version === '2' &&
     isEIP712Transaction(typedData.message)
   );
+}
+
+export function transformEip712TypedData(
+  typedData: TypedDataDefinition,
+): UnionRequiredBy<
+  Omit<SignEip712TransactionParameters, 'chain'>,
+  'to' | 'data'
+> & { chainId: number } {
+  if (!isEip712TypedData(typedData)) {
+    throw new BaseError('Typed data is not an EIP712 transaction');
+  }
+
+  if (typedData.domain?.chainId === undefined) {
+    throw new BaseError('Chain ID is required for EIP712 transaction');
+  }
+
+  return {
+    chainId: typedData.domain.chainId,
+    account: parseAccount(
+      toHex(typedData.message['from'] as bigint, {
+        size: 20,
+      }),
+    ),
+    to: toHex(typedData.message['to'] as bigint, {
+      size: 20,
+    }),
+    gas: typedData.message['gasLimit'] as bigint,
+    gasPerPubdata: typedData.message['gasPerPubdataByteLimit'] as bigint,
+    maxFeePerGas: typedData.message['maxFeePerGas'] as bigint,
+    maxPriorityFeePerGas: typedData.message['maxPriorityFeePerGas'] as bigint,
+    paymaster:
+      (typedData.message['paymaster'] as bigint) > 0n
+        ? toHex(typedData.message['paymaster'] as bigint, {
+            size: 20,
+          })
+        : undefined,
+    nonce: typedData.message['nonce'] as number,
+    value: typedData.message['value'] as bigint,
+    data: typedData.message['data'] as Hex,
+    factoryDeps: typedData.message['factoryDeps'] as Hex[],
+    paymasterInput:
+      typedData.message['paymasterParams'] !== '0x'
+        ? (typedData.message['paymasterParams'] as Hex)
+        : undefined,
+  };
 }

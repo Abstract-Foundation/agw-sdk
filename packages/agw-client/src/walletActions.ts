@@ -18,6 +18,7 @@ import {
   type WalletClient,
   type WriteContractParameters,
 } from 'viem';
+import type { SignTransactionReturnType } from 'viem/accounts';
 import { getChainId } from 'viem/actions';
 import {
   type ChainEIP712,
@@ -50,6 +51,7 @@ import {
 import { sendTransactionForSession } from './actions/sendTransactionForSession.js';
 import { signMessage } from './actions/signMessage.js';
 import { signTransaction } from './actions/signTransaction.js';
+import { signTransactionForSession } from './actions/signTransactionForSession.js';
 import { signTypedData } from './actions/signTypedData.js';
 import { writeContract } from './actions/writeContract.js';
 import { writeContractForSession } from './actions/writeContractForSession.js';
@@ -105,6 +107,7 @@ export type AbstractWalletActions<
 export type SessionClientActions<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
+  chainOverride extends ChainEIP712 | undefined = undefined,
 > = {
   sendTransaction: <
     const request extends SendTransactionRequest<chain, chainOverride>,
@@ -117,6 +120,9 @@ export type SessionClientActions<
       request
     >,
   ) => Promise<SendTransactionReturnType>;
+  signTransaction: (
+    args: SignEip712TransactionParameters<chain, account, chainOverride>,
+  ) => Promise<SignTransactionReturnType>;
   writeContract: WalletActions<chain, account>['writeContract'];
 };
 
@@ -138,6 +144,14 @@ export function sessionWalletActions(
       ),
     writeContract: (args) =>
       writeContractForSession(
+        client,
+        signerClient,
+        publicClient,
+        args,
+        session,
+      ),
+    signTransaction: (args) =>
+      signTransactionForSession(
         client,
         signerClient,
         publicClient,

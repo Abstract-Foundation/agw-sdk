@@ -9,6 +9,8 @@ import {
   type EIP1193RequestFn,
   type EIP1474Methods,
   hexToBigInt,
+  hexToNumber,
+  isHex,
   toHex,
   type Transport,
 } from 'viem';
@@ -16,6 +18,7 @@ import { toAccount } from 'viem/accounts';
 
 import { createAbstractClient } from './abstractClient.js';
 import { agwCapabilities, type SendCallsParams } from './eip5792.js';
+import { validChains } from './exports/index.js';
 import { getSmartAccountAddressFromInitialSigner } from './utils.js';
 
 interface TransformEIP1193ProviderOptions {
@@ -230,6 +233,23 @@ export function transformEIP1193Provider(
           status: receipt?.status === undefined ? 'PENDING' : 'CONFIRMED',
           receipts: [receipt],
         };
+      }
+      case 'wallet_addEthereumChain':
+      case 'wallet_switchEthereumChain': {
+        const request = params[0];
+        const chainIdHex = request.chainId;
+        if (!chainIdHex) {
+          throw new Error('Chain ID is required');
+        }
+        // chainId is hex most likely, convert to number
+        const chainId = isHex(chainIdHex)
+          ? hexToNumber(chainIdHex)
+          : chainIdHex;
+        const chain = Object.values(validChains).find((c) => c.id === chainId);
+        if (!chain) {
+          throw new Error(`Chain ${chainId} not supported`);
+        }
+        return await provider.request(e);
       }
       case 'wallet_showCallsStatus': {
         // not implemented

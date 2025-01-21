@@ -36,6 +36,7 @@ export interface ToSessionClientParams {
   client: AbstractClient;
   signer: Account;
   session: SessionConfig;
+  paymasterHandler?: CustomPaymasterHandler;
 }
 
 export function toSessionClient({

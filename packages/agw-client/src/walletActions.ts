@@ -67,7 +67,10 @@ import {
 } from './actions/sendTransaction.js';
 import { sendTransactionForSession } from './actions/sendTransactionForSession.js';
 import { signMessage } from './actions/signMessage.js';
-import { signTransaction } from './actions/signTransaction.js';
+import {
+  type CustomPaymasterHandler,
+  signTransaction,
+} from './actions/signTransaction.js';
 import { signTransactionForSession } from './actions/signTransactionForSession.js';
 import {
   signTypedData,

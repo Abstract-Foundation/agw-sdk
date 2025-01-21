@@ -200,6 +200,7 @@ export function sessionWalletActions(
         publicClient,
         args,
         session,
+        paymasterHandler,
       ),
     signTypedData: (args) =>
       signTypedDataForSession(

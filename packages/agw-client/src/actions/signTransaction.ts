@@ -7,6 +7,7 @@ import {
   type Hex,
   parseAbiParameters,
   type Transport,
+  type UnionRequiredBy,
   type WalletClient,
 } from 'viem';
 import { getChainId, readContract, signTypedData } from 'viem/actions';
@@ -15,6 +16,7 @@ import {
   type ChainEIP712,
   type SignEip712TransactionParameters,
   type SignEip712TransactionReturnType,
+  type TransactionRequestEIP712,
 } from 'viem/zksync';
 
 import AGWAccountAbi from '../abis/AGWAccount.js';
@@ -25,6 +27,27 @@ import {
 import { AccountNotFoundError } from '../errors/account.js';
 import { VALID_CHAINS } from '../utils.js';
 import { transformHexValues } from '../utils.js';
+
+export interface CustomPaymasterParameters {
+  nonce: number;
+  from: Address;
+  to: Address;
+  gas: bigint;
+  gasPrice: bigint;
+  gasPerPubdata: bigint;
+  value: bigint;
+  data: Hex | undefined;
+  maxFeePerGas: bigint;
+  maxPriorityFeePerGas: bigint;
+  chainId: number;
+}
+
+export type CustomPaymasterHandler = (
+  args: CustomPaymasterParameters,
+) => Promise<{
+  paymaster: Address;
+  paymasterInput: Hex;
+}>;
 
 export async function signTransaction<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
@@ -37,7 +60,51 @@ export async function signTransaction<
   validator: Address,
   useSignerAddress = false,
   validationHookData: Record<string, Hex> = {},
+  customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<SignEip712TransactionReturnType> {
+  const chain = client.chain;
+
+  if (!chain?.serializers?.transaction)
+    throw new BaseError('transaction serializer not found on chain.');
+
+  const { transaction, customSignature } = await signEip712TransactionInternal(
+    client,
+    signerClient,
+    args,
+    validator,
+    useSignerAddress,
+    validationHookData,
+    customPaymasterHandler,
+  );
+
+  return chain.serializers.transaction(
+    {
+      ...transaction,
+      customSignature,
+      type: 'eip712',
+    } as any,
+    { r: '0x0', s: '0x0', v: 0n },
+  ) as SignEip712TransactionReturnType;
+}
+
+export async function signEip712TransactionInternal<
+  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  account extends Account | undefined = Account | undefined,
+  chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+>(
+  client: Client<Transport, ChainEIP712, Account>,
+  signerClient: WalletClient<Transport, ChainEIP712, Account>,
+  args: SignEip712TransactionParameters<chain, account, chainOverride>,
+  validator: Address,
+  useSignerAddress = false,
+  validationHookData: Record<string, Hex> = {},
+  customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
+): Promise<{
+  transaction: UnionRequiredBy<TransactionRequestEIP712, 'from'> & {
+    chainId: number;
+  };
+  customSignature: Hex;
+}> {
   const {
     account: account_ = client.account,
     chain = client.chain,
@@ -75,8 +142,6 @@ export async function signTransaction<
 
   if (!chain?.custom?.getEip712Domain)
     throw new BaseError('`getEip712Domain` not found on chain.');
-  if (!chain?.serializers?.transaction)
-    throw new BaseError('transaction serializer not found on chain.');
 
   const chainId = await getAction(client, getChainId, 'getChainId')({});
   if (chain !== null)
@@ -85,10 +150,15 @@ export async function signTransaction<
       chain: chain,
     });
 
-  const eip712Domain = chain?.custom.getEip712Domain({
-    ...transaction,
+  const transactionWithPaymaster = await getTransactionWithPaymasterData(
     chainId,
-    from: fromAccount.address,
+    fromAccount,
+    transaction,
+    customPaymasterHandler,
+  );
+
+  const eip712Domain = chain?.custom.getEip712Domain({
+    ...transactionWithPaymaster,
     type: 'eip712',
   });
 
@@ -124,14 +194,48 @@ export async function signTransaction<
     );
   }
 
-  return chain?.serializers?.transaction(
-    {
+  return {
+    transaction: transactionWithPaymaster,
+    customSignature: signature,
+  };
+}
+
+async function getTransactionWithPaymasterData(
+  chainId: number,
+  fromAccount: Account,
+  transaction: TransactionRequestEIP712,
+  customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
+): Promise<
+  UnionRequiredBy<TransactionRequestEIP712, 'from'> & { chainId: number }
+> {
+  if (
+    customPaymasterHandler &&
+    !transaction.paymaster &&
+    !transaction.paymasterInput
+  ) {
+    const paymasterResult = await customPaymasterHandler({
       chainId,
-      ...transaction,
       from: fromAccount.address,
-      customSignature: signature,
-      type: 'eip712' as any,
-    },
-    { r: '0x0', s: '0x0', v: 0n },
-  ) as SignEip712TransactionReturnType;
+      data: transaction.data,
+      gas: transaction.gas ?? 0n,
+      gasPrice: transaction.gasPrice ?? 0n,
+      gasPerPubdata: transaction.gasPerPubdata ?? 0n,
+      maxFeePerGas: transaction.maxFeePerGas ?? 0n,
+      maxPriorityFeePerGas: transaction.maxPriorityFeePerGas ?? 0n,
+      nonce: transaction.nonce ?? 0,
+      to: transaction.to ?? '0x0',
+      value: transaction.value ?? 0n,
+    });
+    return {
+      ...transaction,
+      ...paymasterResult,
+      from: fromAccount.address,
+      chainId,
+    };
+  }
+  return {
+    ...transaction,
+    from: fromAccount.address,
+    chainId,
+  };
 }

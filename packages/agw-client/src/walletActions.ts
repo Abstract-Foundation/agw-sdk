@@ -18,7 +18,7 @@ import {
   type WalletClient,
   type WriteContractParameters,
 } from 'viem';
-import { parseAccount } from 'viem/accounts';
+import { parseAccount, type SignTransactionReturnType } from 'viem/accounts';
 import { getChainId } from 'viem/actions';
 import {
   type ChainEIP712,
@@ -67,8 +67,15 @@ import {
 } from './actions/sendTransaction.js';
 import { sendTransactionForSession } from './actions/sendTransactionForSession.js';
 import { signMessage } from './actions/signMessage.js';
-import { signTransaction } from './actions/signTransaction.js';
-import { signTypedData } from './actions/signTypedData.js';
+import {
+  type CustomPaymasterHandler,
+  signTransaction,
+} from './actions/signTransaction.js';
+import { signTransactionForSession } from './actions/signTransactionForSession.js';
+import {
+  signTypedData,
+  signTypedDataForSession,
+} from './actions/signTypedData.js';
 import { writeContract } from './actions/writeContract.js';
 import { writeContractForSession } from './actions/writeContractForSession.js';
 import { EOA_VALIDATOR_ADDRESS } from './constants.js';
@@ -127,6 +134,7 @@ export type AbstractWalletActions<
 export type SessionClientActions<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
+  chainOverride extends ChainEIP712 | undefined = undefined,
 > = {
   sendTransaction: <
     const request extends SendTransactionRequest<chain, chainOverride>,
@@ -139,7 +147,11 @@ export type SessionClientActions<
       request
     >,
   ) => Promise<SendTransactionReturnType>;
+  signTransaction: (
+    args: SignEip712TransactionParameters<chain, account, chainOverride>,
+  ) => Promise<SignTransactionReturnType>;
   writeContract: WalletActions<chain, account>['writeContract'];
+  signTypedData: WalletActions<chain, account>['signTypedData'];
 };
 
 export interface LinkableWalletActions {
@@ -160,6 +172,7 @@ export function sessionWalletActions(
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
   session: SessionConfig,
+  paymasterHandler?: CustomPaymasterHandler,
 ) {
   return (
     client: Client<Transport, ChainEIP712, Account>,
@@ -179,6 +192,23 @@ export function sessionWalletActions(
         publicClient,
         args,
         session,
+      ),
+    signTransaction: (args) =>
+      signTransactionForSession(
+        client,
+        signerClient,
+        publicClient,
+        args,
+        session,
+        paymasterHandler,
+      ),
+    signTypedData: (args) =>
+      signTypedDataForSession(
+        client,
+        signerClient,
+        args as any,
+        session,
+        paymasterHandler,
       ),
   });
 }

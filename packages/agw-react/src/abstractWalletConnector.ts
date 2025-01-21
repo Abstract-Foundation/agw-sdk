@@ -88,10 +88,12 @@ function abstractWalletConnector(
       parameters?: { chainId?: number | undefined } | undefined,
     ) => {
       const chainId = parameters?.chainId ?? defaultChain.id;
-      const chain = validChains[chainId];
-      if (!chain) {
+      if (!validChains[chainId]) {
         throw new Error('Unsupported chain');
       }
+      const chain =
+        params.chains.find((c) => c.id === chainId) ?? validChains[chainId];
+
       const provider = await connector.getProvider({
         chainId,
       });

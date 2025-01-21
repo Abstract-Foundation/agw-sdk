@@ -29,7 +29,10 @@ import {
 } from '../sessions.js';
 import { isEip712TypedData, transformEip712TypedData } from '../utils.js';
 import { sendPrivySignTypedData } from './sendPrivyTransaction.js';
-import { signEip712TransactionInternal } from './signTransaction.js';
+import {
+  type CustomPaymasterHandler,
+  signEip712TransactionInternal,
+} from './signTransaction.js';
 
 export async function signTypedData(
   client: Client<Transport, ChainEIP712, Account>,
@@ -82,6 +85,7 @@ export async function signTypedDataForSession<
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   parameters: TypedDataDefinition<typedData, primaryType>,
   session: SessionConfig,
+  paymasterHandler?: CustomPaymasterHandler,
 ): Promise<Hex> {
   // if the typed data is already a zkSync EIP712 transaction, don't try to transform it
   // to an AGW typed signature, just pass it through to the signer.
@@ -121,6 +125,7 @@ export async function signTypedDataForSession<
     SESSION_KEY_VALIDATOR_ADDRESS,
     false,
     validationHookData,
+    paymasterHandler,
   );
 
   return customSignature;

@@ -169,6 +169,7 @@ export function sessionWalletActions(
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
   session: SessionConfig,
+  paymasterHandler?: CustomPaymasterHandler,
 ) {
   return (
     client: Client<Transport, ChainEIP712, Account>,
@@ -198,7 +199,13 @@ export function sessionWalletActions(
         session,
       ),
     signTypedData: (args) =>
-      signTypedDataForSession(client, signerClient, args as any, session),
+      signTypedDataForSession(
+        client,
+        signerClient,
+        args as any,
+        session,
+        paymasterHandler,
+      ),
   });
 }
 

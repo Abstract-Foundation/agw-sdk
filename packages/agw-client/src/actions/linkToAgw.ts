@@ -51,10 +51,9 @@ export async function linkToAgw(
     l2Chain,
   } = parameters;
 
-  if (!account_)
-    throw new AccountNotFoundError({
-      docsPath: '/docs/contract/writeContract',
-    });
+  if (!account_) {
+    throw new AccountNotFoundError();
+  }
   const account = parseAccount(account_);
 
   if (!VALID_CHAINS[l2Chain.id]) {

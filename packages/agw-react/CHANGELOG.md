@@ -1,5 +1,12 @@
 # @abstract-foundation/agw-react
 
+## 1.0.2
+
+### Patch Changes
+
+- 0f861e2: fix: Update wagmi connector to prefer chain object from config instead of defaultChains
+- f80f18c: fix: throw error if switching to unsupported chain
+
 ## 1.0.1
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @abstract-foundation/agw-client
 
+## 1.1.0
+
+### Minor Changes
+
+- 3d379e7: Add functions for managing EOA -> AGW linking
+- b9758fc: Add ability to sign typed messages on a session client (thirdweb compat)
+
 ## 1.0.1
 
 ### Patch Changes

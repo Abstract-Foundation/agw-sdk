@@ -1,5 +1,13 @@
 # @abstract-foundation/agw-react
 
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies [3d379e7]
+- Updated dependencies [b9758fc]
+  - @abstract-foundation/agw-client@1.1.0
+
 ## 1.0.1
 
 ### Patch Changes

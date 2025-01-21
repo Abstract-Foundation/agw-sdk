@@ -18,7 +18,7 @@ import {
   type WalletClient,
   type WriteContractParameters,
 } from 'viem';
-import type { SignTransactionReturnType } from 'viem/accounts';
+import { parseAccount, type SignTransactionReturnType } from 'viem/accounts';
 import { getChainId } from 'viem/actions';
 import {
   type ChainEIP712,
@@ -34,6 +34,23 @@ import {
   type CreateSessionReturnType,
 } from './actions/createSession.js';
 import { deployContract } from './actions/deployContract.js';
+import {
+  getLinkedAccounts,
+  type GetLinkedAccountsParameters,
+  type GetLinkedAccountsReturnType,
+} from './actions/getLinkedAccounts.js';
+import {
+  getLinkedAgw,
+  type GetLinkedAgwParameters,
+  type GetLinkedAgwReturnType,
+  isLinkedAccount,
+  type IsLinkedAccountParameters,
+} from './actions/getLinkedAgw.js';
+import {
+  linkToAgw,
+  type LinkToAgwParameters,
+  type LinkToAgwReturnType,
+} from './actions/linkToAgw.js';
 import {
   prepareTransactionRequest,
   type PrepareTransactionRequestParameters,
@@ -68,6 +85,10 @@ export type AbstractWalletActions<
   account extends Account | undefined = Account | undefined,
 > = Eip712WalletActions<chain, account> & {
   getChainId: () => Promise<GetChainIdReturnType>;
+  getLinkedAccounts: (
+    args: GetLinkedAccountsParameters,
+  ) => Promise<GetLinkedAccountsReturnType>;
+  isLinkedAccount: (args: IsLinkedAccountParameters) => Promise<boolean>;
   createSession: (
     args: CreateSessionParameters,
   ) => Promise<CreateSessionReturnType>;
@@ -130,6 +151,20 @@ export type SessionClientActions<
   signTypedData: WalletActions<chain, account>['signTypedData'];
 };
 
+export interface LinkableWalletActions {
+  linkToAgw: (args: LinkToAgwParameters) => Promise<LinkToAgwReturnType>;
+  getLinkedAgw: () => Promise<GetLinkedAgwReturnType>;
+}
+
+export interface LinkablePublicActions {
+  getLinkedAgw: (
+    args: GetLinkedAgwParameters,
+  ) => Promise<GetLinkedAgwReturnType>;
+  getLinkedAccounts: (
+    args: GetLinkedAccountsParameters,
+  ) => Promise<GetLinkedAccountsReturnType>;
+}
+
 export function sessionWalletActions(
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
@@ -179,6 +214,8 @@ export function globalWalletActions<
     client: Client<Transport, ChainEIP712, Account>,
   ): AbstractWalletActions<Chain, Account> => ({
     getChainId: () => getChainId(client),
+    getLinkedAccounts: (args) => getLinkedAccounts(client, args),
+    isLinkedAccount: (args) => isLinkedAccount(client, args),
     createSession: (args) => createSession(client, publicClient, args),
     revokeSessions: (args) => revokeSessions(client, args),
     prepareAbstractTransactionRequest: (args) =>
@@ -248,5 +285,24 @@ export function globalWalletActions<
         signer,
         session: session,
       }),
+  });
+}
+
+export function linkableWalletActions() {
+  return (
+    client: WalletClient<Transport, Chain, Account>,
+  ): LinkableWalletActions => ({
+    linkToAgw: (args) => linkToAgw(client, args),
+    getLinkedAgw: () =>
+      getLinkedAgw(client, { address: parseAccount(client.account).address }),
+  });
+}
+
+export function linkablePublicActions() {
+  return (
+    client: Client<Transport, ChainEIP712, Account>,
+  ): LinkablePublicActions => ({
+    getLinkedAgw: (args) => getLinkedAgw(client, args),
+    getLinkedAccounts: (args) => getLinkedAccounts(client, args),
   });
 }

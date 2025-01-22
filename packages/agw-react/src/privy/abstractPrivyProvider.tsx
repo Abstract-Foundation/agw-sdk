@@ -63,7 +63,7 @@ export const AbstractPrivyProvider = ({
     <PrivyProvider {...props}>
       <WagmiProvider config={wagmiConfig}>
         <QueryClientProvider client={queryClient}>
-          <InjectWagmiConnector chain={chain}>
+          <InjectWagmiConnector chain={chain} transport={transport}>
             {props.children}
           </InjectWagmiConnector>
         </QueryClientProvider>

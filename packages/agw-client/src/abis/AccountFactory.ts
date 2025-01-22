@@ -37,6 +37,11 @@ const AccountFactoryAbi = [
   },
   {
     inputs: [],
+    name: 'ALREADY_CREATED',
+    type: 'error',
+  },
+  {
+    inputs: [],
     name: 'DEPLOYMENT_FAILED',
     type: 'error',
   },
@@ -104,11 +109,17 @@ const AccountFactoryAbi = [
       {
         indexed: true,
         internalType: 'address',
-        name: 'newDeployer',
+        name: 'deployer',
         type: 'address',
       },
+      {
+        indexed: true,
+        internalType: 'bool',
+        name: 'authorized',
+        type: 'bool',
+      },
     ],
-    name: 'DeployerChanged',
+    name: 'DeployerAuthorized',
     type: 'event',
   },
   {
@@ -186,7 +197,7 @@ const AccountFactoryAbi = [
     inputs: [
       {
         internalType: 'address',
-        name: '',
+        name: 'account',
         type: 'address',
       },
     ],
@@ -194,7 +205,7 @@ const AccountFactoryAbi = [
     outputs: [
       {
         internalType: 'address',
-        name: '',
+        name: 'deployer',
         type: 'address',
       },
     ],
@@ -218,13 +229,19 @@ const AccountFactoryAbi = [
     inputs: [
       {
         internalType: 'address',
-        name: 'newDeployer',
+        name: 'deployer',
         type: 'address',
       },
     ],
-    name: 'changeDeployer',
-    outputs: [],
-    stateMutability: 'nonpayable',
+    name: 'authorizedDeployers',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: 'authorized',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -280,19 +297,6 @@ const AccountFactoryAbi = [
       },
     ],
     stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'deployer',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -426,6 +430,43 @@ const AccountFactoryAbi = [
   {
     inputs: [
       {
+        internalType: 'bytes32',
+        name: 'salt',
+        type: 'bytes32',
+      },
+    ],
+    name: 'saltToAccount',
+    outputs: [
+      {
+        internalType: 'address',
+        name: 'accountAddress',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'deployer',
+        type: 'address',
+      },
+      {
+        internalType: 'bool',
+        name: 'authorized',
+        type: 'bool',
+      },
+    ],
+    name: 'setDeployer',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
         internalType: 'address',
         name: 'newOwner',
         type: 'address',
@@ -437,5 +478,3 @@ const AccountFactoryAbi = [
     type: 'function',
   },
 ];
-
-export default AccountFactoryAbi;

@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-react
 
+## 1.2.1
+
+### Patch Changes
+
+- 895f4bc: Pass custom transport to read functions if needed
+
 ## 1.2.0
 
 ### Minor Changes

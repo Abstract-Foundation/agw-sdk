@@ -4,9 +4,8 @@
 
 ### Patch Changes
 
-- Updated dependencies [3d379e7]
-- Updated dependencies [b9758fc]
-  - @abstract-foundation/agw-client@1.1.0
+- 0f861e2: fix: Update wagmi connector to prefer chain object from config instead of defaultChains
+- f80f18c: fix: throw error if switching to unsupported chain
 
 ## 1.0.1
 

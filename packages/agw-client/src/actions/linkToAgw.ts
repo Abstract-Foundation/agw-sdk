@@ -3,6 +3,7 @@ import {
   type Account,
   type Address,
   type Chain,
+  type Client,
   createPublicClient,
   decodeEventLog,
   encodeFunctionData,
@@ -10,7 +11,6 @@ import {
   http,
   type PublicClient,
   type Transport,
-  type WalletClient,
 } from 'viem';
 import { writeContract } from 'viem/actions';
 import { getAction, parseAccount } from 'viem/utils';
@@ -41,7 +41,7 @@ export interface LinkToAgwReturnType {
 }
 
 export async function linkToAgw(
-  client: WalletClient<Transport, Chain, Account>,
+  client: Client<Transport, Chain, Account>,
   parameters: LinkToAgwParameters,
 ): Promise<LinkToAgwReturnType> {
   const {

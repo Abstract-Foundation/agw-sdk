@@ -1,7 +1,7 @@
 {
   "name": "@abstract-foundation/agw-client",
   "description": "Abstract Global Wallet Client SDK",
-  "version": "1.1.0-beta.1",
+  "version": "1.1.0-beta.2",
   "license": "MIT",
   "repository": {
     "type": "git",

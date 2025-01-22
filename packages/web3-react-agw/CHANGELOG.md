@@ -1,6 +1,10 @@
 # @abstract-foundation/web3-react-agw
 
-## 1.0.2
+## 1.1.0
+
+### Minor Changes
+
+- 63547e1: Fix typing for wallet extension
 
 ### Patch Changes
 

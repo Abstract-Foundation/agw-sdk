@@ -78,7 +78,7 @@ export async function createAbstractClient({
   const baseClient = createClient({
     account: toAccount(smartAccountAddress),
     chain: chain,
-    transport: publicTransport,
+    transport,
   });
 
   // Create a signer wallet client to handle actual signing

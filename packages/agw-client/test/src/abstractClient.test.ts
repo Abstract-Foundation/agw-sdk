@@ -85,14 +85,13 @@ describe('createAbstractClient', () => {
 
   it('creates client with default public transport', async () => {
     const mockTransport = vi.fn();
-    const mockPublicTransport = expect.any(Function);
     const abstractClient = await createAbstractClient({
       signer,
       chain: anvilAbstractTestnet.chain as ChainEIP712,
       transport: mockTransport,
     });
 
-    testAbstractClient(abstractClient, mockPublicTransport);
+    testAbstractClient(abstractClient, mockTransport);
   });
 
   it('creates client with custom public transport', async () => {
@@ -105,6 +104,6 @@ describe('createAbstractClient', () => {
       publicTransport: mockPublicTransport,
     });
 
-    testAbstractClient(abstractClient, mockPublicTransport);
+    testAbstractClient(abstractClient, mockTransport);
   });
 });

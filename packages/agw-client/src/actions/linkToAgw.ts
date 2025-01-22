@@ -3,7 +3,6 @@ import {
   type Account,
   type Address,
   type Chain,
-  type Client,
   createPublicClient,
   decodeEventLog,
   encodeFunctionData,
@@ -11,6 +10,7 @@ import {
   http,
   type PublicClient,
   type Transport,
+  type WalletClient,
 } from 'viem';
 import { writeContract } from 'viem/actions';
 import { getAction, parseAccount } from 'viem/utils';
@@ -40,8 +40,12 @@ export interface LinkToAgwReturnType {
   getL2TransactionHash: () => Promise<Hash>;
 }
 
-export async function linkToAgw(
-  client: Client<Transport, Chain, Account>,
+export async function linkToAgw<
+  transport extends Transport = Transport,
+  chain extends Chain | undefined = Chain | undefined,
+  account extends Account | undefined = Account | undefined,
+>(
+  client: WalletClient<transport, chain, account>,
   parameters: LinkToAgwParameters,
 ): Promise<LinkToAgwReturnType> {
   const {
@@ -140,7 +144,7 @@ export async function linkToAgw(
     args: [bridgeArgs],
     maxFeePerGas,
     maxPriorityFeePerGas,
-  });
+  } as any);
 
   return {
     l1TransactionHash,
@@ -149,8 +153,11 @@ export async function linkToAgw(
   };
 }
 
-async function getL2HashFromPriorityOp(
-  publicClient: PublicClient,
+async function getL2HashFromPriorityOp<
+  chain extends Chain | undefined = Chain | undefined,
+  account extends Account | undefined = Account | undefined,
+>(
+  publicClient: PublicClient<Transport, chain, account>,
   l1TransactionHash: Hash,
 ): Promise<Hash> {
   const receipt = await publicClient.waitForTransactionReceipt({

@@ -15,6 +15,7 @@ import {
   type SignTypedDataReturnType,
   type Transport,
   type WalletActions,
+  walletActions,
   type WalletClient,
   type WriteContractParameters,
 } from 'viem';
@@ -154,10 +155,13 @@ export type SessionClientActions<
   signTypedData: WalletActions<chain, account>['signTypedData'];
 };
 
-export interface LinkableWalletActions {
+export type LinkableWalletActions<
+  chain extends Chain | undefined = Chain | undefined,
+  account extends Account | undefined = Account | undefined,
+> = WalletActions<chain, account> & {
   linkToAgw: (args: LinkToAgwParameters) => Promise<LinkToAgwReturnType>;
   getLinkedAgw: () => Promise<GetLinkedAgwReturnType>;
-}
+};
 
 export interface LinkablePublicActions {
   getLinkedAgw: (
@@ -302,19 +306,27 @@ export function globalWalletActions<
   });
 }
 
-export function linkableWalletActions() {
+export function linkableWalletActions<
+  transport extends Transport = Transport,
+  chain extends Chain | undefined = Chain | undefined,
+  account extends Account | undefined = Account | undefined,
+>() {
   return (
-    client: Client<Transport, Chain, Account>,
-  ): LinkableWalletActions => ({
+    client: WalletClient<transport, chain, account>,
+  ): LinkableWalletActions<chain, account> => ({
+    ...walletActions(client),
     linkToAgw: (args) => linkToAgw(client, args),
-    getLinkedAgw: () =>
-      getLinkedAgw(client, { address: parseAccount(client.account).address }),
+    getLinkedAgw: () => getLinkedAgw(client, {}),
   });
 }
 
-export function linkablePublicActions() {
+export function linkablePublicActions<
+  transport extends Transport = Transport,
+  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  account extends Account | undefined = Account | undefined,
+>() {
   return (
-    client: Client<Transport, ChainEIP712, Account>,
+    client: Client<transport, chain, account>,
   ): LinkablePublicActions => ({
     getLinkedAgw: (args) => getLinkedAgw(client, args),
     getLinkedAccounts: (args) => getLinkedAccounts(client, args),

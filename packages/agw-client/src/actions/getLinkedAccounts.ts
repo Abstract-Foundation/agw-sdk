@@ -31,8 +31,12 @@ export interface IsLinkedAccountParameters {
   address: Address;
 }
 
-export async function getLinkedAccounts(
-  client: Client<Transport, ChainEIP712, Account>,
+export async function getLinkedAccounts<
+  transport extends Transport = Transport,
+  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  account extends Account | undefined = Account | undefined,
+>(
+  client: Client<transport, chain, account>,
   parameters: GetLinkedAccountsParameters,
 ): Promise<GetLinkedAccountsReturnType> {
   const { agwAddress } = parameters;

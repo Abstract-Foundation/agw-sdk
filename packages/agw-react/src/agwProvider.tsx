@@ -32,7 +32,7 @@ interface AbstractWalletConfig {
  * const App = () => {
  *   // optional configuration overrides
  *   const config = {
- *     testnet: true,
+ *     chain: abstractTestnet,
  *     transport: http("https://your.abstract.node.example.com/rpc")
  *   };
  *   return (

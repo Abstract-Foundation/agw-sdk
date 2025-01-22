@@ -10,7 +10,6 @@ import {
   type EIP1193RequestFn,
   type EIP1474Methods,
   http,
-  type Transport,
 } from 'viem';
 
 import { AGW_APP_ID, ICON_URL } from './constants.js';
@@ -18,8 +17,6 @@ import { AGW_APP_ID, ICON_URL } from './constants.js';
 interface AbstractWalletConnectorOptions {
   /** RainbowKit connector details */
   rkDetails: WalletDetailsParams;
-  /** Override transports for chains */
-  overrideTransports: Record<number, Transport>;
 }
 
 /**
@@ -59,8 +56,7 @@ function abstractWalletConnector(
   Record<string, unknown>,
   Record<string, unknown>
 > {
-  const { rkDetails, overrideTransports } = options;
-
+  const { rkDetails } = options;
   return (params) => {
     const chains = [...params.chains];
     let defaultChain = params.chains[0];
@@ -98,16 +94,7 @@ function abstractWalletConnector(
         chainId,
       });
 
-      const providerChainId = await provider.request({
-        method: 'eth_chainId',
-      });
-
-      let transport: Transport | undefined;
-      if (validChains[Number(providerChainId)] === undefined) {
-        // Transport is not overridden but provider is not on a supported chain,
-        // use default http transport
-        transport = overrideTransports?.[chainId] ?? http();
-      }
+      const transport = params.transports?.[chainId] ?? http();
 
       return transformEIP1193Provider({
         provider,

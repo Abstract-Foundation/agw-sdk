@@ -478,3 +478,5 @@ const AccountFactoryAbi = [
     type: 'function',
   },
 ];
+
+export default AccountFactoryAbi;

@@ -1,6 +1,8 @@
 import {
   type Account,
   type Address,
+  BaseError,
+  type Chain,
   type Client,
   getAddress,
   InvalidAddressError,
@@ -23,18 +25,25 @@ export interface GetLinkedAgwReturnType {
 }
 
 export interface GetLinkedAgwParameters {
-  address: Address;
+  address?: Address | undefined;
 }
 
 export interface IsLinkedAccountParameters {
   address: Address;
 }
 
-export async function getLinkedAgw(
-  client: Client<Transport, ChainEIP712, Account>,
+export async function getLinkedAgw<
+  chain extends Chain | undefined = Chain | undefined,
+  account extends Account | undefined = Account | undefined,
+>(
+  client: Client<Transport, chain, account>,
   parameters: GetLinkedAgwParameters,
 ): Promise<GetLinkedAgwReturnType> {
-  const { address } = parameters;
+  const { address = client.account?.address } = parameters;
+
+  if (address === undefined) {
+    throw new BaseError('No address provided');
+  }
 
   if (!isAddress(address, { strict: false })) {
     throw new InvalidAddressError({ address });

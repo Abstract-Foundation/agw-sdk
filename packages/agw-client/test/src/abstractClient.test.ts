@@ -74,6 +74,15 @@ describe('createAbstractClient', () => {
     );
   };
 
+  it('throws if no transport is provided', () => {
+    expect(
+      createAbstractClient({
+        signer,
+        chain: anvilAbstractTestnet.chain as ChainEIP712,
+      }),
+    ).rejects.toThrow();
+  });
+
   it('creates client with default public transport', async () => {
     const mockTransport = vi.fn();
     const mockPublicTransport = expect.any(Function);

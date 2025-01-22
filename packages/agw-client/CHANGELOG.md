@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.1.1
+
+### Patch Changes
+
+- 4fcaef4: Fix transport used for inner client
+
 ## 1.1.0
 
 ### Minor Changes

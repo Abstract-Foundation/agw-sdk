@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-react
 
+## 1.2.0
+
+### Minor Changes
+
+- ae2ad0a: Update privy packages to properly identify connected chain
+
 ## 1.1.0
 
 ### Minor Changes

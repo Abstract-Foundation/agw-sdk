@@ -1,12 +1,13 @@
 import { createAbstractClient } from '@abstract-foundation/agw-client';
 import { useQuery } from '@tanstack/react-query';
-import { custom, useChains } from 'wagmi';
+import { custom, useChains, useConfig } from 'wagmi';
 
 import { useGlobalWalletSignerClient } from './useGlobalWalletSignerClient.js';
 
 export const useAbstractClient = () => {
   const { data: signer, status, error } = useGlobalWalletSignerClient();
   const [chain] = useChains();
+  const config = useConfig();
 
   return useQuery({
     gcTime: 0,
@@ -24,6 +25,7 @@ export const useAbstractClient = () => {
         chain,
         transport: custom(signer.transport),
         isPrivyCrossApp: true,
+        publicTransport: config?._internal.transports[chain.id],
       });
 
       return client;

@@ -191,20 +191,27 @@ export const usePrivyCrossAppProvider = ({
               transaction.eip712Meta.paymasterParams.paymasterInput,
             );
           }
-          return await sendTransaction(transaction, {
-            address: transaction.from,
-          });
+          return await sendTransaction(
+            {
+              ...transaction,
+              chainId: chain.id,
+            },
+            {
+              address: transaction.from,
+            },
+          );
         }
         case 'eth_signTypedData_v4':
           return await signTypedData(
             JSON.parse(params[1]) as SignTypedDataParams,
-            { address: params[0] },
+            { address: params[0], chainId: chain.id },
           );
         case 'eth_sign':
           throw new Error('eth_sign is unsafe and not supported');
         case 'personal_sign': {
           return await signMessage(fromHex(params[0], 'string'), {
             address: params[1],
+            chainId: chain.id,
           });
         }
         default:

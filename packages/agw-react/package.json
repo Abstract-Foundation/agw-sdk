@@ -66,8 +66,8 @@
     "@abstract-foundation/agw-client": "workspace:*"
   },
   "peerDependencies": {
-    "@privy-io/cross-app-connect": "^0.1.2",
-    "@privy-io/react-auth": "^1.97.0",
+    "@privy-io/cross-app-connect": "^0.1.4",
+    "@privy-io/react-auth": "^2.0.5",
     "@tanstack/react-query": "^5",
     "react": ">=18",
     "secp256k1": ">=5.0.1",
@@ -78,8 +78,8 @@
   },
   "devDependencies": {
     "@abstract-foundation/agw-client": "workspace:*",
-    "@privy-io/cross-app-connect": "^0.1.2",
-    "@privy-io/react-auth": "^1.97.0",
+    "@privy-io/cross-app-connect": "^0.1.4",
+    "@privy-io/react-auth": "^2.0.5",
     "@rainbow-me/rainbowkit": "^2.1.6",
     "@tanstack/query-core": "^5.56.2",
     "@types/react": ">=18.3.1",

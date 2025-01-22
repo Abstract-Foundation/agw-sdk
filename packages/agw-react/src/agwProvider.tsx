@@ -1,6 +1,7 @@
+import { validChains } from '@abstract-foundation/agw-client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import { http, type Transport } from 'viem';
+import { type Chain, http, type Transport } from 'viem';
 import { abstractTestnet } from 'viem/chains';
 import { createConfig, WagmiProvider } from 'wagmi';
 
@@ -12,7 +13,7 @@ interface AbstractWalletConfig {
    * @type {boolean}
    * @default false
    */
-  testnet?: boolean;
+  chain: Chain;
   /**
    * Optional transport for the client.
    * @type {Transport}
@@ -45,14 +46,16 @@ interface AbstractWalletConfig {
  */
 export const AbstractWalletProvider = ({
   config = {
-    testnet: false,
+    chain: abstractTestnet,
     transport: http(),
   },
   children,
 }: React.PropsWithChildren<{ config: AbstractWalletConfig }>) => {
-  const { testnet = false, transport } = config;
-  // TODO: replace with mainnet when we have the configuration
-  const chain = testnet ? abstractTestnet : abstractTestnet;
+  const { chain, transport } = config;
+
+  if (!validChains[chain.id]) {
+    throw new Error(`Chain ${chain.id} is not supported`);
+  }
 
   const wagmiConfig = createConfig({
     chains: [chain],

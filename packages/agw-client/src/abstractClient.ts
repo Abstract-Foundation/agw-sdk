@@ -43,6 +43,7 @@ interface CreateAbstractClientParameters {
   transport?: Transport;
   address?: Address;
   isPrivyCrossApp?: boolean;
+  publicTransport?: Transport;
 }
 
 type AbstractClientActions = AbstractWalletActions<ChainEIP712, Account>;
@@ -56,14 +57,15 @@ export async function createAbstractClient({
   transport,
   address,
   isPrivyCrossApp = false,
+  publicTransport = http(),
 }: CreateAbstractClientParameters): Promise<AbstractClient> {
   if (!transport) {
-    transport = http();
+    throw new Error('Transport is required');
   }
 
   const publicClient = createPublicClient({
     chain: chain,
-    transport: http(),
+    transport: publicTransport,
   });
 
   const smartAccountAddress =
@@ -76,7 +78,7 @@ export async function createAbstractClient({
   const baseClient = createClient({
     account: toAccount(smartAccountAddress),
     chain: chain,
-    transport,
+    transport: publicTransport,
   });
 
   // Create a signer wallet client to handle actual signing

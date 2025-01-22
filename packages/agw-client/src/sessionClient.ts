@@ -68,7 +68,7 @@ export function createSessionClient({
   }
 
   const publicClient = createPublicClient({
-    transport: http(),
+    transport,
     chain,
   });
 

@@ -74,24 +74,37 @@ describe('createAbstractClient', () => {
     );
   };
 
-  it('creates client without transport', async () => {
-    const mockTransport = expect.any(Function);
-    const abstractClient = await createAbstractClient({
-      signer,
-      chain: anvilAbstractTestnet.chain as ChainEIP712,
-    });
-
-    testAbstractClient(abstractClient, mockTransport);
+  it('throws if no transport is provided', () => {
+    expect(
+      createAbstractClient({
+        signer,
+        chain: anvilAbstractTestnet.chain as ChainEIP712,
+      }),
+    ).rejects.toThrow();
   });
 
-  it('creates client with custom transport', async () => {
+  it('creates client with default public transport', async () => {
     const mockTransport = vi.fn();
+    const mockPublicTransport = expect.any(Function);
     const abstractClient = await createAbstractClient({
       signer,
       chain: anvilAbstractTestnet.chain as ChainEIP712,
       transport: mockTransport,
     });
 
-    testAbstractClient(abstractClient, mockTransport);
+    testAbstractClient(abstractClient, mockPublicTransport);
+  });
+
+  it('creates client with custom public transport', async () => {
+    const mockTransport = vi.fn();
+    const mockPublicTransport = vi.fn();
+    const abstractClient = await createAbstractClient({
+      signer,
+      chain: anvilAbstractTestnet.chain as ChainEIP712,
+      transport: mockTransport,
+      publicTransport: mockPublicTransport,
+    });
+
+    testAbstractClient(abstractClient, mockPublicTransport);
   });
 });

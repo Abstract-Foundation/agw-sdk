@@ -14,6 +14,7 @@ const AGW_APP_ID = 'cm04asygd041fmry9zmcyn5o5';
 
 const VALID_CHAINS: Record<number, Chain> = {
   [abstractTestnet.id]: abstractTestnet,
+  [2741]: { id: 2741 } as Chain,
 };
 
 function parseChainId(chainId: string | number) {

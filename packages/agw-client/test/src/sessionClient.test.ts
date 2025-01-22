@@ -92,30 +92,15 @@ describe('createSessionClient', () => {
     expect(getSmartAccountAddressFromInitialSigner).not.toHaveBeenCalled();
   };
 
-  it('creates client without transport', async () => {
-    const mockTransport = expect.any(Function);
-    const abstractClient = await createAbstractClient({
-      signer,
-      chain: anvilAbstractTestnet.chain as ChainEIP712,
-      address: address.smartAccountAddress,
-    });
-
-    const sessionClient = toSessionClient({
-      client: abstractClient,
-      signer: sessionSigner,
-      session,
-    });
-
-    testSessionClient(sessionClient, mockTransport);
-  });
-
   it('creates client with custom transport', async () => {
-    const mockTransport = vi.fn();
+    const mockTransport = expect.any(Function);
+    const mockReadTransport = vi.fn();
     const abstractClient = await createAbstractClient({
       signer,
       chain: anvilAbstractTestnet.chain as ChainEIP712,
       address: address.smartAccountAddress,
       transport: mockTransport,
+      publicTransport: mockReadTransport,
     });
 
     const sessionClient = toSessionClient({

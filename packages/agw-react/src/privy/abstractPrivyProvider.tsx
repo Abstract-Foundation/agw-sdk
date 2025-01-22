@@ -1,3 +1,4 @@
+import { validChains } from '@abstract-foundation/agw-client';
 import {
   type LoginMethodOrderOption,
   PrivyProvider,
@@ -5,7 +6,7 @@ import {
 } from '@privy-io/react-auth';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import { type Transport } from 'viem';
+import { type Chain, type Transport } from 'viem';
 import { abstractTestnet } from 'viem/chains';
 import { createConfig, http, WagmiProvider } from 'wagmi';
 
@@ -22,16 +23,18 @@ export const agwAppLoginMethod: LoginMethodOrderOption = `privy:${AGW_APP_ID}`;
  * @property {Transport} transport - Optional transport to use, defaults to standard http.
  */
 interface AgwPrivyProviderProps extends PrivyProviderProps {
-  testnet?: boolean;
+  chain?: Chain;
   transport?: Transport;
 }
 
 export const AbstractPrivyProvider = ({
-  testnet = false,
+  chain = abstractTestnet,
   transport,
   ...props
 }: AgwPrivyProviderProps) => {
-  const chain = testnet ? abstractTestnet : abstractTestnet;
+  if (!validChains[chain.id]) {
+    throw new Error(`Chain ${chain.id} is not supported`);
+  }
 
   const wagmiConfig = createConfig({
     chains: [chain],

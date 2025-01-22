@@ -225,7 +225,10 @@ export function globalWalletActions<
     client: Client<Transport, ChainEIP712, Account>,
   ): AbstractWalletActions<Chain, Account> => ({
     getChainId: () => getChainId(client),
-    getLinkedAccounts: (args) => getLinkedAccounts(client, args),
+    getLinkedAccounts: () =>
+      getLinkedAccounts(client, {
+        agwAddress: parseAccount(client.account).address,
+      }),
     isLinkedAccount: (args) => isLinkedAccount(client, args),
     createSession: (args) => createSession(client, publicClient, args),
     revokeSessions: (args) => revokeSessions(client, args),
@@ -301,7 +304,7 @@ export function globalWalletActions<
 
 export function linkableWalletActions() {
   return (
-    client: WalletClient<Transport, Chain, Account>,
+    client: Client<Transport, Chain, Account>,
   ): LinkableWalletActions => ({
     linkToAgw: (args) => linkToAgw(client, args),
     getLinkedAgw: () =>

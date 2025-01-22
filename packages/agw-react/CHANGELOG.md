@@ -1,5 +1,13 @@
 # @abstract-foundation/agw-react
 
+## 1.2.3
+
+### Patch Changes
+
+- 4fcaef4: Fix transport used in useAbstractClient
+- Updated dependencies [4fcaef4]
+  - @abstract-foundation/agw-client@1.1.1
+
 ## 1.2.2
 
 ### Patch Changes

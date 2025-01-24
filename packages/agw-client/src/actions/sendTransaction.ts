@@ -26,6 +26,7 @@ import type { SendTransactionBatchParameters } from '../types/sendTransactionBat
 import { getInitializerCalldata, isSmartAccountDeployed } from '../utils.js';
 import { sendPrivyTransaction } from './sendPrivyTransaction.js';
 import { sendTransactionInternal } from './sendTransactionInternal.js';
+import type { CustomPaymasterHandler } from './signTransaction.js';
 
 export async function sendTransactionBatch<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
@@ -40,6 +41,7 @@ export async function sendTransactionBatch<
   publicClient: PublicClient<Transport, ChainEIP712>,
   parameters: SendTransactionBatchParameters<request>,
   isPrivyCrossApp = false,
+  customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<SendTransactionReturnType> {
   const { calls, paymaster, paymasterInput, ...rest } = parameters;
   if (calls.length === 0) {
@@ -145,6 +147,8 @@ export async function sendTransactionBatch<
     },
     EOA_VALIDATOR_ADDRESS,
     !isDeployed,
+    {},
+    customPaymasterHandler,
   );
 }
 
@@ -167,6 +171,7 @@ export async function sendTransaction<
     request
   >,
   isPrivyCrossApp = false,
+  customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<SendEip712TransactionReturnType> {
   if (isPrivyCrossApp) return await sendPrivyTransaction(client, parameters);
 
@@ -208,5 +213,7 @@ export async function sendTransaction<
     parameters,
     EOA_VALIDATOR_ADDRESS,
     !isDeployed,
+    {},
+    customPaymasterHandler,
   );
 }

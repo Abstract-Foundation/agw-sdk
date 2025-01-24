@@ -11,6 +11,7 @@ import {
 import { toAccount } from 'viem/accounts';
 import { type ChainEIP712 } from 'viem/zksync';
 
+import type { CustomPaymasterHandler } from './actions/signTransaction.js';
 import { getSmartAccountAddressFromInitialSigner } from './utils.js';
 import {
   type AbstractWalletActions,
@@ -41,9 +42,34 @@ interface CreateAbstractClientParameters {
    * @optional
    */
   transport?: Transport;
+
+  /**
+   * The address of the smart account.
+   * @type {Address}
+   * @optional
+   */
   address?: Address;
+
+  /**
+   * Whether the client is a Privy cross-app client.
+   * @type {boolean}
+   * @optional
+   */
   isPrivyCrossApp?: boolean;
+
+  /**
+   * The transport layer for the underlying public client.
+   * @type {Transport}
+   * @optional
+   */
   publicTransport?: Transport;
+
+  /**
+   * The custom paymaster handler.
+   * @type {CustomPaymasterHandler}
+   * @optional
+   */
+  customPaymasterHandler?: CustomPaymasterHandler;
 }
 
 type AbstractClientActions = AbstractWalletActions<ChainEIP712, Account>;
@@ -58,6 +84,7 @@ export async function createAbstractClient({
   address,
   isPrivyCrossApp = false,
   publicTransport = http(),
+  customPaymasterHandler,
 }: CreateAbstractClientParameters): Promise<AbstractClient> {
   if (!transport) {
     throw new Error('Transport is required');
@@ -89,7 +116,12 @@ export async function createAbstractClient({
   });
 
   const abstractClient = baseClient.extend(
-    globalWalletActions(signerWalletClient, publicClient, isPrivyCrossApp),
+    globalWalletActions(
+      signerWalletClient,
+      publicClient,
+      isPrivyCrossApp,
+      customPaymasterHandler,
+    ),
   );
   return abstractClient as AbstractClient;
 }

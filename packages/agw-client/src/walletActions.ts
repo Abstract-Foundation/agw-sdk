@@ -224,6 +224,7 @@ export function globalWalletActions<
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
   isPrivyCrossApp = false,
+  customPaymasterHandler?: CustomPaymasterHandler,
 ) {
   return (
     client: Client<Transport, ChainEIP712, Account>,
@@ -250,6 +251,7 @@ export function globalWalletActions<
         publicClient,
         args as any,
         isPrivyCrossApp,
+        customPaymasterHandler,
       ),
     sendTransactionBatch: (args) =>
       sendTransactionBatch(
@@ -258,6 +260,7 @@ export function globalWalletActions<
         publicClient,
         args,
         isPrivyCrossApp,
+        customPaymasterHandler,
       ),
     signMessage: (args: Omit<SignMessageParameters, 'account'>) =>
       signMessage(client, signerClient, args, isPrivyCrossApp),
@@ -269,8 +272,8 @@ export function globalWalletActions<
         EOA_VALIDATOR_ADDRESS,
         false,
         {},
-        undefined,
         isPrivyCrossApp,
+        customPaymasterHandler,
       ),
     signTypedData: (
       args: Omit<SignTypedDataParameters, 'account' | 'privateKey'>,
@@ -289,6 +292,7 @@ export function globalWalletActions<
               publicClient,
               args,
               isPrivyCrossApp,
+              customPaymasterHandler,
             ),
         }),
         signerClient,
@@ -307,6 +311,7 @@ export function globalWalletActions<
         client: client as AbstractClient,
         signer,
         session: session,
+        paymasterHandler: customPaymasterHandler,
       }),
   });
 }

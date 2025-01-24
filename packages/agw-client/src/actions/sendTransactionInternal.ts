@@ -28,7 +28,10 @@ import { INSUFFICIENT_BALANCE_SELECTOR } from '../constants.js';
 import { AccountNotFoundError } from '../errors/account.js';
 import { InsufficientBalanceError } from '../errors/insufficientBalance.js';
 import { prepareTransactionRequest } from './prepareTransaction.js';
-import { signTransaction } from './signTransaction.js';
+import {
+  type CustomPaymasterHandler,
+  signTransaction,
+} from './signTransaction.js';
 
 export async function sendTransactionInternal<
   const request extends SendTransactionRequest<chain, chainOverride>,
@@ -48,6 +51,7 @@ export async function sendTransactionInternal<
   validator: Address,
   isInitialTransaction: boolean,
   validationHookData: Record<string, Hex> = {},
+  customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<SendEip712TransactionReturnType> {
   const { chain = client.chain } = parameters;
 
@@ -91,6 +95,7 @@ export async function sendTransactionInternal<
       validator,
       isInitialTransaction,
       validationHookData,
+      customPaymasterHandler,
     );
     return await getAction(
       client,

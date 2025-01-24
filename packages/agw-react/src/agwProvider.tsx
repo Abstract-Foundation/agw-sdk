@@ -19,6 +19,12 @@ interface AbstractWalletConfig {
    * @default http()
    */
   transport?: Transport;
+  /**
+   * Optional query client.
+   * @type {QueryClient}
+   * @default new QueryClient()
+   */
+  queryClient?: QueryClient;
 }
 
 /**
@@ -31,9 +37,9 @@ interface AbstractWalletConfig {
  * const App = () => {
  *   // optional configuration overrides
  *   const transport = http("https://your.abstract.node.example.com/rpc")
- *
+ *   const queryClient = new QueryClient()
  *   return (
- *     <AbstractWalletProvider chain={abstractTestnet} transport={transport}>
+ *     <AbstractWalletProvider chain={abstractTestnet} transport={transport} queryClient={queryClient}>
  *       <Component {...pageProps} />
  *     </AbstractWalletProvider>
  *   );
@@ -44,6 +50,7 @@ interface AbstractWalletConfig {
 export const AbstractWalletProvider = ({
   chain,
   transport,
+  queryClient = new QueryClient(),
   children,
 }: React.PropsWithChildren<AbstractWalletConfig>) => {
   if (!validChains[chain.id]) {
@@ -60,7 +67,6 @@ export const AbstractWalletProvider = ({
     multiInjectedProviderDiscovery: false,
   });
 
-  const queryClient = new QueryClient();
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-react
 
+## 1.2.4
+
+### Patch Changes
+
+- ba55a52: Export privy InjectWagmiConnector for advanced usages
+
 ## 1.2.3
 
 ### Patch Changes

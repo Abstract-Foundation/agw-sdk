@@ -15,7 +15,7 @@ import {
   type UnionRequiredBy,
 } from 'viem';
 import { parseAccount } from 'viem/accounts';
-import { abstractTestnet } from 'viem/chains';
+import { abstract, abstractTestnet } from 'viem/chains';
 import {
   type ChainEIP712,
   type SignEip712TransactionParameters,
@@ -33,7 +33,7 @@ import { type Call } from './types/call.js';
 // TODO: support Abstract mainnet
 export const VALID_CHAINS: Record<number, Chain> = {
   [abstractTestnet.id]: abstractTestnet,
-  [2741]: { id: 2741 } as Chain,
+  [abstract.id]: abstract,
 };
 
 export function convertBigIntToString(value: any): any {
@@ -169,7 +169,7 @@ export function transformEip712TypedData(
   }
 
   return {
-    chainId: typedData.domain.chainId,
+    chainId: Number(typedData.domain.chainId),
     account: parseAccount(
       toHex(typedData.message['from'] as bigint, {
         size: 20,

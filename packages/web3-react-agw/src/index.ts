@@ -8,13 +8,13 @@ import type {
 } from '@web3-react/types';
 import { Connector } from '@web3-react/types';
 import { type Chain, type EIP1193Provider } from 'viem';
-import { abstractTestnet } from 'viem/chains';
+import { abstract, abstractTestnet } from 'viem/chains';
 
 const AGW_APP_ID = 'cm04asygd041fmry9zmcyn5o5';
 
 const VALID_CHAINS: Record<number, Chain> = {
   [abstractTestnet.id]: abstractTestnet,
-  [2741]: { id: 2741 } as Chain,
+  [abstract.id]: abstract,
 };
 
 function parseChainId(chainId: string | number) {

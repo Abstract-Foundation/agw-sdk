@@ -7,7 +7,6 @@ import {
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { type Chain, type Transport } from 'viem';
-import { abstractTestnet } from 'viem/chains';
 import { createConfig, http, WagmiProvider } from 'wagmi';
 
 import { AGW_APP_ID } from '../constants.js';
@@ -23,12 +22,12 @@ export const agwAppLoginMethod: LoginMethodOrderOption = `privy:${AGW_APP_ID}`;
  * @property {Transport} transport - Optional transport to use, defaults to standard http.
  */
 interface AgwPrivyProviderProps extends PrivyProviderProps {
-  chain?: Chain;
+  chain: Chain;
   transport?: Transport;
 }
 
 export const AbstractPrivyProvider = ({
-  chain = abstractTestnet,
+  chain,
   transport,
   ...props
 }: AgwPrivyProviderProps) => {

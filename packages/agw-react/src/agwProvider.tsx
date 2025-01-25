@@ -2,7 +2,6 @@ import { validChains } from '@abstract-foundation/agw-client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { type Chain, http, type Transport } from 'viem';
-import { abstractTestnet } from 'viem/chains';
 import { createConfig, WagmiProvider } from 'wagmi';
 
 import { abstractWalletConnector } from './abstractWalletConnector.js';
@@ -45,10 +44,7 @@ interface AbstractWalletConfig {
  * @param {AbstractWalletConfig} config - The configuration for the AbstractWalletProvider.
  */
 export const AbstractWalletProvider = ({
-  config = {
-    chain: abstractTestnet,
-    transport: http(),
-  },
+  config,
   children,
 }: React.PropsWithChildren<{ config: AbstractWalletConfig }>) => {
   const { chain, transport } = config;

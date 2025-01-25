@@ -66,13 +66,13 @@
   "peerDependencies": {
     "abitype": "^1.0.0",
     "typescript": ">=5.0.4",
-    "viem": "^2.21.26"
+    "viem": "^2.22.14"
   },
   "devDependencies": {
     "@types/node": "^22.5.5",
     "@vitest/coverage-v8": "^2.1.1",
     "prool": "^0.0.16",
-    "viem": "^2.21.26",
+    "viem": "^2.22.14",
     "vitest": "^2.1.1"
   },
   "peerDependenciesMeta": {

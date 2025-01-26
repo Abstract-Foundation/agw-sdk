@@ -53,6 +53,7 @@ export const InjectWagmiConnector = (props: InjectWagmiConnectorProps) => {
 
   useEffect(() => {
     const setup = async (provider: EIP1193Provider) => {
+      config.storage?.removeItem('xyz.abs.privy.disconnected');
       const wagmiConnector = injected({
         target: {
           provider,

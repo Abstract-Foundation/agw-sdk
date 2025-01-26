@@ -1,5 +1,17 @@
 # @abstract-foundation/agw-react
 
+## 1.4.0
+
+### Minor Changes
+
+- 7de8115: Add non executing transaction signing
+
+### Patch Changes
+
+- Updated dependencies [7de8115]
+- Updated dependencies [97015f9]
+  - @abstract-foundation/agw-client@1.3.0
+
 ## 1.3.0
 
 ### Minor Changes

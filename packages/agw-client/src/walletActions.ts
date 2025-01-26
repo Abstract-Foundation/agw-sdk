@@ -267,6 +267,10 @@ export function globalWalletActions<
         signerClient,
         args as SignEip712TransactionParameters<chain, account>,
         EOA_VALIDATOR_ADDRESS,
+        false,
+        {},
+        undefined,
+        isPrivyCrossApp,
       ),
     signTypedData: (
       args: Omit<SignTypedDataParameters, 'account' | 'privateKey'>,

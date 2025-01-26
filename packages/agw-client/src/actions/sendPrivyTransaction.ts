@@ -11,6 +11,7 @@ import {
 import {
   type ChainEIP712,
   type SendEip712TransactionParameters,
+  type SignEip712TransactionParameters,
   type SignEip712TransactionReturnType,
 } from 'viem/zksync';
 
@@ -69,5 +70,26 @@ export async function sendPrivySignTypedData(
     } as any,
     { retryCount: 0 },
   )) as Hex;
+  return result;
+}
+
+export async function signPrivyTransaction<
+  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  account extends Account | undefined = Account | undefined,
+  chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+>(
+  client: Client<Transport, ChainEIP712, Account>,
+  parameters: SignEip712TransactionParameters<chain, account, chainOverride>,
+): Promise<SignEip712TransactionReturnType> {
+  const { chain: _chain, account: _account, ...request } = parameters;
+
+  const result = (await client.request(
+    {
+      method: 'privy_signSmartWalletTx',
+      params: [replaceBigInts(request, toHex)],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any,
+    { retryCount: 0 },
+  )) as SignEip712TransactionReturnType;
   return result;
 }

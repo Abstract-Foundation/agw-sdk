@@ -171,30 +171,37 @@ export function transformEip712TypedData(
   return {
     chainId: Number(typedData.domain.chainId),
     account: parseAccount(
-      toHex(typedData.message['from'] as bigint, {
+      toHex(BigInt(typedData.message['from'] as string), {
         size: 20,
       }),
     ),
-    to: toHex(typedData.message['to'] as bigint, {
+    to: toHex(BigInt(typedData.message['to'] as string), {
       size: 20,
     }),
-    gas: typedData.message['gasLimit'] as bigint,
-    gasPerPubdata: typedData.message['gasPerPubdataByteLimit'] as bigint,
-    maxFeePerGas: typedData.message['maxFeePerGas'] as bigint,
-    maxPriorityFeePerGas: typedData.message['maxPriorityFeePerGas'] as bigint,
+    gas: BigInt(typedData.message['gasLimit'] as string),
+    gasPerPubdata: BigInt(
+      typedData.message['gasPerPubdataByteLimit'] as string,
+    ),
+    maxFeePerGas: BigInt(typedData.message['maxFeePerGas'] as string),
+    maxPriorityFeePerGas: BigInt(
+      typedData.message['maxPriorityFeePerGas'] as string,
+    ),
     paymaster:
-      (typedData.message['paymaster'] as bigint) > 0n
-        ? toHex(typedData.message['paymaster'] as bigint, {
+      (typedData.message['paymaster'] as string) != '0'
+        ? toHex(BigInt(typedData.message['paymaster'] as string), {
             size: 20,
           })
         : undefined,
     nonce: typedData.message['nonce'] as number,
-    value: typedData.message['value'] as bigint,
-    data: typedData.message['data'] as Hex,
+    value: BigInt(typedData.message['value'] as string),
+    data:
+      typedData.message['data'] === '0x0'
+        ? '0x'
+        : (typedData.message['data'] as Hex),
     factoryDeps: typedData.message['factoryDeps'] as Hex[],
     paymasterInput:
-      typedData.message['paymasterParams'] !== '0x'
-        ? (typedData.message['paymasterParams'] as Hex)
+      typedData.message['paymasterInput'] !== '0x'
+        ? (typedData.message['paymasterInput'] as Hex)
         : undefined,
   };
 }

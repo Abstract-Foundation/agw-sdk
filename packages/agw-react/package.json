@@ -79,7 +79,7 @@
   "devDependencies": {
     "@abstract-foundation/agw-client": "workspace:*",
     "@privy-io/cross-app-connect": "^0.1.4",
-    "@privy-io/react-auth": "^2.0.5",
+    "@privy-io/react-auth": "^2.0.8",
     "@rainbow-me/rainbowkit": "^2.1.6",
     "@tanstack/query-core": "^5.56.2",
     "@types/react": ">=18.3.1",

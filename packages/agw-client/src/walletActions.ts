@@ -296,6 +296,7 @@ export function globalWalletActions<
           ChainEIP712,
           Account
         >,
+        isPrivyCrossApp,
       ),
     toSessionClient: (signer, session) =>
       toSessionClient({

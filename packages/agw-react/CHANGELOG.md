@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-react
 
+## 1.4.1
+
+### Patch Changes
+
+- acfc601: Bump cross app connect dependency
+
 ## 1.4.0
 
 ### Minor Changes

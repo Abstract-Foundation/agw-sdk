@@ -81,10 +81,12 @@ export async function signPrivyTransaction<
   client: Client<Transport, ChainEIP712, Account>,
   parameters: SignEip712TransactionParameters<chain, account, chainOverride>,
 ): Promise<SignEip712TransactionReturnType> {
+  const { chain: _chain, account: _account, ...request } = parameters;
+
   const result = (await client.request(
     {
       method: 'privy_signSmartWalletTx',
-      params: [replaceBigInts(parameters, toHex)],
+      params: [replaceBigInts(request, toHex)],
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any,
     { retryCount: 0 },

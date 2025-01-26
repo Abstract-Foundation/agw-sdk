@@ -40,9 +40,7 @@ export async function signTypedData(
   // if the typed data is already a zkSync EIP712 transaction, don't try to transform it
   // to an AGW typed signature, just pass it through to the signer.
   if (isEip712TypedData(parameters)) {
-    const transformedTypedData = transformEip712TypedData(
-      parameters.message as any,
-    );
+    const transformedTypedData = transformEip712TypedData(parameters);
 
     if (transformedTypedData.chainId !== client.chain.id) {
       throw new BaseError('Chain ID mismatch in AGW typed signature');
@@ -62,13 +60,15 @@ export async function signTypedData(
       isPrivyCrossApp,
     );
 
-    if (signedTransaction.startsWith('0x71')) {
+    if (!signedTransaction.startsWith('0x71')) {
       throw new BaseError(
         'Expected RLP encoded EIP-712 transaction as signature',
       );
     }
 
-    const signatureParts = fromRlp(signedTransaction, 'hex');
+    const rlpSignature: Hex = `0x${signedTransaction.slice(4)}`;
+
+    const signatureParts = fromRlp(rlpSignature, 'hex');
     if (signatureParts.length < 15) {
       throw new BaseError(
         'Expected RLP encoded EIP-712 transaction with at least 15 fields',

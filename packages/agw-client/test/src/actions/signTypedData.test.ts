@@ -19,7 +19,7 @@ import {
 } from 'viem';
 import { toAccount } from 'viem/accounts';
 import { getCode } from 'viem/actions';
-import { ChainEIP712 } from 'viem/zksync';
+import { ChainEIP712, getGeneralPaymasterInput } from 'viem/zksync';
 import { describe, expect, it, vi } from 'vitest';
 vi.mock('viem/actions', async (importOriginal) => {
   const actual = await importOriginal();
@@ -132,7 +132,9 @@ describe('signTypedData', async () => {
         value: 0n,
         data: '0x',
         factoryDeps: [],
-        paymasterInput: '0x',
+        paymasterInput: getGeneralPaymasterInput({
+          innerInput: '0x',
+        }),
       },
     });
     expect(signedMessage).toBe(

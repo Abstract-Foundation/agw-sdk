@@ -200,8 +200,8 @@ export function transformEip712TypedData(
         : (typedData.message['data'] as Hex),
     factoryDeps: typedData.message['factoryDeps'] as Hex[],
     paymasterInput:
-      typedData.message['paymasterParams'] !== '0x'
-        ? (typedData.message['paymasterParams'] as Hex)
+      typedData.message['paymasterInput'] !== '0x'
+        ? (typedData.message['paymasterInput'] as Hex)
         : undefined,
   };
 }

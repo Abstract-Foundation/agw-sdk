@@ -1,24 +1,18 @@
-import { sign } from 'crypto';
 import {
   type Account,
   BaseError,
   type Client,
-  encodeAbiParameters,
   fromRlp,
   hashTypedData,
   type Hex,
-  parseAbiParameters,
   type Transport,
   type TypedData,
   type TypedDataDefinition,
   type WalletClient,
 } from 'viem';
 import { type SignTypedDataParameters } from 'viem/accounts';
-import { readContract, signTypedData as viemSignTypedData } from 'viem/actions';
 import type { ChainEIP712 } from 'viem/chains';
-import { getAction } from 'viem/utils';
 
-import AGWAccountAbi from '../abis/AGWAccount.js';
 import {
   EOA_VALIDATOR_ADDRESS,
   SESSION_KEY_VALIDATOR_ADDRESS,

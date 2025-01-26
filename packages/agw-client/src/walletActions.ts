@@ -275,18 +275,7 @@ export function globalWalletActions<
       deployContract(client, signerClient, publicClient, args, isPrivyCrossApp),
     writeContract: (args) =>
       writeContract(
-        Object.assign(client, {
-          sendTransaction: (
-            args: SendEip712TransactionParameters<chain, account>,
-          ) =>
-            sendTransaction(
-              client,
-              signerClient,
-              publicClient,
-              args,
-              isPrivyCrossApp,
-            ),
-        }),
+        client,
         signerClient,
         publicClient,
         args as WriteContractParameters<

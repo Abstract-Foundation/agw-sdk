@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.2.0
+
+### Minor Changes
+
+- 3cf7f67: Update provider config; require chain definition
+
 ## 1.1.1
 
 ### Patch Changes

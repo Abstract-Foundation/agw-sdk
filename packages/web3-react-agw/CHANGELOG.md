@@ -1,5 +1,16 @@
 # @abstract-foundation/web3-react-agw
 
+## 1.2.0
+
+### Minor Changes
+
+- 3cf7f67: Update provider config; require chain definition
+
+### Patch Changes
+
+- Updated dependencies [3cf7f67]
+  - @abstract-foundation/agw-client@1.2.0
+
 ## 1.1.1
 
 ### Patch Changes

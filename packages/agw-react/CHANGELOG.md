@@ -1,5 +1,17 @@
 # @abstract-foundation/agw-react
 
+## 1.3.0
+
+### Minor Changes
+
+- 3cf7f67: Update provider config; require chain definition
+
+### Patch Changes
+
+- 38a9b11: remove wagmi disconnected shim before creating connector
+- Updated dependencies [3cf7f67]
+  - @abstract-foundation/agw-client@1.2.0
+
 ## 1.2.4
 
 ### Patch Changes

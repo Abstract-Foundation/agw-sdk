@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-react
 
+## 1.4.2
+
+### Patch Changes
+
+- fc3c63c: Allow passthru of zks_estimateFee to underlying provider in privy native flow
+
 ## 1.4.1
 
 ### Patch Changes

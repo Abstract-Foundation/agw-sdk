@@ -27,11 +27,9 @@ import {
 import { INSUFFICIENT_BALANCE_SELECTOR } from '../constants.js';
 import { AccountNotFoundError } from '../errors/account.js';
 import { InsufficientBalanceError } from '../errors/insufficientBalance.js';
+import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
 import { prepareTransactionRequest } from './prepareTransaction.js';
-import {
-  type CustomPaymasterHandler,
-  signTransaction,
-} from './signTransaction.js';
+import { signTransaction } from './signTransaction.js';
 
 export async function sendTransactionInternal<
   const request extends SendTransactionRequest<chain, chainOverride>,

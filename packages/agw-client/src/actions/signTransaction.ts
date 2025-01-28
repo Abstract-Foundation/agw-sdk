@@ -25,30 +25,10 @@ import {
   type AssertEip712RequestParameters,
 } from '../eip712.js';
 import { AccountNotFoundError } from '../errors/account.js';
+import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
 import { VALID_CHAINS } from '../utils.js';
 import { transformHexValues } from '../utils.js';
 import { signPrivyTransaction } from './sendPrivyTransaction.js';
-
-export interface CustomPaymasterParameters {
-  nonce: number;
-  from: Address;
-  to: Address;
-  gas: bigint;
-  gasPrice: bigint;
-  gasPerPubdata: bigint;
-  value: bigint;
-  data: Hex | undefined;
-  maxFeePerGas: bigint;
-  maxPriorityFeePerGas: bigint;
-  chainId: number;
-}
-
-export type CustomPaymasterHandler = (
-  args: CustomPaymasterParameters,
-) => Promise<{
-  paymaster: Address;
-  paymasterInput: Hex;
-}>;
 
 export async function signTransaction<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,

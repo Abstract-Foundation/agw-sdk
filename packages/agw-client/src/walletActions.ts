@@ -68,10 +68,7 @@ import {
 } from './actions/sendTransaction.js';
 import { sendTransactionForSession } from './actions/sendTransactionForSession.js';
 import { signMessage } from './actions/signMessage.js';
-import {
-  type CustomPaymasterHandler,
-  signTransaction,
-} from './actions/signTransaction.js';
+import { signTransaction } from './actions/signTransaction.js';
 import { signTransactionForSession } from './actions/signTransactionForSession.js';
 import {
   signTypedData,
@@ -82,6 +79,7 @@ import { writeContractForSession } from './actions/writeContractForSession.js';
 import { EOA_VALIDATOR_ADDRESS } from './constants.js';
 import { type SessionClient, toSessionClient } from './sessionClient.js';
 import type { SessionConfig } from './sessions.js';
+import type { CustomPaymasterHandler } from './types/customPaymaster.js';
 import type { SendTransactionBatchParameters } from './types/sendTransactionBatch.js';
 
 export type AbstractWalletActions<

@@ -270,6 +270,10 @@ export function globalWalletActions<
         EOA_VALIDATOR_ADDRESS,
         false,
         {},
+        undefined,
+        isPrivyCrossApp,
+        false,
+        {},
         customPaymasterHandler,
       ),
     signTypedData: (
@@ -301,6 +305,7 @@ export function globalWalletActions<
           ChainEIP712,
           Account
         >,
+        isPrivyCrossApp,
       ),
     toSessionClient: (signer, session) =>
       toSessionClient({

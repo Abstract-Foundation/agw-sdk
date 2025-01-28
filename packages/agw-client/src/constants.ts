@@ -1,5 +1,5 @@
 import type { Address } from 'viem';
-import { abstractTestnet } from 'viem/chains';
+import { abstract, abstractTestnet } from 'viem/chains';
 
 // AA smart contract deployment
 const SMART_ACCOUNT_FACTORY_ADDRESS =
@@ -34,7 +34,7 @@ const BASE_GAS_PER_PUBDATA_BYTE = 800n;
 
 const BRIDGEHUB_ADDRESS: Record<number, Address> = {
   [abstractTestnet.id]: '0x35A54c8C757806eB6820629bc82d90E056394C92',
-  [2741]: '0x303a465b659cbb0ab36ee643ea362c509eeb5213',
+  [abstract.id]: '0x303a465b659cbb0ab36ee643ea362c509eeb5213',
 };
 
 export {

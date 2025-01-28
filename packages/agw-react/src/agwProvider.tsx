@@ -2,7 +2,6 @@ import { validChains } from '@abstract-foundation/agw-client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { type Chain, http, type Transport } from 'viem';
-import { abstractTestnet } from 'viem/chains';
 import { createConfig, WagmiProvider } from 'wagmi';
 
 import { abstractWalletConnector } from './abstractWalletConnector.js';
@@ -31,12 +30,10 @@ interface AbstractWalletConfig {
  *
  * const App = () => {
  *   // optional configuration overrides
- *   const config = {
- *     chain: abstractTestnet,
- *     transport: http("https://your.abstract.node.example.com/rpc")
- *   };
+ *   const transport = http("https://your.abstract.node.example.com/rpc")
+ *
  *   return (
- *     <AbstractWalletProvider config={config}>
+ *     <AbstractWalletProvider chain={abstractTestnet} transport={transport}>
  *       <Component {...pageProps} />
  *     </AbstractWalletProvider>
  *   );
@@ -45,14 +42,10 @@ interface AbstractWalletConfig {
  * @param {AbstractWalletConfig} config - The configuration for the AbstractWalletProvider.
  */
 export const AbstractWalletProvider = ({
-  config = {
-    chain: abstractTestnet,
-    transport: http(),
-  },
+  chain,
+  transport,
   children,
-}: React.PropsWithChildren<{ config: AbstractWalletConfig }>) => {
-  const { chain, transport } = config;
-
+}: React.PropsWithChildren<AbstractWalletConfig>) => {
   if (!validChains[chain.id]) {
     throw new Error(`Chain ${chain.id} is not supported`);
   }

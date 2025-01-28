@@ -1,5 +1,47 @@
 # @abstract-foundation/agw-react
 
+## 1.4.2
+
+### Patch Changes
+
+- fc3c63c: Allow passthru of zks_estimateFee to underlying provider in privy native flow
+
+## 1.4.1
+
+### Patch Changes
+
+- acfc601: Bump cross app connect dependency
+
+## 1.4.0
+
+### Minor Changes
+
+- 7de8115: Add non executing transaction signing
+
+### Patch Changes
+
+- Updated dependencies [7de8115]
+- Updated dependencies [97015f9]
+  - @abstract-foundation/agw-client@1.3.0
+
+## 1.3.0
+
+### Minor Changes
+
+- 3cf7f67: Update provider config; require chain definition
+
+### Patch Changes
+
+- 38a9b11: remove wagmi disconnected shim before creating connector
+- Updated dependencies [3cf7f67]
+  - @abstract-foundation/agw-client@1.2.0
+
+## 1.2.4
+
+### Patch Changes
+
+- ba55a52: Export privy InjectWagmiConnector for advanced usages
+
 ## 1.2.3
 
 ### Patch Changes

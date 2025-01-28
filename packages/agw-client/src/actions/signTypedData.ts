@@ -2,21 +2,17 @@ import {
   type Account,
   BaseError,
   type Client,
-  encodeAbiParameters,
+  fromRlp,
   hashTypedData,
   type Hex,
-  parseAbiParameters,
   type Transport,
   type TypedData,
   type TypedDataDefinition,
   type WalletClient,
 } from 'viem';
-import type { SignTypedDataParameters } from 'viem/accounts';
-import { readContract, signTypedData as viemSignTypedData } from 'viem/actions';
+import { type SignTypedDataParameters } from 'viem/accounts';
 import type { ChainEIP712 } from 'viem/chains';
-import { getAction } from 'viem/utils';
 
-import AGWAccountAbi from '../abis/AGWAccount.js';
 import {
   EOA_VALIDATOR_ADDRESS,
   SESSION_KEY_VALIDATOR_ADDRESS,
@@ -32,6 +28,7 @@ import { sendPrivySignTypedData } from './sendPrivyTransaction.js';
 import {
   type CustomPaymasterHandler,
   signEip712TransactionInternal,
+  signTransaction,
 } from './signTransaction.js';
 
 export async function signTypedData(
@@ -40,34 +37,49 @@ export async function signTypedData(
   parameters: Omit<SignTypedDataParameters, 'account' | 'privateKey'>,
   isPrivyCrossApp = false,
 ): Promise<Hex> {
-  if (isPrivyCrossApp) return await sendPrivySignTypedData(client, parameters);
-
   // if the typed data is already a zkSync EIP712 transaction, don't try to transform it
   // to an AGW typed signature, just pass it through to the signer.
   if (isEip712TypedData(parameters)) {
-    const rawSignature = await viemSignTypedData(signerClient, parameters);
-    // Match the expect signature format of the AGW smart account so the result can be
-    // directly used in eth_sendRawTransaction as the customSignature field
-    const hookData: Hex[] = [];
-    const validationHooks = await getAction(
-      client,
-      readContract,
-      'readContract',
-    )({
-      address: client.account.address,
-      abi: AGWAccountAbi,
-      functionName: 'listHooks',
-      args: [true],
-    });
-    for (const _ of validationHooks) {
-      hookData.push('0x');
+    const transformedTypedData = transformEip712TypedData(parameters);
+
+    if (transformedTypedData.chainId !== client.chain.id) {
+      throw new BaseError('Chain ID mismatch in AGW typed signature');
     }
 
-    const signature = encodeAbiParameters(
-      parseAbiParameters(['bytes', 'address', 'bytes[]']),
-      [rawSignature, EOA_VALIDATOR_ADDRESS, hookData],
+    const signedTransaction = await signTransaction(
+      client,
+      signerClient,
+      {
+        ...transformedTypedData,
+        chain: client.chain,
+      },
+      EOA_VALIDATOR_ADDRESS,
+      false,
+      {},
+      undefined,
+      isPrivyCrossApp,
     );
-    return signature;
+
+    if (!signedTransaction.startsWith('0x71')) {
+      throw new BaseError(
+        'Expected RLP encoded EIP-712 transaction as signature',
+      );
+    }
+
+    const rlpSignature: Hex = `0x${signedTransaction.slice(4)}`;
+
+    const signatureParts = fromRlp(rlpSignature, 'hex');
+    if (signatureParts.length < 15) {
+      throw new BaseError(
+        'Expected RLP encoded EIP-712 transaction with at least 15 fields',
+      );
+    }
+    // This is somewhat not type safe as it assumes that the signature from signTransaction is an
+    // RLP encoded 712 transaction and that the customSignature field is the 15th field in the transaction.
+    // That being said, it's a safe assumption for the current use case.
+    return signatureParts[14] as Hex;
+  } else if (isPrivyCrossApp) {
+    return await sendPrivySignTypedData(client, parameters);
   }
 
   return await getAgwTypedSignature({

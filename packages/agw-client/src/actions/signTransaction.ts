@@ -28,6 +28,7 @@ import { AccountNotFoundError } from '../errors/account.js';
 import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
 import { VALID_CHAINS } from '../utils.js';
 import { transformHexValues } from '../utils.js';
+import { signPrivyTransaction } from './sendPrivyTransaction.js';
 
 export async function signTransaction<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
@@ -41,8 +42,13 @@ export async function signTransaction<
   useSignerAddress = false,
   validationHookData: Record<string, Hex> = {},
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
+  isPrivyCrossApp = false,
 ): Promise<SignEip712TransactionReturnType> {
   const chain = client.chain;
+
+  if (isPrivyCrossApp) {
+    return signPrivyTransaction(client, args);
+  }
 
   if (!chain?.serializers?.transaction)
     throw new BaseError('transaction serializer not found on chain.');

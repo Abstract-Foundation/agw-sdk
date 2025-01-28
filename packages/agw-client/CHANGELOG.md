@@ -1,5 +1,21 @@
 # @abstract-foundation/agw-client
 
+## 1.3.0
+
+### Minor Changes
+
+- 7de8115: Add non executing transaction signing
+
+### Patch Changes
+
+- 97015f9: Correctly pass isPrivyCrossApp flag to writeContract
+
+## 1.2.0
+
+### Minor Changes
+
+- 3cf7f67: Update provider config; require chain definition
+
 ## 1.1.1
 
 ### Patch Changes

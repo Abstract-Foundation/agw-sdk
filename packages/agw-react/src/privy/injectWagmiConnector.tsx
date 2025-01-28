@@ -7,9 +7,41 @@ import { injected } from 'wagmi/connectors';
 import { usePrivyCrossAppProvider } from './usePrivyCrossAppProvider.js';
 
 interface InjectWagmiConnectorProps extends React.PropsWithChildren {
+  /**
+   * The chain to connect to.
+   * @type {Chain}
+   */
   chain: Chain;
+  /**
+   * Optional transport configuration for the provider.
+   * @type {Transport}
+   * @optional
+   */
   transport?: Transport;
 }
+
+/**
+ * InjectWagmiConnector is a React component that injects the Abstract Wallet provider into Wagmi's connector system.
+ * It handles the setup and reconnection of the wallet provider when ready.
+ *
+ * @example
+ * ```tsx
+ * import { InjectWagmiConnector } from '@abstractwallet/agw-react';
+ *
+ * const App = () => {
+ *   return (
+ *     <InjectWagmiConnector chain={chain} transport={transport}>
+ *       <Component {...pageProps} />
+ *     </InjectWagmiConnector>
+ *   );
+ * };
+ * ```
+ *
+ * @param {InjectWagmiConnectorProps} props - The component props
+ * @param {Chain} props.chain - The blockchain network to connect to
+ * @param {Transport} [props.transport] - Optional transport configuration for the provider
+ * @param {React.ReactNode} props.children - Child components to render
+ */
 
 export const InjectWagmiConnector = (props: InjectWagmiConnectorProps) => {
   const { chain, transport, children } = props;
@@ -21,6 +53,7 @@ export const InjectWagmiConnector = (props: InjectWagmiConnectorProps) => {
 
   useEffect(() => {
     const setup = async (provider: EIP1193Provider) => {
+      config.storage?.removeItem('xyz.abs.privy.disconnected');
       const wagmiConnector = injected({
         target: {
           provider,

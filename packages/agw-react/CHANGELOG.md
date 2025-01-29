@@ -1,5 +1,21 @@
 # @abstract-foundation/agw-react
 
+## 1.4.4
+
+### Patch Changes
+
+- bab7735: Fix chains sorting
+
+  Sorting alphabetically works well for strings ("Apple" comes before "Banana").
+  But, sorting numbers can produce incorrect results.
+  "25" is bigger than "100", because "2" is bigger than "1".
+
+  This makes abstractTestnet to become defaultChain instead of abstractMainnet,
+  which in turn can produce some issues on dApps using AGW with both Abstract testnet and mainnet.
+
+- Updated dependencies [bab7735]
+  - @abstract-foundation/agw-client@1.3.1
+
 ## 1.4.3
 
 ### Patch Changes

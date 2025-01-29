@@ -18,6 +18,7 @@ import { type ChainEIP712 } from 'viem/zksync';
 
 import { AccountNotFoundError } from '../errors/account.js';
 import type { SessionConfig } from '../sessions.js';
+import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
 import { sendTransactionForSession } from './sendTransactionForSession.js';
 
 export async function writeContractForSession<
@@ -44,6 +45,7 @@ export async function writeContractForSession<
     chainOverride
   >,
   session: SessionConfig,
+  customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<WriteContractReturnType> {
   const {
     abi,
@@ -79,6 +81,7 @@ export async function writeContractForSession<
         ...request,
       },
       session,
+      customPaymasterHandler,
     );
   } catch (error) {
     throw getContractError(error as BaseError, {

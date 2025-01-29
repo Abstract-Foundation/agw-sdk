@@ -186,6 +186,7 @@ export function sessionWalletActions(
         publicClient,
         args,
         session,
+        paymasterHandler,
       ),
     writeContract: (args) =>
       writeContractForSession(
@@ -194,6 +195,7 @@ export function sessionWalletActions(
         publicClient,
         args,
         session,
+        paymasterHandler,
       ),
     signTransaction: (args) =>
       signTransactionForSession(

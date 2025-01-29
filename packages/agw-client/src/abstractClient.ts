@@ -11,7 +11,7 @@ import {
 import { toAccount } from 'viem/accounts';
 import { type ChainEIP712 } from 'viem/zksync';
 
-import type { CustomPaymasterHandler } from './actions/signTransaction.js';
+import type { CustomPaymasterHandler } from './types/customPaymaster.js';
 import { getSmartAccountAddressFromInitialSigner } from './utils.js';
 import {
   type AbstractWalletActions,

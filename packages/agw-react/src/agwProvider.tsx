@@ -24,7 +24,7 @@ interface AbstractWalletConfig {
    * @type {QueryClient}
    * @default new QueryClient()
    */
-  queryClient?: QueryClient;
+  queryClient: QueryClient;
 }
 
 /**

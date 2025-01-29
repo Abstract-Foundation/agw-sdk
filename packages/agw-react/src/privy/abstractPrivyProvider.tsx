@@ -25,7 +25,7 @@ export const agwAppLoginMethod: LoginMethodOrderOption = `privy:${AGW_APP_ID}`;
 interface AgwPrivyProviderProps extends PrivyProviderProps {
   chain: Chain;
   transport?: Transport;
-  queryClient?: QueryClient;
+  queryClient: QueryClient;
 }
 
 export const AbstractPrivyProvider = ({

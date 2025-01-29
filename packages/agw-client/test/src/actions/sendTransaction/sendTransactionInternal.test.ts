@@ -159,6 +159,7 @@ describe('sendTransactionInternal', () => {
         EOA_VALIDATOR_ADDRESS,
         isInitialTransaction,
         {},
+        undefined,
       );
 
       // Validate that the sendRawTransaction call was made with the correct parameters

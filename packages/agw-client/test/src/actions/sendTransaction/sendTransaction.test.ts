@@ -154,6 +154,8 @@ describe('sendTransaction', () => {
         }),
         EOA_VALIDATOR_ADDRESS,
         !isDeployed,
+        {},
+        undefined,
       );
       expect(transactionHash).toBe('0xmockedTransactionHash');
     },
@@ -303,6 +305,8 @@ describe('sendTransactionBatch', () => {
         }),
         EOA_VALIDATOR_ADDRESS,
         !isDeployed,
+        {},
+        undefined,
       );
       expect(transactionHash).toBe('0xmockedTransactionHash');
     },
@@ -391,6 +395,8 @@ describe('sendTransactionBatch', () => {
       }),
       EOA_VALIDATOR_ADDRESS,
       false,
+      {},
+      undefined,
     );
     expect(transactionHash).toBe('0xmockedTransactionHash');
   });

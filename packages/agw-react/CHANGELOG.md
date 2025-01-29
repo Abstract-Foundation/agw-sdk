@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-react
 
+## 1.4.3
+
+### Patch Changes
+
+- 76244d1: Add optional queryClient to providers
+
 ## 1.4.2
 
 ### Patch Changes

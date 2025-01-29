@@ -30,7 +30,6 @@ import {
 import { isEIP712Transaction } from './eip712.js';
 import { type Call } from './types/call.js';
 
-// TODO: support Abstract mainnet
 export const VALID_CHAINS: Record<number, Chain> = {
   [abstractTestnet.id]: abstractTestnet,
   [abstract.id]: abstract,
@@ -189,8 +188,8 @@ export function transformEip712TypedData(
     paymaster:
       (typedData.message['paymaster'] as string) != '0'
         ? toHex(BigInt(typedData.message['paymaster'] as string), {
-            size: 20,
-          })
+          size: 20,
+        })
         : undefined,
     nonce: typedData.message['nonce'] as number,
     value: BigInt(typedData.message['value'] as string),

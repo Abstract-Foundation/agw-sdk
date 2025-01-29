@@ -20,15 +20,18 @@ export const agwAppLoginMethod: LoginMethodOrderOption = `privy:${AGW_APP_ID}`;
  * @extends PrivyProviderProps
  * @property {boolean} testnet - Whether to use abstract testnet, defaults to false.
  * @property {Transport} transport - Optional transport to use, defaults to standard http.
+ * @property {QueryClient} queryClient - Optional query client to use, defaults to a standard query client.
  */
 interface AgwPrivyProviderProps extends PrivyProviderProps {
   chain: Chain;
   transport?: Transport;
+  queryClient: QueryClient;
 }
 
 export const AbstractPrivyProvider = ({
   chain,
   transport,
+  queryClient = new QueryClient(),
   ...props
 }: AgwPrivyProviderProps) => {
   if (!validChains[chain.id]) {
@@ -44,7 +47,6 @@ export const AbstractPrivyProvider = ({
     },
     multiInjectedProviderDiscovery: false,
   });
-  const queryClient = new QueryClient();
 
   // if no login methods and order are provided, set the default login method to the privy app login method
   if (!props.config) {

@@ -1,0 +1,10 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "@abstract-foundation/agw-client": "1.3.0",
+    "@abstract-foundation/agw-react": "1.4.3",
+    "@abstract-foundation/web3-react-agw": "1.3.0"
+  },
+  "changesets": ["rotten-rivers-cry", "weak-maps-arrive"]
+}

@@ -1,5 +1,17 @@
 # @abstract-foundation/agw-react
 
+## 1.5.0-beta.0
+
+### Minor Changes
+
+- e2a658a: Update sendTransaction flows to use custom paymaster handler if passed in
+
+### Patch Changes
+
+- Updated dependencies [e2a658a]
+- Updated dependencies [4c4badc]
+  - @abstract-foundation/agw-client@1.4.0-next.0
+
 ## 1.4.3
 
 ### Patch Changes

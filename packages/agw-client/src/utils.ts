@@ -30,7 +30,6 @@ import {
 import { isEIP712Transaction } from './eip712.js';
 import { type Call } from './types/call.js';
 
-// TODO: support Abstract mainnet
 export const VALID_CHAINS: Record<number, Chain> = {
   [abstractTestnet.id]: abstractTestnet,
   [abstract.id]: abstract,

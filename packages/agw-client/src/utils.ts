@@ -188,8 +188,8 @@ export function transformEip712TypedData(
     paymaster:
       (typedData.message['paymaster'] as string) != '0'
         ? toHex(BigInt(typedData.message['paymaster'] as string), {
-          size: 20,
-        })
+            size: 20,
+          })
         : undefined,
     nonce: typedData.message['nonce'] as number,
     value: BigInt(typedData.message['value'] as string),

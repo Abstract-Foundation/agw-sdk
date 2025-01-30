@@ -62,6 +62,7 @@ describe('globalWalletActions', () => {
       mockPublicClient,
       mockArgs,
       false,
+      undefined,
     );
   });
 
@@ -78,6 +79,7 @@ describe('globalWalletActions', () => {
       mockPublicClient,
       mockArgs,
       false,
+      undefined,
     );
   });
 
@@ -198,6 +200,7 @@ describe('sessionWalletActions', () => {
       mockPublicClient,
       mockArgs,
       session,
+      undefined,
     );
   });
 
@@ -217,6 +220,7 @@ describe('sessionWalletActions', () => {
       mockPublicClient,
       mockArgs,
       session,
+      undefined,
     );
   });
 });

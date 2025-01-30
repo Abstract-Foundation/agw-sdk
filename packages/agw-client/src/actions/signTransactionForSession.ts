@@ -21,11 +21,9 @@ import {
   getPeriodIdsForTransaction,
   type SessionConfig,
 } from '../sessions.js';
+import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
 import { isSmartAccountDeployed } from '../utils.js';
-import {
-  type CustomPaymasterHandler,
-  signTransaction,
-} from './signTransaction.js';
+import { signTransaction } from './signTransaction.js';
 
 export interface SendTransactionForSessionParameters<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,

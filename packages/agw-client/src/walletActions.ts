@@ -68,10 +68,7 @@ import {
 } from './actions/sendTransaction.js';
 import { sendTransactionForSession } from './actions/sendTransactionForSession.js';
 import { signMessage } from './actions/signMessage.js';
-import {
-  type CustomPaymasterHandler,
-  signTransaction,
-} from './actions/signTransaction.js';
+import { signTransaction } from './actions/signTransaction.js';
 import { signTransactionForSession } from './actions/signTransactionForSession.js';
 import {
   signTypedData,
@@ -82,6 +79,7 @@ import { writeContractForSession } from './actions/writeContractForSession.js';
 import { EOA_VALIDATOR_ADDRESS } from './constants.js';
 import { type SessionClient, toSessionClient } from './sessionClient.js';
 import type { SessionConfig } from './sessions.js';
+import type { CustomPaymasterHandler } from './types/customPaymaster.js';
 import type { SendTransactionBatchParameters } from './types/sendTransactionBatch.js';
 
 export type AbstractWalletActions<
@@ -188,6 +186,7 @@ export function sessionWalletActions(
         publicClient,
         args,
         session,
+        paymasterHandler,
       ),
     writeContract: (args) =>
       writeContractForSession(
@@ -196,6 +195,7 @@ export function sessionWalletActions(
         publicClient,
         args,
         session,
+        paymasterHandler,
       ),
     signTransaction: (args) =>
       signTransactionForSession(
@@ -224,6 +224,7 @@ export function globalWalletActions<
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
   isPrivyCrossApp = false,
+  customPaymasterHandler?: CustomPaymasterHandler,
 ) {
   return (
     client: Client<Transport, ChainEIP712, Account>,
@@ -250,6 +251,7 @@ export function globalWalletActions<
         publicClient,
         args as any,
         isPrivyCrossApp,
+        customPaymasterHandler,
       ),
     sendTransactionBatch: (args) =>
       sendTransactionBatch(
@@ -258,6 +260,7 @@ export function globalWalletActions<
         publicClient,
         args,
         isPrivyCrossApp,
+        customPaymasterHandler,
       ),
     signMessage: (args: Omit<SignMessageParameters, 'account'>) =>
       signMessage(client, signerClient, args, isPrivyCrossApp),
@@ -269,7 +272,7 @@ export function globalWalletActions<
         EOA_VALIDATOR_ADDRESS,
         false,
         {},
-        undefined,
+        customPaymasterHandler,
         isPrivyCrossApp,
       ),
     signTypedData: (
@@ -289,6 +292,7 @@ export function globalWalletActions<
               publicClient,
               args,
               isPrivyCrossApp,
+              customPaymasterHandler,
             ),
         }),
         signerClient,
@@ -307,6 +311,7 @@ export function globalWalletActions<
         client: client as AbstractClient,
         signer,
         session: session,
+        paymasterHandler: customPaymasterHandler,
       }),
   });
 }

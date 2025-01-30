@@ -20,6 +20,7 @@ import {
   getPeriodIdsForTransaction,
   type SessionConfig,
 } from '../sessions.js';
+import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
 import { isSmartAccountDeployed } from '../utils.js';
 import { sendTransactionInternal } from './sendTransactionInternal.js';
 
@@ -60,6 +61,7 @@ export async function sendTransactionForSession<
     request
   >,
   session: SessionConfig,
+  customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<SendEip712TransactionReturnType> {
   const isDeployed = await isSmartAccountDeployed(
     publicClient,
@@ -94,5 +96,6 @@ export async function sendTransactionForSession<
         }),
       ),
     },
+    customPaymasterHandler,
   );
 }

@@ -23,10 +23,10 @@ import {
   getPeriodIdsForTransaction,
   type SessionConfig,
 } from '../sessions.js';
+import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
 import { isEip712TypedData, transformEip712TypedData } from '../utils.js';
 import { sendPrivySignTypedData } from './sendPrivyTransaction.js';
 import {
-  type CustomPaymasterHandler,
   signEip712TransactionInternal,
   signTransaction,
 } from './signTransaction.js';

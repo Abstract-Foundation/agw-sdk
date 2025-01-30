@@ -22,6 +22,10 @@ import {
   SMART_ACCOUNT_FACTORY_ADDRESS,
 } from '../constants.js';
 import { type Call } from '../types/call.js';
+import type {
+  CustomPaymasterHandler,
+  PaymasterArgs,
+} from '../types/customPaymaster.js';
 import type { SendTransactionBatchParameters } from '../types/sendTransactionBatch.js';
 import { getInitializerCalldata, isSmartAccountDeployed } from '../utils.js';
 import { sendPrivyTransaction } from './sendPrivyTransaction.js';
@@ -40,6 +44,7 @@ export async function sendTransactionBatch<
   publicClient: PublicClient<Transport, ChainEIP712>,
   parameters: SendTransactionBatchParameters<request>,
   isPrivyCrossApp = false,
+  customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<SendTransactionReturnType> {
   const { calls, paymaster, paymasterInput, ...rest } = parameters;
   if (calls.length === 0) {
@@ -145,6 +150,8 @@ export async function sendTransactionBatch<
     },
     EOA_VALIDATOR_ADDRESS,
     !isDeployed,
+    {},
+    customPaymasterHandler,
   );
 }
 
@@ -167,8 +174,32 @@ export async function sendTransaction<
     request
   >,
   isPrivyCrossApp = false,
+  customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<SendEip712TransactionReturnType> {
-  if (isPrivyCrossApp) return await sendPrivyTransaction(client, parameters);
+  if (isPrivyCrossApp) {
+    let paymasterData: Partial<PaymasterArgs> = {};
+    // SendEip712TransactionParameters doesn't actually have paymaster or paymasterInput fields
+    // defined, so we just have to cast to any here to access them
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const requestAsAny = parameters as any;
+    if (
+      customPaymasterHandler &&
+      !requestAsAny.paymaster &&
+      !requestAsAny.paymasterInput
+    ) {
+      paymasterData = await customPaymasterHandler({
+        ...(parameters as any),
+        from: client.account.address,
+        chainId: parameters.chain?.id ?? client.chain.id,
+      });
+    }
+
+    const updatedParameters = {
+      ...parameters,
+      ...(paymasterData as any),
+    };
+    return await sendPrivyTransaction(client, updatedParameters);
+  }
 
   const isDeployed = await isSmartAccountDeployed(
     publicClient,
@@ -208,5 +239,7 @@ export async function sendTransaction<
     parameters,
     EOA_VALIDATOR_ADDRESS,
     !isDeployed,
+    {},
+    customPaymasterHandler,
   );
 }

@@ -163,6 +163,7 @@ describe('sendTransaction', () => {
           }),
         ),
       },
+      undefined,
     );
   });
 
@@ -205,6 +206,7 @@ describe('sendTransaction', () => {
           }),
         ),
       },
+      undefined,
     );
   });
 

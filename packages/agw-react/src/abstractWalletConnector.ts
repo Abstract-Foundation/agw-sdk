@@ -60,7 +60,11 @@ function abstractWalletConnector(
   return (params) => {
     const chains = [...params.chains];
     let defaultChain = params.chains[0];
-    const validChainIds = Object.keys(validChains).map(Number).sort();
+    const validChainIds = Object.keys(validChains)
+      .map(Number)
+      .sort(function (a, b) {
+        return a - b;
+      });
     for (const chainId of validChainIds) {
       const chainIndex = chains.findIndex((chain) => chain.id === chainId);
       const hasChain = chainIndex !== -1;

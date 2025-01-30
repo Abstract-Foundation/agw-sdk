@@ -137,5 +137,6 @@ test('writeContractForSession', async () => {
       to: MOCK_CONTRACT_ADDRESS,
     },
     session,
+    undefined,
   );
 });

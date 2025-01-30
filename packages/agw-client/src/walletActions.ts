@@ -272,8 +272,8 @@ export function globalWalletActions<
         EOA_VALIDATOR_ADDRESS,
         false,
         {},
-        isPrivyCrossApp,
         customPaymasterHandler,
+        isPrivyCrossApp,
       ),
     signTypedData: (
       args: Omit<SignTypedDataParameters, 'account' | 'privateKey'>,

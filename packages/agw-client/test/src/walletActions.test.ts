@@ -200,6 +200,7 @@ describe('sessionWalletActions', () => {
       mockPublicClient,
       mockArgs,
       session,
+      undefined,
     );
   });
 
@@ -219,6 +220,7 @@ describe('sessionWalletActions', () => {
       mockPublicClient,
       mockArgs,
       session,
+      undefined,
     );
   });
 });

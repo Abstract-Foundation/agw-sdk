@@ -1,5 +1,17 @@
 # @abstract-foundation/web3-react-agw
 
+## 1.4.0
+
+### Minor Changes
+
+- 0178623: Update sendTransaction flows to use custom paymaster handler if passed in
+
+### Patch Changes
+
+- Updated dependencies [0178623]
+- Updated dependencies [0178623]
+  - @abstract-foundation/agw-client@1.4.0
+
 ## 1.3.1
 
 ### Patch Changes

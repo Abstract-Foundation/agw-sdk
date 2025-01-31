@@ -1,5 +1,12 @@
 # @abstract-foundation/agw-client
 
+## 1.4.0
+
+### Minor Changes
+
+- 0178623: Update sendTransaction flows to use custom paymaster handler if passed in
+- 0178623: Add paymaster handler functions for sending transactions
+
 ## 1.3.1
 
 ### Patch Changes

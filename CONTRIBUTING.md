@@ -1,87 +1,122 @@
 # Contribution Guidelines
 
-We’re excited that you’re interested in contributing to the Abstract Global Wallet SDK! ❤️ Contributions, whether they're bug reports, feature suggestions, documentation updates, or code enhancements, are highly appreciated.
+We're excited that you're interested in contributing to the Abstract Global Wallet SDK! ❤️ This document will guide you through the contribution process and help you get started.
 
-To make the contribution process smooth and efficient, please follow these guidelines.
+## Table of Contents
+- [Code of Conduct](#code-of-conduct)
+- [Getting Started](#getting-started)
+- [Development Setup](#development-setup)
+- [Contributing Process](#contributing-process)
+- [Pull Request Guidelines](#pull-request-guidelines)
+- [Bug Reports & Feature Requests](#bug-reports--feature-requests)
+- [Coding Standards](#coding-standards)
 
-## How to Contribute
+## Code of Conduct
+
+We are committed to providing a welcoming and inclusive experience for everyone. Please read and follow our Code of Conduct.
+
+## Getting Started
+
+### Prerequisites
+- Node.js (v14 or higher)
+- npm or yarn
+- Git
+
+### Development Setup
+
+1. Fork the repository
+2. Clone your fork:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/agw-sdk.git
+   cd agw-sdk
+   ```
+3. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+4. Create a new branch:
+   ```bash
+   git checkout -b your-branch-name
+   ```
+
+## Contributing Process
 
 ### 1. Fork the Repository
 
-Fork the repository to your GitHub account to get started. This will create your own copy where you can make changes.
+1. Visit the [main repository](https://github.com/Abstract-Foundation/agw-sdk)
+2. Click the "Fork" button in the top right
+3. Clone your fork locally
 
-1. Go to the main repository on GitHub.
-2. Click the "Fork" button in the top right corner.
-3. Once the repository is forked, clone it to your local machine. 
-
-### 2. Create a New Branch
-
-Before you start working on your changes, create a new branch for your work to keep the `main` branch clean:
+### 2. Keep Your Fork Updated
 
 ```bash
-git checkout -b your-branch-name
+# Add the upstream repository
+git remote add upstream https://github.com/Abstract-Foundation/agw-sdk.git
+
+# Fetch upstream changes
+git fetch upstream
+
+# Merge upstream changes into your main branch
+git checkout main
+git merge upstream/main
 ```
 
-- Use a descriptive name for your branch (e.g., `feature/add-new-component` or `bugfix/fix-issue-123`).
-
-### 3. Make Your Changes
-
-Now that you have a branch set up, you can make changes to the codebase. When making changes:
-
-- Follow the existing code style and structure.
-- Write clear, concise commit messages that explain the "why" behind your changes.
-- Make sure your changes are well-tested. If applicable, add tests to validate the new functionality.
-
-### 4. Commit Your Changes
-
-Once you're happy with your changes and everything works as expected, commit them to your branch:
+### 3. Create a Feature Branch
 
 ```bash
-git add .
-git commit -m "description of your changes"
+git checkout -b feature/your-feature-name
+# or
+git checkout -b fix/your-bugfix-name
 ```
 
-### 5. Push to Your Fork
+### 4. Make Your Changes
 
-Push the changes to your fork on GitHub:
+- Write clean, maintainable code
+- Follow our coding standards
+- Add tests for new features
+- Update documentation as needed
+- Commit your changes with clear messages
 
-```bash
-git push origin your-branch-name
-```
+### 5. Submit a Pull Request
 
-### 6. Submit a Pull Request (PR)
+1. Push your changes to your fork
+2. Go to the original repository
+3. Click "New Pull Request"
+4. Choose your branch
+5. Fill in the PR template
 
-- **Title**: Use a concise and informative title for your pull request.
-- **Description**: Provide a detailed description of the changes made, why you made them, and any relevant details about the implementation.
-- **Link to Issue**: If your PR addresses an issue, please link to it (e.g., `Fixes #123`).
+## Pull Request Guidelines
 
-Submit the pull request and wait for the review process to begin.
+### PR Title Format
+- feat: Add new feature
+- fix: Fix specific issue
+- docs: Update documentation
+- style: Code style changes
+- refactor: Code refactoring
+- test: Add or update tests
+- chore: Maintenance tasks
+
+### PR Description Should Include:
+- Clear description of changes
+- Motivation and context
+- Breaking changes (if any)
+- Screenshots (if applicable)
+- Related issue numbers
+
+## Bug Reports & Feature Requests
+
+When submitting issues:
+
+1. Use our issue templates
+2. Provide detailed reproduction steps
+3. Include relevant information:
+   - SDK version
+   - Environment details
+   - Error messages
+   - Screenshots/GIFs
 
 ---
 
-## Reporting Bugs and Issues
-
-If you encounter a bug or want to suggest a feature:
-
-- Use the Github Issues page to report issues or request features.
-- Include as much detail as possible: steps to reproduce the issue, expected behavior, and screenshots if applicable.
-- If submitting a feature request, please explain the use case and benefits of the feature.
-
-### **How Do I Submit a Good Enhancement Suggestion?**
-
-Enhancement suggestions are tracked as [GitHub issues](https://github.com/Abstract-Foundation/agw-sdk/issues).
-
-- Use a **clear and descriptive title** for the issue to identify the suggestion.
-- Provide a **step-by-step description of the suggested enhancement** in as many details as possible.
-- **Describe the current behavior** and **explain which behavior you expected to see instead** and why. At this point you can also tell which alternatives do not work for you.
-- You may want to **include screenshots and animated GIFs** which help you demonstrate the steps or point out the part which the suggestion is related to. You can use [this tool](https://www.cockos.com/licecap/) to record GIFs on macOS and Windows, and [this tool](https://github.com/colinkeenan/silentcast) or [this tool](https://github.com/GNOME/byzanz) on Linux.
-- **Explain why this enhancement would be useful** to most agw-sdk users. You may also want to point out the other projects that solved it better and which could serve as inspiration.
-
----
-
-## Coding Guidelines
-
-- Follow the existing structure and style of the codebase.
-- Ensure all functionality is thoroughly tested.
-- Write clear, self-documenting code and add comments when necessary.
-- Keep performance and security in mind when making changes.
+Thank you for contributing to Abstract Global Wallet SDK! 🚀

@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-react
 
+## 1.5.1
+
+### Patch Changes
+
+- 943bf8b: Fix injected wagmi connector to reconnect on reload
+
 ## 1.5.0
 
 ### Minor Changes

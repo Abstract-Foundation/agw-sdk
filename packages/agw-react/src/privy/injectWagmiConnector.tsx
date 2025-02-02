@@ -70,7 +70,7 @@ export const InjectWagmiConnector = (props: InjectWagmiConnectorProps) => {
       return connector;
     };
 
-    if (ready && !isSetup) {
+    if (ready && (!isSetup || config.connectors.length === 0)) {
       setup(provider).then((connector) => {
         if (connector) {
           reconnect({ connectors: [connector] });
@@ -78,7 +78,7 @@ export const InjectWagmiConnector = (props: InjectWagmiConnectorProps) => {
         }
       });
     }
-  }, [provider, ready]);
+  }, [provider, ready, isSetup, config, reconnect]);
 
   return <Fragment>{children}</Fragment>;
 };

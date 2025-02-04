@@ -112,6 +112,9 @@ importers:
       '@types/jest':
         specifier: ^29.5.14
         version: 29.5.14
+      '@types/node':
+        specifier: ^22.5.5
+        version: 22.6.1
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@22.6.1)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@22.6.1)(typescript@5.7.3))

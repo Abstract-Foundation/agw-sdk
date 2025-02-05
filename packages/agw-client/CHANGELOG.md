@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.4.1
+
+### Patch Changes
+
+- 30647bd: Fix undefined data in transaction so it doesn't serialize to 0x00
+
 ## 1.4.0
 
 ### Minor Changes

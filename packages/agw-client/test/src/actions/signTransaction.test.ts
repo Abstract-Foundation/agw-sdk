@@ -69,6 +69,7 @@ const transaction: ZksyncTransactionRequestEIP712 = {
   from: '0x0000000000000000000000000000000000000000',
   paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
   paymasterInput: '0x',
+  data: '0x',
 };
 
 const transactionWithBigIntValues = {

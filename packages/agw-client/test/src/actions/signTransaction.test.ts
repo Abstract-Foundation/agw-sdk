@@ -69,7 +69,6 @@ const transaction: ZksyncTransactionRequestEIP712 = {
   from: '0x0000000000000000000000000000000000000000',
   paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
   paymasterInput: '0x',
-  data: '0x',
 };
 
 const transactionWithBigIntValues = {
@@ -101,6 +100,7 @@ test('with useSignerAddress false', async () => {
       {
         chainId: anvilAbstractTestnet.chain.id,
         ...transaction,
+        data: '0x',
         from: address.smartAccountAddress,
         customSignature: signature,
         type: 'eip712' as any,
@@ -131,6 +131,7 @@ test('with useSignerAddress true', async () => {
       {
         chainId: anvilAbstractTestnet.chain.id,
         ...transaction,
+        data: '0x',
         from: address.signerAddress,
         customSignature: signature,
         type: 'eip712' as any,

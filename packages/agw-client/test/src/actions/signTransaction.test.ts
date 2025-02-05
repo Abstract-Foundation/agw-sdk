@@ -100,6 +100,7 @@ test('with useSignerAddress false', async () => {
       {
         chainId: anvilAbstractTestnet.chain.id,
         ...transaction,
+        data: '0x',
         from: address.smartAccountAddress,
         customSignature: signature,
         type: 'eip712' as any,
@@ -130,6 +131,7 @@ test('with useSignerAddress true', async () => {
       {
         chainId: anvilAbstractTestnet.chain.id,
         ...transaction,
+        data: '0x',
         from: address.signerAddress,
         customSignature: signature,
         type: 'eip712' as any,

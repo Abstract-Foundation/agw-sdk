@@ -143,6 +143,12 @@ export async function signEip712TransactionInternal<
     customPaymasterHandler,
   );
 
+  if (transactionWithPaymaster.data === undefined) {
+    // serializer turns undefined into 0x00 which causes issues sending
+    // eth to contracts that don't have a fallback function
+    transactionWithPaymaster.data = '0x';
+  }
+
   const eip712Domain = chain?.custom.getEip712Domain({
     ...transactionWithPaymaster,
     type: 'eip712',

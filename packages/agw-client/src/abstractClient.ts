@@ -86,12 +86,18 @@ export async function createAbstractClient({
   publicTransport = http(),
   customPaymasterHandler,
 }: CreateAbstractClientParameters): Promise<AbstractClient> {
+  if (!signer) {
+    throw new Error('Signer is required to create an AbstractClient');
+  }
+  if (!chain) {
+    throw new Error('Chain configuration (EIP-712) is required');
+  }
   if (!transport) {
-    throw new Error('Transport is required');
+    throw new Error('Transport is required and must be explicitly provided');
   }
 
   const publicClient = createPublicClient({
-    chain: chain,
+    chain,
     transport: publicTransport,
   });
 
@@ -104,14 +110,13 @@ export async function createAbstractClient({
 
   const baseClient = createClient({
     account: toAccount(smartAccountAddress),
-    chain: chain,
+    chain,
     transport,
   });
 
-  // Create a signer wallet client to handle actual signing
   const signerWalletClient = createWalletClient({
     account: signer,
-    chain: chain,
+    chain,
     transport,
   });
 
@@ -123,5 +128,6 @@ export async function createAbstractClient({
       customPaymasterHandler,
     ),
   );
+
   return abstractClient as AbstractClient;
 }

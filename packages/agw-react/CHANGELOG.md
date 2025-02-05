@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-react
 
+## 1.5.2
+
+### Patch Changes
+
+- 77b8eca: Make queryClient optional
+
 ## 1.5.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.4.2
+
+### Patch Changes
+
+- 70a58fc: Update dependencies
+
 ## 1.4.1
 
 ### Patch Changes

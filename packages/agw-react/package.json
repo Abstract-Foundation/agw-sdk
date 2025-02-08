@@ -73,7 +73,7 @@
     "secp256k1": ">=5.0.1",
     "typescript": ">=5.0.4",
     "thirdweb": "^5.68.0",
-    "viem": "^2.22.14",
+    "viem": "^2.22.23",
     "wagmi": "^2.14.11"
   },
   "devDependencies": {
@@ -84,11 +84,11 @@
     "@tanstack/query-core": "^5.56.2",
     "@types/react": ">=18.3.1",
     "@types/react-dom": ">=18.3.0",
-    "@wagmi/core": "^2",
+    "@wagmi/core": "^2.16.4",
     "react": ">=18.3.1",
     "react-dom": ">=18.3.1",
     "thirdweb": "^5.68.0",
-    "viem": "^2.22.14"
+    "viem": "^2.22.23"
   },
   "peerDependenciesMeta": {
     "typescript": {

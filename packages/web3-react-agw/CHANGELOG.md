@@ -38,7 +38,7 @@
 
 ### Minor Changes
 
-- 7de8115: Add non executing transaction signing
+- 7de8115: Add non-executing transaction signing
 
 ### Patch Changes
 

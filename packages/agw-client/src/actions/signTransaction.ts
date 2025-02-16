@@ -17,6 +17,7 @@ import {
   type SignEip712TransactionParameters,
   type SignEip712TransactionReturnType,
   type TransactionRequestEIP712,
+  type ZksyncTransactionRequestEIP712,
 } from 'viem/zksync';
 
 import AGWAccountAbi from '../abis/AGWAccount.js';
@@ -77,27 +78,22 @@ export async function signEip712TransactionInternal<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
   chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  request extends TransactionRequestEIP712 = TransactionRequestEIP712,
 >(
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
-  args: SignEip712TransactionParameters<chain, account, chainOverride>,
-  validator: Address,
-  useSignerAddress = false,
+  args: SignEip712TransactionParameters<chain, account, chainOverride, request>,
+  validatorAddress: Address,
+  useSignerAddress = true,
   validationHookData: Record<string, Hex> = {},
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
-): Promise<{
-  transaction: UnionRequiredBy<TransactionRequestEIP712, 'from'> & {
-    chainId: number;
-  };
-  customSignature: Hex;
-}> {
+): Promise<SignEip712TransactionReturnType> {
   const {
     account: account_ = client.account,
     chain = client.chain,
     ...transaction
   } = args;
-  // TODO: open up typing to allow for eip712 transactions
-  transaction.type = 'eip712' as any;
+  transaction.type = 'eip712';
   transformHexValues(transaction, [
     'value',
     'nonce',
@@ -182,7 +178,7 @@ export async function signEip712TransactionInternal<
     // Match the expect signature format of the AGW smart account
     signature = encodeAbiParameters(
       parseAbiParameters(['bytes', 'address', 'bytes[]']),
-      [rawSignature, validator, hookData],
+      [rawSignature, validatorAddress, hookData],
     );
   }
 

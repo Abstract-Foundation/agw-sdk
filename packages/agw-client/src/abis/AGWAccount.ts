@@ -152,7 +152,7 @@ const AGWAccountAbi = [
   },
   {
     inputs: [],
-    name: 'RECUSIVE_MODULE_CALL',
+    name: 'RECURSIVE_MODULE_CALL',
     type: 'error',
   },
   {

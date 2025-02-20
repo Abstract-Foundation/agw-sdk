@@ -24,7 +24,7 @@ const restrictedSelectors = new Set<string>([
   toFunctionSelector('function transfer(address, uint256)'),
 ]);
 
-enum SessionKeyPolicyStatus {
+export enum SessionKeyPolicyStatus {
   Unset = 0,
   Allowed = 1,
   Denied = 2,

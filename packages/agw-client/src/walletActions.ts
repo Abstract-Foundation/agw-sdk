@@ -210,6 +210,7 @@ export function sessionWalletActions(
       signTypedDataForSession(
         client,
         signerClient,
+        publicClient,
         args as any,
         session,
         paymasterHandler,
@@ -268,6 +269,7 @@ export function globalWalletActions<
       signTransaction(
         client,
         signerClient,
+        publicClient,
         args as SignEip712TransactionParameters<chain, account>,
         EOA_VALIDATOR_ADDRESS,
         false,
@@ -277,7 +279,8 @@ export function globalWalletActions<
       ),
     signTypedData: (
       args: Omit<SignTypedDataParameters, 'account' | 'privateKey'>,
-    ) => signTypedData(client, signerClient, args, isPrivyCrossApp),
+    ) =>
+      signTypedData(client, signerClient, publicClient, args, isPrivyCrossApp),
     deployContract: (args) =>
       deployContract(client, signerClient, publicClient, args, isPrivyCrossApp),
     writeContract: (args) =>

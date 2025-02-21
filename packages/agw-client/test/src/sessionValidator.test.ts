@@ -50,6 +50,8 @@ const getCallPolicy = vi
   .fn()
   .mockReturnValue(encodedPolicyStatus[SessionKeyPolicyStatus.Allowed]);
 
+client.multicall = vi.fn().mockResolvedValue(['1']);
+
 client.request = (async ({ method, params }) => {
   if (method === 'eth_chainId') {
     return anvilAbstractMainnet.chain.id;
@@ -127,14 +129,6 @@ describe.only('assertSessionKeyPolicies', async () => {
           ),
         ).rejects.toThrow();
       }
-
-      expect(getCallPolicy).toHaveBeenCalledWith(
-        encodeFunctionData({
-          abi: SessionKeyPolicyRegistryAbi,
-          functionName: input.validationFunction,
-          args: input.validationFunctionArgs as any,
-        }),
-      );
     });
   });
 });

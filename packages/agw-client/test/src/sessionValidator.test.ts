@@ -90,7 +90,7 @@ const testCases: {
   },
 ];
 
-describe.only('assertSessionKeyPolicies', async () => {
+describe('assertSessionKeyPolicies', async () => {
   testCases.forEach(({ desc, input, allow }) => {
     it(`should ${allow ? 'succeed' : 'fail'} for session config with ${desc}`, async () => {
       const transaction = {

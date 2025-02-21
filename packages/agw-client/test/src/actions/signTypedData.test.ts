@@ -1,5 +1,6 @@
 import {
   Address,
+  createPublicClient,
   fromHex,
   Hex,
   toBytes,
@@ -88,55 +89,65 @@ signerClient.request = (async ({ method, params }) => {
   return anvilAbstractTestnet.getClient().request({ method, params } as any);
 }) as EIP1193RequestFn;
 
+const publicClient = createPublicClient({
+  chain: anvilAbstractTestnet.chain as ChainEIP712,
+  transport: http(baseClient.transport.url),
+});
+
 describe('signTypedData', async () => {
   it('should pass through zksync eip712 transaction', async () => {
-    const signedMessage = await signTypedData(baseClient, signerClient, {
-      domain: {
-        name: 'zkSync',
-        version: '2',
-        chainId: 11124,
+    const signedMessage = await signTypedData(
+      baseClient,
+      signerClient,
+      publicClient,
+      {
+        domain: {
+          name: 'zkSync',
+          version: '2',
+          chainId: 11124,
+        },
+        types: {
+          EIP712Domain: [
+            { name: 'name', type: 'string' },
+            { name: 'version', type: 'string' },
+            { name: 'chainId', type: 'uint256' },
+          ],
+          Transaction: [
+            { name: 'txType', type: 'uint256' },
+            { name: 'from', type: 'uint256' },
+            { name: 'to', type: 'uint256' },
+            { name: 'gasLimit', type: 'uint256' },
+            { name: 'gasPerPubdataByteLimit', type: 'uint256' },
+            { name: 'maxFeePerGas', type: 'uint256' },
+            { name: 'maxPriorityFeePerGas', type: 'uint256' },
+            { name: 'paymaster', type: 'uint256' },
+            { name: 'nonce', type: 'uint256' },
+            { name: 'value', type: 'uint256' },
+            { name: 'data', type: 'bytes' },
+            { name: 'factoryDeps', type: 'bytes32[]' },
+            { name: 'paymasterInput', type: 'bytes' },
+          ],
+        },
+        primaryType: 'Transaction',
+        message: {
+          txType: 113n,
+          from: fromHex('0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199', 'bigint'),
+          to: fromHex('0x742d35Cc6634C0532925a3b844Bc454e4438f44e', 'bigint'),
+          gasLimit: 200824n,
+          gasPerPubdataByteLimit: 50000n,
+          maxFeePerGas: 61775821n,
+          maxPriorityFeePerGas: 0n,
+          paymaster: 479727098668981938005249499649736900492014609297n,
+          nonce: 18n,
+          value: 0n,
+          data: '0x',
+          factoryDeps: [],
+          paymasterInput: getGeneralPaymasterInput({
+            innerInput: '0x',
+          }),
+        },
       },
-      types: {
-        EIP712Domain: [
-          { name: 'name', type: 'string' },
-          { name: 'version', type: 'string' },
-          { name: 'chainId', type: 'uint256' },
-        ],
-        Transaction: [
-          { name: 'txType', type: 'uint256' },
-          { name: 'from', type: 'uint256' },
-          { name: 'to', type: 'uint256' },
-          { name: 'gasLimit', type: 'uint256' },
-          { name: 'gasPerPubdataByteLimit', type: 'uint256' },
-          { name: 'maxFeePerGas', type: 'uint256' },
-          { name: 'maxPriorityFeePerGas', type: 'uint256' },
-          { name: 'paymaster', type: 'uint256' },
-          { name: 'nonce', type: 'uint256' },
-          { name: 'value', type: 'uint256' },
-          { name: 'data', type: 'bytes' },
-          { name: 'factoryDeps', type: 'bytes32[]' },
-          { name: 'paymasterInput', type: 'bytes' },
-        ],
-      },
-      primaryType: 'Transaction',
-      message: {
-        txType: 113n,
-        from: fromHex('0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199', 'bigint'),
-        to: fromHex('0x742d35Cc6634C0532925a3b844Bc454e4438f44e', 'bigint'),
-        gasLimit: 200824n,
-        gasPerPubdataByteLimit: 50000n,
-        maxFeePerGas: 61775821n,
-        maxPriorityFeePerGas: 0n,
-        paymaster: 479727098668981938005249499649736900492014609297n,
-        nonce: 18n,
-        value: 0n,
-        data: '0x',
-        factoryDeps: [],
-        paymasterInput: getGeneralPaymasterInput({
-          innerInput: '0x',
-        }),
-      },
-    });
+    );
     expect(signedMessage).toBe(
       encodeAbiParameters(parseAbiParameters(['bytes', 'address', 'bytes[]']), [
         RAW_SIGNATURE,
@@ -155,6 +166,7 @@ describe('signTypedData', async () => {
     const signedMessage = await signTypedData(
       baseClient,
       signerClient,
+      publicClient,
       exampleTypedData,
     );
 
@@ -186,6 +198,7 @@ describe('signTypedData', async () => {
     const signedMessage = await signTypedData(
       baseClient,
       signerClient,
+      publicClient,
       exampleTypedData,
     );
 
@@ -195,6 +208,7 @@ describe('signTypedData', async () => {
     const signedMessage = await signTypedData(
       baseClient,
       signerClient,
+      publicClient,
       exampleTypedData,
       true,
     );

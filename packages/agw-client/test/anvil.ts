@@ -13,7 +13,7 @@ import {
   type Transport,
   webSocket,
 } from 'viem';
-import { abstractTestnet } from 'viem/chains';
+import { abstract, abstractTestnet } from 'viem/chains';
 
 import { accounts, poolId } from './constants.js';
 import { ProviderRpcError } from './errors.js';
@@ -28,6 +28,15 @@ export const anvilAbstractTestnet = defineAnvil({
   port: 8745,
 });
 
+export const anvilAbstractMainnet = defineAnvil({
+  chain: abstract,
+  forkUrl: getEnv(
+    'VITE_ANVIL_FORK_URL_ABSTRACT_MAINNET',
+    'https://api.mainnet.abs.xyz',
+  ),
+  forkBlockNumber: 2281918n,
+  port: 8746,
+});
 ////////////////////////////////////////////////////////////
 // Utilities
 

@@ -125,7 +125,6 @@ test('with useSignerAddress false', async () => {
       chain: anvilAbstractTestnet.chain as ChainEIP712,
     } as SignEip712TransactionParameters,
     EOA_VALIDATOR_ADDRESS,
-    false,
   );
   expect(signedTransaction).toBe(expectedSignedTransaction);
 });
@@ -152,12 +151,12 @@ test('with useSignerAddress true', async () => {
     publicClient,
     {
       ...transaction,
+      from: address.signerAddress, // Use signer address as the from address
       type: 'eip712',
       account: baseClient.account,
       chain: anvilAbstractTestnet.chain as ChainEIP712,
     } as SignEip712TransactionParameters,
     EOA_VALIDATOR_ADDRESS,
-    true,
   );
   expect(signedTransaction).toBe(expectedSignedTransaction);
 });
@@ -174,7 +173,6 @@ test('handles hex values', async () => {
       chain: anvilAbstractTestnet.chain as ChainEIP712,
     } as any,
     EOA_VALIDATOR_ADDRESS,
-    false,
   );
 
   const signedTransactionWithBigIntValues = await signTransaction(
@@ -188,7 +186,6 @@ test('handles hex values', async () => {
       chain: anvilAbstractTestnet.chain as ChainEIP712,
     } as any,
     EOA_VALIDATOR_ADDRESS,
-    false,
   );
 
   expect(signedTransactionWithHexValues).toBe(

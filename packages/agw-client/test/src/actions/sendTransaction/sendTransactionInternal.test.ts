@@ -16,10 +16,21 @@ import { ChainEIP712, ZksyncTransactionRequestEIP712 } from 'viem/zksync';
 import { describe, expect, test, vi } from 'vitest';
 
 import { sendTransactionInternal } from '../../../../src/actions/sendTransactionInternal.js';
+import {
+  EOA_VALIDATOR_ADDRESS,
+  SMART_ACCOUNT_FACTORY_ADDRESS,
+} from '../../../../src/constants.js';
 import { anvilAbstractTestnet } from '../../../anvil.js';
 import { address } from '../../../constants.js';
 
-// Mock the signTransaction function
+vi.mock('viem', async (importOriginal) => {
+  const original = await importOriginal();
+  return {
+    ...(original as any),
+    encodeFunctionData: vi.fn().mockReturnValue('0xmockedEncodedData'),
+  };
+});
+
 vi.mock('../../../../src/actions/signTransaction', () => ({
   signTransaction: vi
     .fn()
@@ -29,7 +40,12 @@ vi.mock('../../../../src/actions/signTransaction', () => ({
 }));
 
 import { signTransaction } from '../../../../src/actions/signTransaction.js';
-import { EOA_VALIDATOR_ADDRESS } from '../../../../src/constants.js';
+import {
+  getInitializerCalldata,
+  isSmartAccountDeployed,
+} from '../../../../src/utils.js';
+
+vi.mock('../../../../src/utils.js');
 
 const MOCK_TRANSACTION_HASH =
   '0x9afe47f3d95eccfc9210851ba5f877f76d372514a26b48bad848a07f77c33b87';
@@ -112,22 +128,28 @@ const transaction: ZksyncTransactionRequestEIP712 = {
 };
 
 describe('sendTransactionInternal', () => {
+  vi.mocked(getInitializerCalldata).mockReturnValue(
+    '0xmockedInitializerCallData',
+  );
   const testCases = [
     {
-      name: 'is initial transaction, not privy cross app',
-      isInitialTransaction: true,
+      name: 'is initial transaction',
+      isDeployed: false,
+      expectedToAddress: SMART_ACCOUNT_FACTORY_ADDRESS,
       expectedFromAddress: address.signerAddress,
     },
     {
-      name: 'is not initial transaction, not privy cross app',
-      isInitialTransaction: false,
+      name: 'is not initial transaction',
+      isDeployed: true,
+      expectedToAddress: transaction.to,
       expectedFromAddress: address.smartAccountAddress,
     },
   ];
 
   test.each(testCases)(
     '$name',
-    async ({ isInitialTransaction, expectedFromAddress }) => {
+    async ({ isDeployed, expectedToAddress, expectedFromAddress }) => {
+      vi.mocked(isSmartAccountDeployed).mockResolvedValue(isDeployed);
       const transactionHash = await sendTransactionInternal(
         baseClient,
         signerClient,
@@ -139,7 +161,6 @@ describe('sendTransactionInternal', () => {
           chain: anvilAbstractTestnet.chain as ChainEIP712,
         } as any,
         EOA_VALIDATOR_ADDRESS,
-        isInitialTransaction,
       );
 
       expect(transactionHash).toBe(MOCK_TRANSACTION_HASH);
@@ -150,15 +171,14 @@ describe('sendTransactionInternal', () => {
         publicClient,
         expect.objectContaining({
           type: 'eip712',
-          to: '0x5432100000000000000000000000000000000000',
+          to: expectedToAddress,
           from: expectedFromAddress,
-          data: '0x1234',
+          data: isDeployed ? '0x1234' : '0xmockedEncodedData',
           paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
           paymasterInput: '0x',
           chainId: abstractTestnet.id,
         }),
         EOA_VALIDATOR_ADDRESS,
-        isInitialTransaction,
         {},
         undefined,
       );
@@ -193,7 +213,6 @@ test('sendTransactionInternal with mismatched chain', async () => {
           chain: invalidChain,
         } as any,
         EOA_VALIDATOR_ADDRESS,
-        false,
       ),
   ).rejects.toThrowError('Current Chain ID:  11124');
 });

@@ -2,11 +2,9 @@ import {
   type Account,
   type Client,
   encodeFunctionData,
-  keccak256,
   type PublicClient,
   type SendTransactionRequest,
   type SendTransactionReturnType,
-  toBytes,
   type Transport,
   type WalletClient,
 } from 'viem';
@@ -15,15 +13,10 @@ import {
   type SendEip712TransactionParameters,
 } from 'viem/zksync';
 
-import AccountFactoryAbi from '../abis/AccountFactory.js';
-import {
-  EOA_VALIDATOR_ADDRESS,
-  SMART_ACCOUNT_FACTORY_ADDRESS,
-} from '../constants.js';
+import { EOA_VALIDATOR_ADDRESS } from '../constants.js';
 import { type Call } from '../types/call.js';
 import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
 import type { SendTransactionBatchParameters } from '../types/sendTransactionBatch.js';
-import { getInitializerCalldata, isSmartAccountDeployed } from '../utils.js';
 import { sendPrivyTransaction } from './sendPrivyTransaction.js';
 import { sendTransactionInternal } from './sendTransactionInternal.js';
 
@@ -113,52 +106,14 @@ export async function sendTransactionBatch<
 
   const { batchCallData, totalValue } = await getBatchCalldata(calls);
 
-  let batchTransaction;
-
-  const isDeployed = await isSmartAccountDeployed(
-    publicClient,
-    client.account.address,
-  );
-  if (!isDeployed) {
-    const initialCall = {
-      target: client.account.address,
-      allowFailure: false,
-      value: totalValue,
-      callData: batchCallData,
-    } as Call;
-
-    // Create calldata for initializing the proxy account
-    const initializerCallData = getInitializerCalldata(
-      signerClient.account.address,
-      EOA_VALIDATOR_ADDRESS,
-      initialCall,
-    );
-    const addressBytes = toBytes(signerClient.account.address);
-    const salt = keccak256(addressBytes);
-    const deploymentCalldata = encodeFunctionData({
-      abi: AccountFactoryAbi,
-      functionName: 'deployAccount',
-      args: [salt, initializerCallData],
-    });
-
-    batchTransaction = {
-      to: SMART_ACCOUNT_FACTORY_ADDRESS,
-      data: deploymentCalldata,
-      value: totalValue,
-      paymaster: paymaster,
-      paymasterInput: paymasterInput,
-      type: 'eip712',
-    } as any;
-  } else {
-    batchTransaction = {
-      to: client.account.address,
-      data: batchCallData,
-      value: totalValue,
-      paymaster: paymaster,
-      paymasterInput: paymasterInput,
-      type: 'eip712',
-    } as any;
-  }
+  const batchTransaction = {
+    to: client.account.address,
+    data: batchCallData,
+    value: totalValue,
+    paymaster: paymaster,
+    paymasterInput: paymasterInput,
+    type: 'eip712',
+  } as any;
 
   return sendTransactionInternal(
     client,
@@ -169,7 +124,6 @@ export async function sendTransactionBatch<
       ...rest,
     },
     EOA_VALIDATOR_ADDRESS,
-    !isDeployed,
     {},
     customPaymasterHandler,
   );

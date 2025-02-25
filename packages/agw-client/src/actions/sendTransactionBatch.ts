@@ -20,22 +20,18 @@ import type { SendTransactionBatchParameters } from '../types/sendTransactionBat
 import { sendPrivyTransaction } from './sendPrivyTransaction.js';
 import { sendTransactionInternal } from './sendTransactionInternal.js';
 
-async function getBatchCalldata<
+export function getBatchTransactionObject<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
-  account extends Account | undefined = Account | undefined,
   chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   request extends SendTransactionRequest<
     chain,
     chainOverride
   > = SendTransactionRequest<chain, chainOverride>,
 >(
-  calls: SendEip712TransactionParameters<
-    chain,
-    account,
-    chainOverride,
-    request
-  >[],
+  client: Client<Transport, ChainEIP712, Account>,
+  parameters: SendTransactionBatchParameters<request>,
 ) {
+  const { calls, paymaster, paymasterInput } = parameters;
   const batchCalls: Call[] = calls.map((tx) => {
     if (!tx.to) throw new Error('Transaction target (to) is required');
     return {
@@ -75,10 +71,16 @@ async function getBatchCalldata<
     BigInt(0),
   );
 
-  return {
-    batchCallData,
-    totalValue,
-  };
+  const batchTransaction = {
+    to: client.account.address,
+    data: batchCallData,
+    value: totalValue,
+    paymaster: paymaster,
+    paymasterInput: paymasterInput,
+    type: 'eip712',
+  } as any;
+
+  return batchTransaction;
 }
 
 export async function sendTransactionBatch<
@@ -96,7 +98,7 @@ export async function sendTransactionBatch<
   isPrivyCrossApp = false,
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<SendTransactionReturnType> {
-  const { calls, paymaster, paymasterInput, ...rest } = parameters;
+  const { calls, ...rest } = parameters;
   if (calls.length === 0) {
     throw new Error('No calls provided');
   }
@@ -104,16 +106,7 @@ export async function sendTransactionBatch<
     return await sendPrivyTransaction(client, parameters);
   }
 
-  const { batchCallData, totalValue } = await getBatchCalldata(calls);
-
-  const batchTransaction = {
-    to: client.account.address,
-    data: batchCallData,
-    value: totalValue,
-    paymaster: paymaster,
-    paymasterInput: paymasterInput,
-    type: 'eip712',
-  } as any;
+  const batchTransaction = getBatchTransactionObject(client, parameters);
 
   return sendTransactionInternal(
     client,

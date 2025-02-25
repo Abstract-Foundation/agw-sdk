@@ -62,10 +62,8 @@ import {
   type RevokeSessionsParameters,
   type RevokeSessionsReturnType,
 } from './actions/revokeSessions.js';
-import {
-  sendTransaction,
-  sendTransactionBatch,
-} from './actions/sendTransaction.js';
+import { sendTransaction } from './actions/sendTransaction.js';
+import { sendTransactionBatch } from './actions/sendTransactionBatch.js';
 import { sendTransactionForSession } from './actions/sendTransactionForSession.js';
 import { signMessage } from './actions/signMessage.js';
 import { signTransaction } from './actions/signTransaction.js';

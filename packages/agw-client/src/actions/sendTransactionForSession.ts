@@ -84,7 +84,6 @@ export async function sendTransactionForSession<
     publicClient,
     parameters,
     SESSION_KEY_VALIDATOR_ADDRESS,
-    !isDeployed,
     {
       [SESSION_KEY_VALIDATOR_ADDRESS]: encodeSessionWithPeriodIds(
         session,

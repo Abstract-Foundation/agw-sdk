@@ -43,6 +43,7 @@ export async function assertSessionKeyPolicies<
     'account' | 'chain'
   >,
 ) {
+  // Only validate on Abstract mainnet
   if (chainId !== abstract.id) {
     return;
   }
@@ -152,7 +153,7 @@ function getSessionFromTransaction<
 ) {
   if (
     transaction.to === SESSION_KEY_VALIDATOR_ADDRESS &&
-    transaction.data?.substring(0, 10) === '0x5a0694d2'
+    transaction.data?.substring(0, 10) === '0x5a0694d2' // createSession(SessionLib.SessionSpec memory sessionSpec)
   ) {
     const sessionSpec = decodeFunctionData({
       abi: SessionKeyValidatorAbi,

@@ -26,7 +26,9 @@ import { address } from '../constants.js';
 import {
   sessionSelector,
   sessionTargetAddress,
+  sessionWithConstrainedApprovalCallPolicy,
   sessionWithSimpleCallPolicy,
+  sessionWithUnrestrictedApprovalCallPolicy,
 } from '../fixtures.js';
 
 const client = createPublicClient({
@@ -67,7 +69,7 @@ client.request = (async ({ method, params }) => {
   return anvilAbstractMainnet.getClient().request({ method, params } as any);
 }) as EIP1193RequestFn;
 
-const testCases: {
+const simpleSessionTestCases: {
   desc: string;
   input: {
     session: SessionConfig;
@@ -88,10 +90,28 @@ const testCases: {
     },
     allow: true,
   },
+  {
+    desc: 'constrained approval call policy',
+    input: {
+      session: sessionWithConstrainedApprovalCallPolicy,
+      validationFunction: 'getCallPolicyStatus',
+      validationFunctionArgs: [sessionTargetAddress, sessionSelector],
+    },
+    allow: true,
+  },
+  {
+    desc: 'unrestricted approval call policy',
+    input: {
+      session: sessionWithUnrestrictedApprovalCallPolicy,
+      validationFunction: 'getCallPolicyStatus',
+      validationFunctionArgs: [sessionTargetAddress, sessionSelector],
+    },
+    allow: false,
+  },
 ];
 
 describe('assertSessionKeyPolicies', async () => {
-  testCases.forEach(({ desc, input, allow }) => {
+  simpleSessionTestCases.forEach(({ desc, input, allow }) => {
     it(`should ${allow ? 'succeed' : 'fail'} for session config with ${desc}`, async () => {
       const transaction = {
         to: SESSION_KEY_VALIDATOR_ADDRESS as Address,

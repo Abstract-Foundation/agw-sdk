@@ -282,7 +282,6 @@ export function globalWalletActions<
         publicClient,
         args as SignEip712TransactionParameters<chain, account>,
         EOA_VALIDATOR_ADDRESS,
-        false,
         {},
         customPaymasterHandler,
         isPrivyCrossApp,

@@ -8,10 +8,7 @@ import {
   type Transport,
   type WalletClient,
 } from 'viem';
-import {
-  type ChainEIP712,
-  type SendEip712TransactionParameters,
-} from 'viem/zksync';
+import { type ChainEIP712 } from 'viem/zksync';
 
 import { EOA_VALIDATOR_ADDRESS } from '../constants.js';
 import { type Call } from '../types/call.js';

@@ -100,7 +100,6 @@ describe('globalWalletActions', () => {
       mockPublicClient,
       mockArgs,
       EOA_VALIDATOR_ADDRESS,
-      false,
       {},
       undefined,
       false,

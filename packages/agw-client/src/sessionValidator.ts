@@ -175,7 +175,7 @@ function getSessionFromTransaction<
         .toLowerCase()
         .startsWith(SESSION_KEY_VALIDATOR_ADDRESS.toLowerCase())
     ) {
-      // Remove '0x' prefix (2 chars) + validator address (20 bytes or 40 chars)
+      // Remove '0x' prefix (2 chars) + validator address 20 bytes (40 chars)
       const sessionData = moduleAndData.args[0].substring(42);
 
       return decodeAbiParameters([getSessionSpec()], `0x${sessionData}`)[0];

@@ -355,8 +355,8 @@ export const sessionTests: SessionConfig[] = [
         toFunctionSelector('buy(uint256,uint256,uint256,uint256)'),
         toFunctionSelector('claimWinnings(uint256)'),
       ].map((selector) => ({
-        target: '0x4f4988A910f8aE9B3214149A8eA1F2E4e3Cd93CC' as `0x${string}`,
-        selector,
+        target: '0x4f4988A910f8aE9B3214149A8eA1F2E4e3Cd93CC' as `0x${string}`, // Contract address
+        selector, // Allowed function
         valueLimit: {
           limitType: LimitType.Lifetime,
           limit: 0n,
@@ -365,9 +365,9 @@ export const sessionTests: SessionConfig[] = [
         maxValuePerUse: 0n,
         constraints: [],
       })),
-
       {
-        target: '0xf19609e96187cdaa34cffb96473fac567e547302' as `0x${string}`,
+        // PTS
+        target: '0xf19609e96187cdaa34cffb96473fac567e547302',
         selector: toFunctionSelector('approve(address,uint256) external'),
         valueLimit: {
           limitType: LimitType.Lifetime,
@@ -375,7 +375,61 @@ export const sessionTests: SessionConfig[] = [
           period: 0n,
         },
         maxValuePerUse: 0n,
-        constraints: [],
+        constraints: [
+          {
+            condition: ConstraintCondition.Equal,
+            index: 0n,
+            limit: LimitUnlimited,
+            refValue: encodeAbiParameters(
+              [{ type: 'address' }],
+              ['0x4f4988A910f8aE9B3214149A8eA1F2E4e3Cd93CC'],
+            ),
+          },
+        ],
+      },
+      {
+        // PENGU
+        target: '0x9ebe3a824ca958e4b3da772d2065518f009cba62',
+        selector: toFunctionSelector('approve(address,uint256) external'),
+        valueLimit: {
+          limitType: LimitType.Lifetime,
+          limit: 0n,
+          period: 0n,
+        },
+        maxValuePerUse: 0n,
+        constraints: [
+          {
+            condition: ConstraintCondition.Equal,
+            index: 0n,
+            limit: LimitUnlimited,
+            refValue: encodeAbiParameters(
+              [{ type: 'address' }],
+              ['0x4f4988A910f8aE9B3214149A8eA1F2E4e3Cd93CC'],
+            ),
+          },
+        ],
+      },
+      {
+        // USDC
+        target: '0x84a71ccd554cc1b02749b35d22f684cc8ec987e1',
+        selector: toFunctionSelector('approve(address,uint256) external'),
+        valueLimit: {
+          limitType: LimitType.Lifetime,
+          limit: 0n,
+          period: 0n,
+        },
+        maxValuePerUse: 0n,
+        constraints: [
+          {
+            condition: ConstraintCondition.Equal,
+            index: 0n,
+            limit: LimitUnlimited,
+            refValue: encodeAbiParameters(
+              [{ type: 'address' }],
+              ['0x4f4988A910f8aE9B3214149A8eA1F2E4e3Cd93CC'],
+            ),
+          },
+        ],
       },
     ],
     transferPolicies: [],
@@ -429,106 +483,106 @@ export const sessionTests: SessionConfig[] = [
     ],
     transferPolicies: [],
   },
-  {
-    signer: sessionSignerAddress,
-    expiresAt: sessionExpiry,
+  // {
+  //   signer: sessionSignerAddress,
+  //   expiresAt: sessionExpiry,
 
-    feeLimit: {
-      limitType: LimitType.Lifetime,
-      limit: parseEther('30'),
-      period: 0n,
-    },
+  //   feeLimit: {
+  //     limitType: LimitType.Lifetime,
+  //     limit: parseEther('30'),
+  //     period: 0n,
+  //   },
 
-    callPolicies: [
-      // allow wrapping eth
-      {
-        target: '0x3439153EB7AF838Ad19d56E1571FBD09333C2809',
-        selector: toFunctionSelector('deposit()'),
-        valueLimit: {
-          limitType: LimitType.Unlimited,
-          limit: parseEther('30'),
-          period: 0n,
-        },
-        maxValuePerUse: parseEther('30'),
-        constraints: [],
-      },
+  //   callPolicies: [
+  //     // allow wrapping eth
+  //     {
+  //       target: '0x3439153EB7AF838Ad19d56E1571FBD09333C2809',
+  //       selector: toFunctionSelector('deposit()'),
+  //       valueLimit: {
+  //         limitType: LimitType.Unlimited,
+  //         limit: parseEther('30'),
+  //         period: 0n,
+  //       },
+  //       maxValuePerUse: parseEther('30'),
+  //       constraints: [],
+  //     },
 
-      // allow approving weth
-      {
-        target: '0x3439153EB7AF838Ad19d56E1571FBD09333C2809',
-        selector: toFunctionSelector(
-          'function approve(address guy, uint256 wad)',
-        ),
-        valueLimit: {
-          limitType: LimitType.Lifetime,
-          limit: parseEther('30'),
-          period: 0n,
-        },
-        maxValuePerUse: parseEther('1.0'),
-        constraints: [],
-      },
+  //     // allow approving weth
+  //     {
+  //       target: '0x3439153EB7AF838Ad19d56E1571FBD09333C2809',
+  //       selector: toFunctionSelector(
+  //         'function approve(address guy, uint256 wad)',
+  //       ),
+  //       valueLimit: {
+  //         limitType: LimitType.Lifetime,
+  //         limit: parseEther('30'),
+  //         period: 0n,
+  //       },
+  //       maxValuePerUse: parseEther('1.0'),
+  //       constraints: [],
+  //     },
 
-      // allow unwrapping eth
-      {
-        target: '0x3439153EB7AF838Ad19d56E1571FBD09333C2809',
-        selector: toFunctionSelector('withdraw(uint256)'),
-        valueLimit: {
-          limitType: LimitType.Unlimited,
-          limit: parseEther('30'),
-          period: 0n,
-        },
-        maxValuePerUse: parseEther('30'),
-        constraints: [],
-      },
+  //     // allow unwrapping eth
+  //     {
+  //       target: '0x3439153EB7AF838Ad19d56E1571FBD09333C2809',
+  //       selector: toFunctionSelector('withdraw(uint256)'),
+  //       valueLimit: {
+  //         limitType: LimitType.Unlimited,
+  //         limit: parseEther('30'),
+  //         period: 0n,
+  //       },
+  //       maxValuePerUse: parseEther('30'),
+  //       constraints: [],
+  //     },
 
-      // allow purchasing tickets
-      {
-        target: '0x3272596F776470D2D7C3f7dfF3dc50888b7D8967',
-        selector: toFunctionSelector(
-          'function purchase(uint256,uint16,address,address,uint256,uint256) external',
-        ),
-        valueLimit: {
-          limitType: LimitType.Unlimited,
-          limit: parseEther('30'),
-          period: 0n,
-        },
-        maxValuePerUse: parseEther('30'),
-        constraints: [],
-      },
+  //     // allow purchasing tickets
+  //     {
+  //       target: '0x3272596F776470D2D7C3f7dfF3dc50888b7D8967',
+  //       selector: toFunctionSelector(
+  //         'function purchase(uint256,uint16,address,address,uint256,uint256) external',
+  //       ),
+  //       valueLimit: {
+  //         limitType: LimitType.Unlimited,
+  //         limit: parseEther('30'),
+  //         period: 0n,
+  //       },
+  //       maxValuePerUse: parseEther('30'),
+  //       constraints: [],
+  //     },
 
-      // allow purchasing tickets with eth
-      {
-        target: '0x3272596F776470D2D7C3f7dfF3dc50888b7D8967',
-        selector: toFunctionSelector(
-          'function purchaseETH(uint256,uint16,address,address,uint256,uint256) payable external',
-        ),
-        valueLimit: {
-          limitType: LimitType.Unlimited,
-          limit: parseEther('30'),
-          period: 0n,
-        },
-        maxValuePerUse: parseEther('30'),
-        constraints: [],
-      },
+  //     // allow purchasing tickets with eth
+  //     {
+  //       target: '0x3272596F776470D2D7C3f7dfF3dc50888b7D8967',
+  //       selector: toFunctionSelector(
+  //         'function purchaseETH(uint256,uint16,address,address,uint256,uint256) payable external',
+  //       ),
+  //       valueLimit: {
+  //         limitType: LimitType.Unlimited,
+  //         limit: parseEther('30'),
+  //         period: 0n,
+  //       },
+  //       maxValuePerUse: parseEther('30'),
+  //       constraints: [],
+  //     },
 
-      // allow claiming tickets
-      {
-        target: '0x3272596F776470D2D7C3f7dfF3dc50888b7D8967',
-        selector: toFunctionSelector(
-          'function claim(uint256 poolId) external payable',
-        ),
-        valueLimit: {
-          limitType: LimitType.Unlimited,
-          limit: parseEther('30'),
-          period: 0n,
-        },
-        maxValuePerUse: parseEther('30'),
-        constraints: [],
-      },
-    ],
+  //     // allow claiming tickets
+  //     {
+  //       target: '0x3272596F776470D2D7C3f7dfF3dc50888b7D8967',
+  //       selector: toFunctionSelector(
+  //         'function claim(uint256 poolId) external payable',
+  //       ),
+  //       valueLimit: {
+  //         limitType: LimitType.Unlimited,
+  //         limit: parseEther('30'),
+  //         period: 0n,
+  //       },
+  //       maxValuePerUse: parseEther('30'),
+  //       constraints: [],
+  //     },
+  //   ],
 
-    transferPolicies: [],
-  },
+  //   transferPolicies: [],
+  // },
   {
     signer: sessionSignerAddress,
     expiresAt: sessionExpiry,

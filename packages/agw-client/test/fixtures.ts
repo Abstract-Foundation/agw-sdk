@@ -483,106 +483,58 @@ export const sampleSessionConfigs: SessionConfig[] = [
     ],
     transferPolicies: [],
   },
-  // {
-  //   signer: sessionSignerAddress,
-  //   expiresAt: sessionExpiry,
-
-  //   feeLimit: {
-  //     limitType: LimitType.Lifetime,
-  //     limit: parseEther('30'),
-  //     period: 0n,
-  //   },
-
-  //   callPolicies: [
-  //     // allow wrapping eth
-  //     {
-  //       target: '0x3439153EB7AF838Ad19d56E1571FBD09333C2809',
-  //       selector: toFunctionSelector('deposit()'),
-  //       valueLimit: {
-  //         limitType: LimitType.Unlimited,
-  //         limit: parseEther('30'),
-  //         period: 0n,
-  //       },
-  //       maxValuePerUse: parseEther('30'),
-  //       constraints: [],
-  //     },
-
-  //     // allow approving weth
-  //     {
-  //       target: '0x3439153EB7AF838Ad19d56E1571FBD09333C2809',
-  //       selector: toFunctionSelector(
-  //         'function approve(address guy, uint256 wad)',
-  //       ),
-  //       valueLimit: {
-  //         limitType: LimitType.Lifetime,
-  //         limit: parseEther('30'),
-  //         period: 0n,
-  //       },
-  //       maxValuePerUse: parseEther('1.0'),
-  //       constraints: [],
-  //     },
-
-  //     // allow unwrapping eth
-  //     {
-  //       target: '0x3439153EB7AF838Ad19d56E1571FBD09333C2809',
-  //       selector: toFunctionSelector('withdraw(uint256)'),
-  //       valueLimit: {
-  //         limitType: LimitType.Unlimited,
-  //         limit: parseEther('30'),
-  //         period: 0n,
-  //       },
-  //       maxValuePerUse: parseEther('30'),
-  //       constraints: [],
-  //     },
-
-  //     // allow purchasing tickets
-  //     {
-  //       target: '0x3272596F776470D2D7C3f7dfF3dc50888b7D8967',
-  //       selector: toFunctionSelector(
-  //         'function purchase(uint256,uint16,address,address,uint256,uint256) external',
-  //       ),
-  //       valueLimit: {
-  //         limitType: LimitType.Unlimited,
-  //         limit: parseEther('30'),
-  //         period: 0n,
-  //       },
-  //       maxValuePerUse: parseEther('30'),
-  //       constraints: [],
-  //     },
-
-  //     // allow purchasing tickets with eth
-  //     {
-  //       target: '0x3272596F776470D2D7C3f7dfF3dc50888b7D8967',
-  //       selector: toFunctionSelector(
-  //         'function purchaseETH(uint256,uint16,address,address,uint256,uint256) payable external',
-  //       ),
-  //       valueLimit: {
-  //         limitType: LimitType.Unlimited,
-  //         limit: parseEther('30'),
-  //         period: 0n,
-  //       },
-  //       maxValuePerUse: parseEther('30'),
-  //       constraints: [],
-  //     },
-
-  //     // allow claiming tickets
-  //     {
-  //       target: '0x3272596F776470D2D7C3f7dfF3dc50888b7D8967',
-  //       selector: toFunctionSelector(
-  //         'function claim(uint256 poolId) external payable',
-  //       ),
-  //       valueLimit: {
-  //         limitType: LimitType.Unlimited,
-  //         limit: parseEther('30'),
-  //         period: 0n,
-  //       },
-  //       maxValuePerUse: parseEther('30'),
-  //       constraints: [],
-  //     },
-  //   ],
-
-  //   transferPolicies: [],
-  // },
+  {
+    signer: sessionSignerAddress,
+    expiresAt: sessionExpiry,
+    feeLimit: {
+      limitType: LimitType.Lifetime,
+      limit: parseEther('30'),
+      period: 0n,
+    },
+    callPolicies: [
+      // allow unwrapping eth (winnings)
+      {
+        target: '0x3439153EB7AF838Ad19d56E1571FBD09333C2809',
+        selector: toFunctionSelector('withdraw(uint256)'),
+        valueLimit: {
+          limitType: LimitType.Unlimited,
+          limit: parseEther('30'),
+          period: 0n,
+        },
+        maxValuePerUse: parseEther('30'),
+        constraints: [],
+      },
+      // allow purchasing tickets with eth
+      {
+        target: '0x3272596F776470D2D7C3f7dfF3dc50888b7D8967',
+        selector: toFunctionSelector(
+          'function purchaseETH(uint256,uint16,address,address,uint256,uint256) payable external',
+        ),
+        valueLimit: {
+          limitType: LimitType.Unlimited,
+          limit: parseEther('30'),
+          period: 0n,
+        },
+        maxValuePerUse: parseEther('30'),
+        constraints: [],
+      },
+      // allow claiming tickets
+      {
+        target: '0x3272596F776470D2D7C3f7dfF3dc50888b7D8967',
+        selector: toFunctionSelector(
+          'function claim(uint256 poolId) external payable',
+        ),
+        valueLimit: {
+          limitType: LimitType.Unlimited,
+          limit: parseEther('30'),
+          period: 0n,
+        },
+        maxValuePerUse: parseEther('30'),
+        constraints: [],
+      },
+    ],
+    transferPolicies: [],
+  },
   {
     signer: sessionSignerAddress,
     expiresAt: sessionExpiry,

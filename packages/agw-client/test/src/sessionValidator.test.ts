@@ -8,13 +8,14 @@ import {
 } from 'viem';
 import { parseAccount } from 'viem/accounts';
 import { ChainEIP712 } from 'viem/zksync';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SessionKeyValidatorAbi } from '../../src/abis/SessionKeyValidator.js';
 import {
   SESSION_KEY_POLICY_REGISTRY_ADDRESS,
   SESSION_KEY_VALIDATOR_ADDRESS,
 } from '../../src/constants.js';
+import { AGWAccountAbi } from '../../src/exports/constants.js';
 import { SessionConfig } from '../../src/sessions.js';
 import {
   assertSessionKeyPolicies,
@@ -111,6 +112,10 @@ const simpleSessionTestCases: {
 ];
 
 describe('assertSessionKeyPolicies', async () => {
+  beforeEach(() => {
+    vi.mocked(client.multicall).mockClear();
+  });
+
   simpleSessionTestCases.forEach(({ desc, input, allow }) => {
     it(`should ${allow ? 'succeed' : 'fail'} for session config with ${desc}`, async () => {
       const transaction = {
@@ -357,5 +362,84 @@ describe('assertSessionKeyPolicies', async () => {
         transaction,
       ),
     ).rejects.toThrow('Session key policy violation');
+  });
+});
+
+describe('assertSessionKeyPolicies with addModule', () => {
+  beforeEach(() => {
+    vi.mocked(client.multicall).mockClear();
+  });
+
+  it('should allow adding a session key validator module', async () => {
+    const sessionConfig = sessionWithSimpleCallPolicy;
+
+    // Encode the session config as initialization data
+    const initData = encodeFunctionData({
+      abi: SessionKeyValidatorAbi,
+      functionName: 'createSession',
+      args: [sessionConfig],
+    }).slice(10); // Remove the function selector (first 10 chars)
+
+    // Combine the module address and init data
+    const moduleAndData = SESSION_KEY_VALIDATOR_ADDRESS + initData;
+
+    const transaction = {
+      to: address.smartAccountAddress as Address,
+      data: encodeFunctionData({
+        abi: AGWAccountAbi,
+        functionName: 'addModule',
+        args: [moduleAndData as Hex],
+      }),
+    };
+
+    getCallPolicy.mockReturnValue(
+      encodedPolicyStatus[SessionKeyPolicyStatus.Allowed],
+    );
+
+    await expect(
+      assertSessionKeyPolicies(
+        client,
+        anvilAbstractMainnet.chain.id,
+        parseAccount(address.smartAccountAddress),
+        transaction,
+      ),
+    ).resolves.not.toThrow();
+
+    // Verify that the policies were checked
+    expect(client.multicall).toHaveBeenCalled();
+  });
+
+  it('should not allow adding a non-session key validator module', async () => {
+    const sessionConfig = sessionWithUnrestrictedApprovalCallPolicy;
+
+    // Encode the session config as initialization data
+    const initData = encodeFunctionData({
+      abi: SessionKeyValidatorAbi,
+      functionName: 'createSession',
+      args: [sessionConfig],
+    }).slice(10); // Remove the function selector (first 10 chars)
+
+    // Combine the module address and init data
+    const moduleAndData = SESSION_KEY_VALIDATOR_ADDRESS + initData;
+
+    const transaction = {
+      to: address.smartAccountAddress as Address,
+      data: encodeFunctionData({
+        abi: AGWAccountAbi,
+        functionName: 'addModule',
+        args: [moduleAndData as Hex],
+      }),
+    };
+
+    await expect(
+      assertSessionKeyPolicies(
+        client,
+        anvilAbstractMainnet.chain.id,
+        parseAccount(address.smartAccountAddress),
+        transaction,
+      ),
+    ).rejects.toThrow();
+
+    expect(client.multicall).not.toHaveBeenCalled();
   });
 });

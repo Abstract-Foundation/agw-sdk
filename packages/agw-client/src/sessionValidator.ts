@@ -129,12 +129,9 @@ export async function assertSessionKeyPolicies<
     const result = results[i];
     const check = checks[i];
 
-    if (check === undefined) {
-      continue;
-    }
     if (Number(result) !== SessionKeyPolicyStatus.Allowed) {
       throw new BaseError(
-        `Session key policy violation. Target: ${check.target}; Status: ${SessionKeyPolicyStatus[Number(result)]}`,
+        `Session key policy violation. Target: ${check?.target}; Status: ${SessionKeyPolicyStatus[Number(result)]}`,
       );
     }
   }
@@ -178,7 +175,8 @@ function getSessionFromTransaction<
         .toLowerCase()
         .startsWith(SESSION_KEY_VALIDATOR_ADDRESS.toLowerCase())
     ) {
-      const sessionData = moduleAndData.args[0].substring(20);
+      // Remove '0x' prefix (2 chars) + validator address (20 bytes or 40 chars)
+      const sessionData = moduleAndData.args[0].substring(42);
 
       return decodeAbiParameters([getSessionSpec()], `0x${sessionData}`)[0];
     }

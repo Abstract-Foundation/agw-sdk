@@ -152,11 +152,10 @@ describe('assertSessionKeyPolicies', async () => {
     });
   });
 
-  // Test for early return when no session can be parsed (lines 55-56)
   it('should return early when no session can be parsed from the transaction', async () => {
     const transaction = {
       to: '0x1234567890123456789012345678901234567890' as Address,
-      data: '0x12345678' as Hex, // Cast to Hex type
+      data: '0x12345678' as Hex,
     };
 
     // Reset the multicall mock to track if it gets called
@@ -175,7 +174,7 @@ describe('assertSessionKeyPolicies', async () => {
     expect(client.multicall).not.toHaveBeenCalled();
   });
 
-  // Test for transfer policies validation (lines 112-121)
+  // Test for transfer policies validation
   it('should validate transfer policies correctly', async () => {
     const transaction = {
       to: SESSION_KEY_VALIDATOR_ADDRESS as Address,
@@ -215,7 +214,6 @@ describe('assertSessionKeyPolicies', async () => {
     );
   });
 
-  // Test for when policy status is not allowed (lines 135-139)
   it('should throw when policy status is not allowed', async () => {
     const transaction = {
       to: SESSION_KEY_VALIDATOR_ADDRESS as Address,
@@ -242,7 +240,6 @@ describe('assertSessionKeyPolicies', async () => {
   });
 
   it('should validate all predefined session configurations', async () => {
-    // Import the sessionTests array
     const { sessionTests } = await import('../fixtures.js');
 
     for (const sessionConfig of sessionTests) {
@@ -283,10 +280,8 @@ describe('assertSessionKeyPolicies', async () => {
   });
 
   it('should detect policy violations in session configurations', async () => {
-    // Import the sessionTests array
     const { sessionTests } = await import('../fixtures.js');
 
-    // Just test the first session config for simplicity
     const sessionConfig = sessionTests[0];
 
     const transaction = {
@@ -298,17 +293,14 @@ describe('assertSessionKeyPolicies', async () => {
       }),
     };
 
-    // Mock the policy status to be denied for this test
     getCallPolicy.mockReturnValue(
       encodedPolicyStatus[SessionKeyPolicyStatus.Denied],
     );
 
-    // Mock multicall to return a denied status
     client.multicall = vi
       .fn()
       .mockResolvedValue([SessionKeyPolicyStatus.Denied.toString()]);
 
-    // Test that the session validation throws an error
     await expect(
       assertSessionKeyPolicies(
         client,
@@ -320,7 +312,6 @@ describe('assertSessionKeyPolicies', async () => {
   });
 
   it('should detect mixed policy statuses correctly', async () => {
-    // Import the sessionTests array
     const { sessionTests } = await import('../fixtures.js');
 
     // Find a session with multiple policies

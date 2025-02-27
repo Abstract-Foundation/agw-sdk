@@ -355,8 +355,7 @@ export const sessionTests: SessionConfig[] = [
         toFunctionSelector('buy(uint256,uint256,uint256,uint256)'),
         toFunctionSelector('claimWinnings(uint256)'),
       ].map((selector) => ({
-        // mainnet MARKET_ERC20_CONTRACT_ADDRESS = "0x4f4988A910f8aE9B3214149A8eA1F2E4e3Cd93CC"
-        target: '0x4f4988A910f8aE9B3214149A8eA1F2E4e3Cd93CC' as `0x${string}`, // Cast to 0x${string}
+        target: '0x4f4988A910f8aE9B3214149A8eA1F2E4e3Cd93CC' as `0x${string}`,
         selector,
         valueLimit: {
           limitType: LimitType.Lifetime,
@@ -368,7 +367,7 @@ export const sessionTests: SessionConfig[] = [
       })),
 
       {
-        target: '0xf19609e96187cdaa34cffb96473fac567e547302' as `0x${string}`, // Cast to 0x${string}
+        target: '0xf19609e96187cdaa34cffb96473fac567e547302' as `0x${string}`,
         selector: toFunctionSelector('approve(address,uint256) external'),
         valueLimit: {
           limitType: LimitType.Lifetime,

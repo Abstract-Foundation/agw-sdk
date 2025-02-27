@@ -240,9 +240,9 @@ describe('assertSessionKeyPolicies', async () => {
   });
 
   it('should validate all predefined session configurations', async () => {
-    const { sessionTests } = await import('../fixtures.js');
+    const { sampleSessionConfigs } = await import('../fixtures.js');
 
-    for (const sessionConfig of sessionTests) {
+    for (const sessionConfig of sampleSessionConfigs) {
       const transaction = {
         to: SESSION_KEY_VALIDATOR_ADDRESS as Address,
         data: encodeFunctionData({
@@ -280,9 +280,9 @@ describe('assertSessionKeyPolicies', async () => {
   });
 
   it('should detect policy violations in session configurations', async () => {
-    const { sessionTests } = await import('../fixtures.js');
+    const { sampleSessionConfigs } = await import('../fixtures.js');
 
-    const sessionConfig = sessionTests[0];
+    const sessionConfig = sampleSessionConfigs[0];
 
     const transaction = {
       to: SESSION_KEY_VALIDATOR_ADDRESS as Address,
@@ -312,14 +312,14 @@ describe('assertSessionKeyPolicies', async () => {
   });
 
   it('should detect mixed policy statuses correctly', async () => {
-    const { sessionTests } = await import('../fixtures.js');
+    const { sampleSessionConfigs } = await import('../fixtures.js');
 
     // Find a session with multiple policies
     const sessionConfig =
-      sessionTests.find(
+      sampleSessionConfigs.find(
         (s) =>
           (s.callPolicies?.length || 0) + (s.transferPolicies?.length || 0) > 1,
-      ) || sessionTests[0];
+      ) || sampleSessionConfigs[0];
 
     const transaction = {
       to: SESSION_KEY_VALIDATOR_ADDRESS as Address,

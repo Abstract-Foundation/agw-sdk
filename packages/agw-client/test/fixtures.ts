@@ -166,7 +166,7 @@ const sessionWithConstrainedApprovalCallPolicy: SessionConfig = {
   transferPolicies: [],
 };
 
-export const sessionTests: SessionConfig[] = [
+export const sampleSessionConfigs: SessionConfig[] = [
   {
     signer: sessionSignerAddress,
     expiresAt: sessionExpiry,

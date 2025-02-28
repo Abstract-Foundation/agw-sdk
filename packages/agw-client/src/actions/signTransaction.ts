@@ -39,7 +39,6 @@ export async function signTransaction<
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   args: SignEip712TransactionParameters<chain, account, chainOverride>,
   validator: Address,
-  useSignerAddress = false,
   validationHookData: Record<string, Hex> = {},
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
   isPrivyCrossApp = false,
@@ -58,7 +57,6 @@ export async function signTransaction<
     signerClient,
     args,
     validator,
-    useSignerAddress,
     validationHookData,
     customPaymasterHandler,
   );
@@ -82,7 +80,6 @@ export async function signEip712TransactionInternal<
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   args: SignEip712TransactionParameters<chain, account, chainOverride>,
   validator: Address,
-  useSignerAddress = false,
   validationHookData: Record<string, Hex> = {},
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<{
@@ -114,6 +111,8 @@ export async function signEip712TransactionInternal<
       docsPath: '/docs/actions/wallet/signTransaction',
     });
   const smartAccount = parseAccount(account_);
+  const useSignerAddress =
+    (transaction as any).from === signerClient.account.address;
   const fromAccount = useSignerAddress ? signerClient.account : smartAccount;
 
   assertEip712Request({

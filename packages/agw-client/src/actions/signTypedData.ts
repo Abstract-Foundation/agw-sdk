@@ -54,7 +54,6 @@ export async function signTypedData(
         chain: client.chain,
       },
       EOA_VALIDATOR_ADDRESS,
-      false,
       {},
       undefined,
       isPrivyCrossApp,
@@ -135,7 +134,6 @@ export async function signTypedDataForSession<
       ...transactionRequest,
     },
     SESSION_KEY_VALIDATOR_ADDRESS,
-    false,
     validationHookData,
     paymasterHandler,
   );

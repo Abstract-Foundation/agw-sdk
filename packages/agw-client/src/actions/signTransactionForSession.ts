@@ -76,7 +76,6 @@ export async function signTransactionForSession<
     signerClient,
     parameters,
     SESSION_KEY_VALIDATOR_ADDRESS,
-    false,
     {
       [SESSION_KEY_VALIDATOR_ADDRESS]: encodeSessionWithPeriodIds(
         session,

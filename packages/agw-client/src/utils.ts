@@ -1,4 +1,4 @@
-import {
+import { 
   type Address,
   BaseError,
   type Chain,
@@ -30,58 +30,76 @@ import {
 import { isEIP712Transaction } from './eip712.js';
 import { type Call } from './types/call.js';
 
-export const VALID_CHAINS: Record<number, Chain> = {
+// Constants
+const VALID_CHAINS: Record<number, Chain> = {
   [abstractTestnet.id]: abstractTestnet,
   [abstract.id]: abstract,
 };
 
-export function convertBigIntToString(value: any): any {
+const INITIALIZER_ABI = [{
+  name: 'initialize',
+  type: 'function',
+  inputs: [
+    { name: 'initialK1Owner', type: 'address' },
+    { name: 'initialK1Validator', type: 'address' },
+    { name: 'modules', type: 'bytes[]' },
+    {
+      name: 'initCall',
+      type: 'tuple',
+      components: [
+        { name: 'target', type: 'address' },
+        { name: 'allowFailure', type: 'bool' },
+        { name: 'value', type: 'uint256' },
+        { name: 'callData', type: 'bytes' },
+      ],
+    },
+  ],
+  outputs: [],
+  stateMutability: 'nonpayable',
+}] as const;
+
+// Type guards
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+// Utility functions
+export function convertBigIntToString<T>(value: T): T {
   if (typeof value === 'bigint') {
-    return value.toString();
-  } else if (Array.isArray(value)) {
-    return value.map(convertBigIntToString);
-  } else if (typeof value === 'object' && value !== null) {
-    return Object.fromEntries(
-      Object.entries(value).map(([key, val]) => [
-        key,
-        convertBigIntToString(val),
-      ]),
-    );
+    return value.toString() as T;
   }
+  
+  if (Array.isArray(value)) {
+    return value.map(convertBigIntToString) as T;
+  }
+
+  if (isObject(value)) {
+    return Object.fromEntries(
+      Object.entries(value).map(([k, v]) => [k, convertBigIntToString(v)]
+    ) as T;
+  }
+
   return value;
 }
 
-export async function getSmartAccountAddressFromInitialSigner<
-  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
->(
+export async function getSmartAccountAddressFromInitialSigner<C extends ChainEIP712 | undefined>(
   initialSigner: Address,
-  publicClient: PublicClient<Transport, chain>,
+  publicClient: PublicClient<Transport, C>,
 ): Promise<Hex> {
-  if (initialSigner === undefined) {
-    throw new Error('Initial signer is required to get smart account address');
-  }
-  // Generate salt based off address
-  const addressBytes = toBytes(initialSigner);
-  const salt = keccak256(addressBytes);
-
-  // Get the deployed account address
-  const accountAddress = (await publicClient.readContract({
+  const salt = keccak256(toBytes(initialSigner));
+  return publicClient.readContract({
     address: SMART_ACCOUNT_FACTORY_ADDRESS,
     abi: AccountFactoryAbi,
     functionName: 'getAddressForSalt',
     args: [salt],
-  })) as Hex;
-
-  return accountAddress;
+  }) as Promise<Hex>;
 }
 
-export async function isAGWAccount<
-  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
->(
-  publicClient: PublicClient<Transport, chain>,
+export async function isAGWAccount<C extends ChainEIP712 | undefined>(
+  publicClient: PublicClient<Transport, C>,
   address: Address,
 ): Promise<boolean> {
-  return await publicClient.readContract({
+  return publicClient.readContract({
     address: AGW_REGISTRY_ADDRESS,
     abi: AGWRegistryAbi,
     functionName: 'isAGW',
@@ -89,15 +107,11 @@ export async function isAGWAccount<
   });
 }
 
-export async function isSmartAccountDeployed<
-  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
->(
-  publicClient: PublicClient<Transport, chain>,
+export async function isSmartAccountDeployed<C extends ChainEIP712 | undefined>(
+  publicClient: PublicClient<Transport, C>,
   address: Hex,
 ): Promise<boolean> {
-  const bytecode = await publicClient.getCode({
-    address: address,
-  });
+  const bytecode = await publicClient.getBytecode({ address });
   return bytecode !== undefined;
 }
 
@@ -107,100 +121,60 @@ export function getInitializerCalldata(
   initialCall: Call,
 ): Hex {
   return encodeFunctionData({
-    abi: [
-      {
-        name: 'initialize',
-        type: 'function',
-        inputs: [
-          { name: 'initialK1Owner', type: 'address' },
-          { name: 'initialK1Validator', type: 'address' },
-          { name: 'modules', type: 'bytes[]' },
-          {
-            name: 'initCall',
-            type: 'tuple',
-            components: [
-              { name: 'target', type: 'address' },
-              { name: 'allowFailure', type: 'bool' },
-              { name: 'value', type: 'uint256' },
-              { name: 'callData', type: 'bytes' },
-            ],
-          },
-        ],
-        outputs: [],
-        stateMutability: 'nonpayable',
-      },
-    ],
+    abi: INITIALIZER_ABI,
     functionName: 'initialize',
     args: [initialOwnerAddress, validatorAddress, [], initialCall],
   });
 }
 
-export function transformHexValues(transaction: any, keys: string[]) {
-  if (!transaction) return;
+export function transformHexValues(transaction: unknown, keys: string[]): void {
+  if (!isObject(transaction)) return;
+
   for (const key of keys) {
-    if (isHex(transaction[key])) {
-      transaction[key] = fromHex(transaction[key], 'bigint');
+    const value = transaction[key];
+    if (isHex(value)) {
+      transaction[key] = fromHex(value, 'bigint');
     }
   }
 }
 
 export function isEip712TypedData(typedData: TypedDataDefinition): boolean {
   return (
-    typedData.message &&
-    typedData.domain?.name === 'zkSync' &&
-    typedData.domain?.version === '2' &&
+    isObject(typedData.message) &&
+    isObject(typedData.domain) &&
+    typedData.domain.name === 'zkSync' &&
+    typedData.domain.version === '2' &&
     isEIP712Transaction(typedData.message)
   );
 }
 
 export function transformEip712TypedData(
   typedData: TypedDataDefinition,
-): UnionRequiredBy<
-  Omit<SignEip712TransactionParameters, 'chain'>,
-  'to' | 'data'
-> & { chainId: number } {
+): UnionRequiredBy<Omit<SignEip712TransactionParameters, 'chain'>, 'to' | 'data'> & { chainId: number } {
   if (!isEip712TypedData(typedData)) {
-    throw new BaseError('Typed data is not an EIP712 transaction');
+    throw new BaseError('Invalid EIP712 transaction format');
   }
 
-  if (typedData.domain?.chainId === undefined) {
-    throw new BaseError('Chain ID is required for EIP712 transaction');
+  const { domain, message } = typedData;
+  if (domain.chainId === undefined) {
+    throw new BaseError('Missing chain ID in EIP712 transaction');
   }
+
+  const toHex20 = (value: string) => toHex(BigInt(value), { size: 20 });
 
   return {
-    chainId: Number(typedData.domain.chainId),
-    account: parseAccount(
-      toHex(BigInt(typedData.message['from'] as string), {
-        size: 20,
-      }),
-    ),
-    to: toHex(BigInt(typedData.message['to'] as string), {
-      size: 20,
-    }),
-    gas: BigInt(typedData.message['gasLimit'] as string),
-    gasPerPubdata: BigInt(
-      typedData.message['gasPerPubdataByteLimit'] as string,
-    ),
-    maxFeePerGas: BigInt(typedData.message['maxFeePerGas'] as string),
-    maxPriorityFeePerGas: BigInt(
-      typedData.message['maxPriorityFeePerGas'] as string,
-    ),
-    paymaster:
-      (typedData.message['paymaster'] as string) != '0'
-        ? toHex(BigInt(typedData.message['paymaster'] as string), {
-            size: 20,
-          })
-        : undefined,
-    nonce: typedData.message['nonce'] as number,
-    value: BigInt(typedData.message['value'] as string),
-    data:
-      typedData.message['data'] === '0x0'
-        ? '0x'
-        : (typedData.message['data'] as Hex),
-    factoryDeps: typedData.message['factoryDeps'] as Hex[],
-    paymasterInput:
-      typedData.message['paymasterInput'] !== '0x'
-        ? (typedData.message['paymasterInput'] as Hex)
-        : undefined,
+    chainId: Number(domain.chainId),
+    account: parseAccount(toHex20(message.from as string)),
+    to: toHex20(message.to as string),
+    gas: BigInt(message.gasLimit as string),
+    gasPerPubdata: BigInt(message.gasPerPubdataByteLimit as string),
+    maxFeePerGas: BigInt(message.maxFeePerGas as string),
+    maxPriorityFeePerGas: BigInt(message.maxPriorityFeePerGas as string),
+    paymaster: message.paymaster !== '0' ? toHex20(message.paymaster as string) : undefined,
+    nonce: message.nonce as number,
+    value: BigInt(message.value as string),
+    data: message.data === '0x0' ? '0x' : message.data as Hex,
+    factoryDeps: message.factoryDeps as Hex[],
+    paymasterInput: message.paymasterInput !== '0x' ? message.paymasterInput as Hex : undefined,
   };
 }

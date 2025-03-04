@@ -84,7 +84,7 @@ export async function signEip712TransactionInternal<
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   args: SignEip712TransactionParameters<chain, account, chainOverride, request>,
   validatorAddress: Address,
-  useSignerAddress = true,
+  useSignerAddress = false,
   validationHookData: Record<string, Hex> = {},
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<SignEip712TransactionReturnType> {

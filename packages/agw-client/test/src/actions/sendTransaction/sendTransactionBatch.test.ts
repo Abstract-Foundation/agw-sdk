@@ -29,6 +29,7 @@ import { encodeFunctionData } from 'viem';
 vi.mock('../../../../src/actions/sendTransactionInternal');
 vi.mock('../../../../src/actions/sendPrivyTransaction');
 
+import AGWAccountAbi from '../../../../src/abis/AGWAccount.js';
 import { sendPrivyTransaction } from '../../../../src/actions/sendPrivyTransaction.js';
 import { sendTransactionInternal } from '../../../../src/actions/sendTransactionInternal.js';
 
@@ -150,7 +151,8 @@ describe('sendTransactionBatch', () => {
     );
 
     expect(encodeFunctionData).toHaveBeenCalledWith({
-      abi: batchCallABI,
+      abi: AGWAccountAbi,
+      functionName: 'batchCall',
       args: [expectedCalls],
     });
 
@@ -191,26 +193,6 @@ describe('sendTransactionBatch', () => {
       },
     ];
 
-    const batchCallABI = [
-      {
-        name: 'batchCall',
-        type: 'function',
-        inputs: [
-          {
-            type: 'tuple[]',
-            name: 'calls',
-            components: [
-              { name: 'target', type: 'address' },
-              { name: 'allowFailure', type: 'bool' },
-              { name: 'value', type: 'uint256' },
-              { name: 'callData', type: 'bytes' },
-            ],
-          },
-        ],
-        outputs: [],
-      },
-    ];
-
     const transactionHash = await sendTransactionBatch(
       baseClient,
       signerClient,
@@ -226,7 +208,8 @@ describe('sendTransactionBatch', () => {
     );
 
     expect(encodeFunctionData).toHaveBeenCalledWith({
-      abi: batchCallABI,
+      abi: AGWAccountAbi,
+      functionName: 'batchCall',
       args: [expectedCalls],
     });
 

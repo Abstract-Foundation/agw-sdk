@@ -10,6 +10,7 @@ import {
 } from 'viem';
 import { type ChainEIP712 } from 'viem/zksync';
 
+import AGWAccountAbi from '../abis/AGWAccount.js';
 import { EOA_VALIDATOR_ADDRESS } from '../constants.js';
 import { type Call } from '../types/call.js';
 import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
@@ -40,25 +41,8 @@ export function getBatchTransactionObject<
   });
 
   const batchCallData = encodeFunctionData({
-    abi: [
-      {
-        name: 'batchCall',
-        type: 'function',
-        inputs: [
-          {
-            type: 'tuple[]',
-            name: 'calls',
-            components: [
-              { name: 'target', type: 'address' },
-              { name: 'allowFailure', type: 'bool' },
-              { name: 'value', type: 'uint256' },
-              { name: 'callData', type: 'bytes' },
-            ],
-          },
-        ],
-        outputs: [],
-      },
-    ],
+    abi: AGWAccountAbi,
+    functionName: 'batchCall',
     args: [batchCalls],
   });
 

@@ -68,7 +68,7 @@ export async function signTransaction<
       ...transaction,
       customSignature,
       type: 'eip712',
-    } as any,
+    },
     { r: '0x0', s: '0x0', v: 0n },
   ) as SignEip712TransactionReturnType;
 }
@@ -96,8 +96,10 @@ export async function signEip712TransactionInternal<
     chain = client.chain,
     ...transaction
   } = args;
-  // TODO: open up typing to allow for eip712 transactions
-  transaction.type = 'eip712' as any;
+  // Previously: `transaction.type = 'eip712' as any;`
+  // Now properly typed for EIP-712:
+  transaction.type = 'eip712';
+
   transformHexValues(transaction, [
     'value',
     'nonce',
@@ -144,8 +146,6 @@ export async function signEip712TransactionInternal<
   );
 
   if (transactionWithPaymaster.data === undefined) {
-    // serializer turns undefined into 0x00 which causes issues sending
-    // eth to contracts that don't have a fallback function
     transactionWithPaymaster.data = '0x';
   }
 
@@ -179,7 +179,7 @@ export async function signEip712TransactionInternal<
         hookData.push(validationHookData[hook] ?? '0x');
       }
     }
-    // Match the expect signature format of the AGW smart account
+    // Match the expected signature format of the AGW smart account
     signature = encodeAbiParameters(
       parseAbiParameters(['bytes', 'address', 'bytes[]']),
       [rawSignature, validator, hookData],

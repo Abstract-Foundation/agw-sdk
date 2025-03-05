@@ -1,5 +1,12 @@
 # @abstract-foundation/web3-react-agw
 
+## 1.4.3-beta.0
+
+### Patch Changes
+
+- Updated dependencies [db52cc1]
+  - @abstract-foundation/agw-client@1.5.0-beta.0
+
 ## 1.4.2
 
 ### Patch Changes

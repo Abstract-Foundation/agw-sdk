@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.5.0-beta.0
+
+### Minor Changes
+
+- db52cc1: Add session key policy checking to transaction signing logic
+
 ## 1.4.2
 
 ### Patch Changes

@@ -1,0 +1,10 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "@abstract-foundation/agw-client": "1.4.2",
+    "@abstract-foundation/agw-react": "1.5.4",
+    "@abstract-foundation/web3-react-agw": "1.4.2"
+  },
+  "changesets": ["fifty-peaches-decide", "purple-needles-sleep"]
+}

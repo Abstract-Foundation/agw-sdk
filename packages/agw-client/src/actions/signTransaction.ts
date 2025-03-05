@@ -104,7 +104,6 @@ export async function signEip712TransactionInternal<
     'maxFeePerGas',
     'maxPriorityFeePerGas',
     'gas',
-    'value',
     'chainId',
     'gasPerPubdata',
   ]);

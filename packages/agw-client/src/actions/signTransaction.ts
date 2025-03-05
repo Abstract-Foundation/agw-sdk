@@ -67,7 +67,7 @@ export async function signTransaction<
     {
       ...transaction,
       customSignature,
-      type: 'eip712',
+      type: 'eip712' as any,
     },
     { r: '0x0', s: '0x0', v: 0n },
   ) as SignEip712TransactionReturnType;
@@ -98,7 +98,7 @@ export async function signEip712TransactionInternal<
   } = args;
   // Previously: `transaction.type = 'eip712' as any;`
   // Now properly typed for EIP-712:
-  transaction.type = 'eip712';
+  (transaction as any).type = 'eip712';
 
   transformHexValues(transaction, [
     'value',
@@ -151,7 +151,7 @@ export async function signEip712TransactionInternal<
 
   const eip712Domain = chain?.custom.getEip712Domain({
     ...transactionWithPaymaster,
-    type: 'eip712',
+    type: 'eip712' as any,
   });
 
   const rawSignature = await signTypedData(signerClient, {

@@ -188,38 +188,36 @@ test('handles hex values', async () => {
 
 test('invalid chain', async () => {
   const invalidChain = mainnet;
-  expect(
-    async () =>
-      await signTransaction(
-        baseClient,
-        signerClient,
-        {
-          ...transaction,
-          type: 'eip712',
-          account: baseClient.account,
-          chain: invalidChain,
-        } as SignEip712TransactionParameters,
-        EOA_VALIDATOR_ADDRESS,
-        false,
-      ),
+  await expect(
+    signTransaction(
+      baseClient,
+      signerClient,
+      {
+        ...transaction,
+        type: 'eip712',
+        account: baseClient.account,
+        chain: invalidChain,
+      } as SignEip712TransactionParameters,
+      EOA_VALIDATOR_ADDRESS,
+      false,
+    ),
   ).rejects.toThrowError('Invalid chain specified');
 });
 
 test('no account provided', async () => {
   baseClient.account = undefined as any;
-  expect(
-    async () =>
-      await signTransaction(
-        baseClient,
-        signerClient,
-        {
-          ...transaction,
-          type: 'eip712',
-          chain: anvilAbstractTestnet.chain as ChainEIP712,
-        } as any,
-        EOA_VALIDATOR_ADDRESS,
-        false,
-      ),
+  await expect(
+    signTransaction(
+      baseClient,
+      signerClient,
+      {
+        ...transaction,
+        type: 'eip712',
+        chain: anvilAbstractTestnet.chain as ChainEIP712,
+      } as any,
+      EOA_VALIDATOR_ADDRESS,
+      false,
+    ),
   ).rejects.toThrowError(
     'Could not find an Account to execute with this Action.',
   );

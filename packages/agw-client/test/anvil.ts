@@ -24,7 +24,7 @@ export const anvilAbstractTestnet = defineAnvil({
     'VITE_ANVIL_FORK_URL_ABSTRACT_TESTNET',
     'https://api.testnet.abs.xyz',
   ),
-  forkBlockNumber: 385120n,
+  forkBlockNumber: 7449957n,
   port: 8745,
 });
 
@@ -34,7 +34,7 @@ export const anvilAbstractMainnet = defineAnvil({
     'VITE_ANVIL_FORK_URL_ABSTRACT_MAINNET',
     'https://api.mainnet.abs.xyz',
   ),
-  forkBlockNumber: 2808692n,
+  forkBlockNumber: 3399420n,
   port: 8746,
 });
 ////////////////////////////////////////////////////////////

@@ -54,6 +54,7 @@ const getCallPolicy = vi
   .mockReturnValue(encodedPolicyStatus[SessionKeyPolicyStatus.Allowed]);
 
 client.multicall = vi.fn().mockResolvedValue(['1']);
+client.readContract = vi.fn().mockResolvedValue(true);
 
 client.request = (async ({ method, params }) => {
   if (method === 'eth_chainId') {

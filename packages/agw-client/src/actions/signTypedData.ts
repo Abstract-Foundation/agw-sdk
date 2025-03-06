@@ -90,7 +90,7 @@ export async function signTypedData(
 }
 
 export async function signTypedDataForSession<
-  const typedData extends TypedData | Record<string, unknown>,
+  typedData extends TypedData | Record<string, unknown>,
   primaryType extends string,
 >(
   client: Client<Transport, ChainEIP712, Account>,

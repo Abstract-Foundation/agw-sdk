@@ -54,7 +54,6 @@ const getCallPolicy = vi
   .mockReturnValue(encodedPolicyStatus[SessionKeyPolicyStatus.Allowed]);
 
 client.multicall = vi.fn().mockResolvedValue(['1']);
-client.readContract = vi.fn().mockResolvedValue(true);
 
 client.request = (async ({ method, params }) => {
   if (method === 'eth_chainId') {
@@ -115,6 +114,7 @@ const simpleSessionTestCases: {
 describe('assertSessionKeyPolicies', async () => {
   beforeEach(() => {
     vi.mocked(client.multicall).mockClear();
+    client.readContract = vi.fn().mockResolvedValue(true);
   });
 
   simpleSessionTestCases.forEach(({ desc, input, allow }) => {
@@ -243,6 +243,32 @@ describe('assertSessionKeyPolicies', async () => {
         transaction,
       ),
     ).rejects.toThrow('Session key policy violation');
+  });
+
+  it('should not validate when feature flag is disabled', async () => {
+    const transaction = {
+      to: SESSION_KEY_VALIDATOR_ADDRESS as Address,
+      data: encodeFunctionData({
+        abi: SessionKeyValidatorAbi,
+        functionName: 'createSession',
+        args: [sessionWithTransferPolicy],
+      }),
+    };
+
+    client.readContract = vi.fn().mockResolvedValue(false);
+    // Mock multicall to return a non-allowed status
+    client.multicall = vi
+      .fn()
+      .mockResolvedValue([SessionKeyPolicyStatus.Denied.toString()]) as any;
+
+    await expect(
+      assertSessionKeyPolicies(
+        client,
+        anvilAbstractMainnet.chain.id,
+        parseAccount(address.smartAccountAddress),
+        transaction,
+      ),
+    ).resolves.not.toThrow();
   });
 
   it('should validate all predefined session configurations', async () => {

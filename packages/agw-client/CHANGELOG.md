@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.5.0-beta.1
+
+### Patch Changes
+
+- Add feature flagging
+
 ## 1.5.0-beta.0
 
 ### Minor Changes

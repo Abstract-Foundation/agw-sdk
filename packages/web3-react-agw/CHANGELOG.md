@@ -1,5 +1,13 @@
 # @abstract-foundation/web3-react-agw
 
+## 1.4.3-beta.1
+
+### Patch Changes
+
+- Add feature flagging
+- Updated dependencies
+  - @abstract-foundation/agw-client@1.5.0-beta.1
+
 ## 1.4.3-beta.0
 
 ### Patch Changes

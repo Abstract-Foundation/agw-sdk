@@ -200,7 +200,7 @@ test('invalid chain', async () => {
       } as SignEip712TransactionParameters,
       EOA_VALIDATOR_ADDRESS,
       false,
-    )
+    ),
   ).rejects.toThrowError('Invalid chain specified');
 });
 
@@ -217,7 +217,8 @@ test('no account provided', async () => {
       } as any,
       EOA_VALIDATOR_ADDRESS,
       false,
-    )
-  ).rejects.toThrowError('Could not find an Account to execute with this Action.');
+    ),
+  ).rejects.toThrowError(
+    'Could not find an Account to execute with this Action.',
+  );
 });
-

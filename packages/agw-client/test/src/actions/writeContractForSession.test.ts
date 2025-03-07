@@ -21,12 +21,6 @@ vi.mock('../../../src/actions/sendTransactionForSession', () => ({
     .mockResolvedValue('0xmockedTransactionHash'),
 }));
 
-vi.mock('../../../src/actions/sendTransactionForSession', () => ({
-  sendTransactionForSession: vi
-    .fn()
-    .mockResolvedValue('0xmockedTransactionHash'),
-}));
-
 import { sendTransactionForSession } from '../../../src/actions/sendTransactionForSession.js';
 import { writeContractForSession } from '../../../src/actions/writeContractForSession.js';
 import { LimitType, SessionConfig } from '../../../src/sessions.js';

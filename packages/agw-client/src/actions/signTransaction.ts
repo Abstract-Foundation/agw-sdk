@@ -6,6 +6,7 @@ import {
   encodeAbiParameters,
   type Hex,
   parseAbiParameters,
+  type PublicClient,
   type Transport,
   type UnionRequiredBy,
   type WalletClient,
@@ -25,6 +26,7 @@ import {
   type AssertEip712RequestParameters,
 } from '../eip712.js';
 import { AccountNotFoundError } from '../errors/account.js';
+import { assertSessionKeyPolicies } from '../sessionValidator.js';
 import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
 import { VALID_CHAINS } from '../utils.js';
 import { transformHexValues } from '../utils.js';
@@ -37,6 +39,7 @@ export async function signTransaction<
 >(
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
+  publicClient: PublicClient<Transport, ChainEIP712>,
   args: SignEip712TransactionParameters<chain, account, chainOverride>,
   validator: Address,
   useSignerAddress = false,
@@ -56,6 +59,7 @@ export async function signTransaction<
   const { transaction, customSignature } = await signEip712TransactionInternal(
     client,
     signerClient,
+    publicClient,
     args,
     validator,
     useSignerAddress,
@@ -80,6 +84,7 @@ export async function signEip712TransactionInternal<
 >(
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
+  publicClient: PublicClient<Transport, ChainEIP712>,
   args: SignEip712TransactionParameters<chain, account, chainOverride>,
   validator: Address,
   useSignerAddress = false,
@@ -134,6 +139,13 @@ export async function signEip712TransactionInternal<
       currentChainId: chainId,
       chain: chain,
     });
+
+  await assertSessionKeyPolicies(
+    publicClient,
+    chainId,
+    fromAccount,
+    transaction,
+  );
 
   const transactionWithPaymaster = await getTransactionWithPaymasterData(
     chainId,

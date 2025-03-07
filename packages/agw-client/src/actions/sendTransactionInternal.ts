@@ -86,6 +86,7 @@ export async function sendTransactionInternal<
     const serializedTransaction = await signTransaction(
       client,
       signerClient,
+      publicClient,
       {
         ...request,
         chainId,

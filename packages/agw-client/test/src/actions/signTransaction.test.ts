@@ -1,6 +1,7 @@
 import { Address } from 'abitype';
 import {
   createClient,
+  createPublicClient,
   createWalletClient,
   EIP1193RequestFn,
   encodeAbiParameters,
@@ -26,6 +27,11 @@ import { address } from '../../constants.js';
 
 const RAW_SIGNATURE =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+
+const publicClient = createPublicClient({
+  chain: anvilAbstractTestnet.chain as ChainEIP712,
+  transport: anvilAbstractTestnet.clientConfig.transport,
+});
 
 const baseClient = createClient({
   account: address.smartAccountAddress,
@@ -111,6 +117,7 @@ test('with useSignerAddress false', async () => {
   const signedTransaction = await signTransaction(
     baseClient,
     signerClient,
+    publicClient,
     {
       ...transaction,
       type: 'eip712',
@@ -142,6 +149,7 @@ test('with useSignerAddress true', async () => {
   const signedTransaction = await signTransaction(
     baseClient,
     signerClient,
+    publicClient,
     {
       ...transaction,
       type: 'eip712',
@@ -158,6 +166,7 @@ test('handles hex values', async () => {
   const signedTransactionWithHexValues = await signTransaction(
     baseClient,
     signerClient,
+    publicClient,
     {
       ...transactionWithHexValues,
       type: 'eip712',
@@ -171,6 +180,7 @@ test('handles hex values', async () => {
   const signedTransactionWithBigIntValues = await signTransaction(
     baseClient,
     signerClient,
+    publicClient,
     {
       ...transactionWithBigIntValues,
       type: 'eip712',
@@ -192,6 +202,7 @@ test('invalid chain', async () => {
     signTransaction(
       baseClient,
       signerClient,
+      publicClient,
       {
         ...transaction,
         type: 'eip712',
@@ -210,6 +221,7 @@ test('no account provided', async () => {
     signTransaction(
       baseClient,
       signerClient,
+      publicClient,
       {
         ...transaction,
         type: 'eip712',

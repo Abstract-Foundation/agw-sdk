@@ -1,5 +1,13 @@
 # @abstract-foundation/agw-react
 
+## 1.5.5
+
+### Patch Changes
+
+- d0b0842: Export usePrivyCrossAppProvider for advanced usage
+- Updated dependencies [1eda3ec]
+  - @abstract-foundation/agw-client@1.5.0
+
 ## 1.5.4
 
 ### Patch Changes

@@ -202,6 +202,7 @@ test('invalid chain', async () => {
     signTransaction(
       baseClient,
       signerClient,
+      publicClient,
       {
         ...transaction,
         type: 'eip712',
@@ -220,6 +221,7 @@ test('no account provided', async () => {
     signTransaction(
       baseClient,
       signerClient,
+      publicClient,
       {
         ...transaction,
         type: 'eip712',

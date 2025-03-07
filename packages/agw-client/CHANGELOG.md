@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.5.0
+
+### Minor Changes
+
+- 1eda3ec: Add session key policy checking to transaction signing logic
+
 ## 1.4.2
 
 ### Patch Changes

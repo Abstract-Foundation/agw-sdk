@@ -62,10 +62,8 @@ import {
   type RevokeSessionsParameters,
   type RevokeSessionsReturnType,
 } from './actions/revokeSessions.js';
-import {
-  sendTransaction,
-  sendTransactionBatch,
-} from './actions/sendTransaction.js';
+import { sendTransaction } from './actions/sendTransaction.js';
+import { sendTransactionBatch } from './actions/sendTransactionBatch.js';
 import { sendTransactionForSession } from './actions/sendTransactionForSession.js';
 import { signMessage } from './actions/signMessage.js';
 import { signTransaction } from './actions/signTransaction.js';
@@ -272,7 +270,6 @@ export function globalWalletActions<
         publicClient,
         args as SignEip712TransactionParameters<chain, account>,
         EOA_VALIDATOR_ADDRESS,
-        false,
         {},
         customPaymasterHandler,
         isPrivyCrossApp,

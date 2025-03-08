@@ -6,16 +6,19 @@ import {
   type Client,
   type DeriveAccount,
   type DeriveChain,
+  encodeFunctionData,
   type ExactPartial,
   formatGwei,
   type FormattedTransactionRequest,
   type GetChainParameter,
   type GetTransactionRequestKzgParameter,
   type IsNever,
+  keccak256,
   type NonceManager,
   type Prettify,
   type PublicClient,
   type SendTransactionParameters,
+  toBytes,
   type TransactionRequest,
   type TransactionRequestEIP1559,
   type TransactionRequestEIP2930,
@@ -51,7 +54,15 @@ import {
   type EstimateFeeParameters,
 } from 'viem/zksync';
 
-import { CONTRACT_DEPLOYER_ADDRESS } from '../constants.js';
+import {
+  CONTRACT_DEPLOYER_ADDRESS,
+  EOA_VALIDATOR_ADDRESS,
+  SMART_ACCOUNT_FACTORY_ADDRESS,
+} from '../constants.js';
+import { AccountFactoryAbi } from '../exports/constants.js';
+import type { Call } from '../types/call.js';
+import { isSmartAccountDeployed } from '../utils.js';
+import { getInitializerCalldata } from '../utils.js';
 
 export type IsUndefined<T> = [undefined] extends [T] ? true : false;
 
@@ -272,15 +283,46 @@ export async function prepareTransactionRequest<
   >,
 ): Promise<PrepareTransactionRequestReturnType> {
   const {
-    isInitialTransaction,
     chain,
     gas,
     nonce,
-    parameters = defaultParameters,
+    parameters: parameterNames = defaultParameters,
   } = args;
 
+  const isDeployed = await isSmartAccountDeployed(
+    publicClient,
+    client.account.address,
+  );
+
+  if (!isDeployed) {
+    const initialCall = {
+      target: args.to,
+      allowFailure: false,
+      value: args.value ?? 0,
+      callData: args.data ?? '0x',
+    } as Call;
+
+    // Create calldata for initializing the proxy account
+    const initializerCallData = getInitializerCalldata(
+      signerClient.account.address,
+      EOA_VALIDATOR_ADDRESS,
+      initialCall,
+    );
+    const addressBytes = toBytes(signerClient.account.address);
+    const salt = keccak256(addressBytes);
+    const deploymentCalldata = encodeFunctionData({
+      abi: AccountFactoryAbi,
+      functionName: 'deployAccount',
+      args: [salt, initializerCallData],
+    });
+
+    // Override transaction fields
+    args.to = SMART_ACCOUNT_FACTORY_ADDRESS;
+    args.data = deploymentCalldata;
+  }
+
   const initiatorAccount = parseAccount(
-    (isInitialTransaction ?? false) ? signerClient.account : client.account,
+    isDeployed ? client.account : signerClient.account,
   );
   const request = {
     ...args,
@@ -297,10 +339,10 @@ export async function prepareTransactionRequest<
     return chainId;
   }
 
-  if (parameters.includes('chainId')) request.chainId = await getChainId();
+  if (parameterNames.includes('chainId')) request.chainId = await getChainId();
 
   if (
-    parameters.includes('nonce') &&
+    parameterNames.includes('nonce') &&
     typeof nonce === 'undefined' &&
     initiatorAccount
   ) {
@@ -315,7 +357,7 @@ export async function prepareTransactionRequest<
   }
 
   let gasFromFeeEstimation: bigint | undefined;
-  if (parameters.includes('fees')) {
+  if (parameterNames.includes('fees')) {
     if (
       typeof request.maxFeePerGas === 'undefined' ||
       typeof request.maxPriorityFeePerGas === 'undefined'
@@ -369,7 +411,7 @@ export async function prepareTransactionRequest<
   }
 
   if (
-    parameters.includes('gas') &&
+    parameterNames.includes('gas') &&
     typeof gas === 'undefined' &&
     gasFromFeeEstimation === undefined // if gas was set by fee estimation, don't estimate again
   )

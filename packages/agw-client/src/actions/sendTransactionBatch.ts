@@ -1,5 +1,6 @@
 import {
   type Account,
+  type Address,
   type Client,
   encodeFunctionData,
   type PublicClient,
@@ -25,10 +26,7 @@ export function getBatchTransactionObject<
     chain,
     chainOverride
   > = SendTransactionRequest<chain, chainOverride>,
->(
-  client: Client<Transport, ChainEIP712, Account>,
-  parameters: SendTransactionBatchParameters<request>,
-) {
+>(address: Address, parameters: SendTransactionBatchParameters<request>) {
   const { calls, paymaster, paymasterInput } = parameters;
   const batchCalls: Call[] = calls.map((tx) => {
     if (!tx.to) throw new Error('Transaction target (to) is required');
@@ -53,7 +51,7 @@ export function getBatchTransactionObject<
   );
 
   const batchTransaction = {
-    to: client.account.address,
+    to: address,
     data: batchCallData,
     value: totalValue,
     paymaster: paymaster,
@@ -87,7 +85,10 @@ export async function sendTransactionBatch<
     return await sendPrivyTransaction(client, parameters);
   }
 
-  const batchTransaction = getBatchTransactionObject(client, parameters);
+  const batchTransaction = getBatchTransactionObject(
+    client.account.address,
+    parameters,
+  );
 
   return sendTransactionInternal(
     client,

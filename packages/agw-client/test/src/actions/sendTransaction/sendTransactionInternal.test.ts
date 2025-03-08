@@ -168,6 +168,7 @@ describe('sendTransactionInternal', () => {
       expect(signTransaction).toHaveBeenCalledWith(
         baseClient,
         signerClient,
+        publicClient,
         expect.objectContaining({
           type: 'eip712',
           to: expectedToAddress,

@@ -97,6 +97,7 @@ describe('globalWalletActions', () => {
     expect(signTransactionModule.signTransaction).toHaveBeenCalledWith(
       mockClient,
       mockSignerClient,
+      mockPublicClient,
       mockArgs,
       EOA_VALIDATOR_ADDRESS,
       {},

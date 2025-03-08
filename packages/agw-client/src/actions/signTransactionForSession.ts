@@ -74,6 +74,7 @@ export async function signTransactionForSession<
   return await signTransaction(
     client,
     signerClient,
+    publicClient,
     parameters,
     SESSION_KEY_VALIDATOR_ADDRESS,
     {

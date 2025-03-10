@@ -151,7 +151,6 @@ describe('sendTransaction', () => {
         paymasterInput: '0xabc',
       },
       SESSION_KEY_VALIDATOR_ADDRESS,
-      false,
       {
         [SESSION_KEY_VALIDATOR_ADDRESS]: encodeSessionWithPeriodIds(
           session,
@@ -194,7 +193,6 @@ describe('sendTransaction', () => {
         type: 'eip712',
       },
       SESSION_KEY_VALIDATOR_ADDRESS,
-      false,
       {
         [SESSION_KEY_VALIDATOR_ADDRESS]: encodeSessionWithPeriodIds(
           session2,

@@ -1,5 +1,13 @@
 # @abstract-foundation/web3-react-agw
 
+## 1.4.4-beta.0
+
+### Patch Changes
+
+- b248522: Refactor send transaction logic and expose batch tx helper method
+- Updated dependencies [b248522]
+  - @abstract-foundation/agw-client@1.5.1-beta.0
+
 ## 1.4.3
 
 ### Patch Changes

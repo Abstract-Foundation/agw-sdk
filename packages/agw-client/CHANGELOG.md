@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.5.1-beta.0
+
+### Patch Changes
+
+- b248522: Refactor send transaction logic and expose batch tx helper method
+
 ## 1.5.0
 
 ### Minor Changes

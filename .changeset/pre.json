@@ -1,0 +1,10 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "@abstract-foundation/agw-client": "1.5.0",
+    "@abstract-foundation/agw-react": "1.5.5",
+    "@abstract-foundation/web3-react-agw": "1.4.3"
+  },
+  "changesets": ["real-houses-travel"]
+}

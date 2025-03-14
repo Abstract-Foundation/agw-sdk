@@ -5,6 +5,7 @@ import {
   type Chain,
   type Client,
   type GetChainIdReturnType,
+  type Hash,
   type PrepareTransactionRequestReturnType,
   type PublicClient,
   type SendTransactionRequest,
@@ -78,7 +79,8 @@ import { writeContract } from './actions/writeContract.js';
 import { writeContractForSession } from './actions/writeContractForSession.js';
 import { EOA_VALIDATOR_ADDRESS } from './constants.js';
 import { type SessionClient, toSessionClient } from './sessionClient.js';
-import type { SessionConfig } from './sessions.js';
+import type { SessionConfig, SessionStatus } from './sessions.js';
+import { getSessionStatus } from './sessions.js';
 import type { CustomPaymasterHandler } from './types/customPaymaster.js';
 import type { SendTransactionBatchParameters } from './types/sendTransactionBatch.js';
 
@@ -127,6 +129,9 @@ export type AbstractWalletActions<
     >,
   ) => Promise<PrepareTransactionRequestReturnType>;
   toSessionClient: (signer: Account, session: SessionConfig) => SessionClient;
+  getSessionStatus: (
+    sessionHashOrConfig: Hash | SessionConfig,
+  ) => Promise<SessionStatus>;
 };
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -316,6 +321,12 @@ export function globalWalletActions<
         session: session,
         paymasterHandler: customPaymasterHandler,
       }),
+    getSessionStatus: (sessionHashOrConfig: Hash | SessionConfig) =>
+      getSessionStatus(
+        publicClient,
+        parseAccount(client.account).address,
+        sessionHashOrConfig,
+      ),
   });
 }
 

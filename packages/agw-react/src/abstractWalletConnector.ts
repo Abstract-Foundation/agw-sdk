@@ -1,8 +1,8 @@
 import {
+  type CustomPaymasterHandler,
   transformEIP1193Provider,
   validChains,
 } from '@abstract-foundation/agw-client';
-import type { CustomPaymasterHandler } from '@abstract-foundation/agw-client/dist/types/types/customPaymaster.js';
 import { toPrivyWalletConnector } from '@privy-io/cross-app-connect/rainbow-kit';
 import type { WalletDetailsParams } from '@rainbow-me/rainbowkit/dist/wallets/Wallet.js';
 import { type CreateConnectorFn } from '@wagmi/core';

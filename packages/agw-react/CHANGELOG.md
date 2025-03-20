@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-react
 
+## 1.5.6-beta.1
+
+### Patch Changes
+
+- 452804a: feat: allow custom paymaster handler in react context
+
 ## 1.5.6-beta.0
 
 ### Patch Changes

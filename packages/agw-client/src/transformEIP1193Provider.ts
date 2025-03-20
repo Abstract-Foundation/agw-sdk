@@ -18,7 +18,7 @@ import { toAccount } from 'viem/accounts';
 
 import { createAbstractClient } from './abstractClient.js';
 import { agwCapabilities, type SendCallsParams } from './eip5792.js';
-import { validChains } from './exports/index.js';
+import { type CustomPaymasterHandler, validChains } from './exports/index.js';
 import { getSmartAccountAddressFromInitialSigner } from './utils.js';
 
 interface TransformEIP1193ProviderOptions {
@@ -26,6 +26,7 @@ interface TransformEIP1193ProviderOptions {
   chain: Chain;
   transport?: Transport;
   isPrivyCrossApp?: boolean;
+  customPaymasterHandler?: CustomPaymasterHandler;
 }
 
 async function getAgwAddressFromInitialSigner(
@@ -55,6 +56,7 @@ async function getAgwClient(
   transport: Transport,
   isPrivyCrossApp: boolean,
   overrideTransport?: Transport,
+  customPaymasterHandler?: CustomPaymasterHandler,
 ) {
   const wallet = createWalletClient({
     account,
@@ -74,6 +76,7 @@ async function getAgwClient(
     transport,
     isPrivyCrossApp,
     publicTransport: overrideTransport,
+    customPaymasterHandler,
   });
 
   return abstractClient;

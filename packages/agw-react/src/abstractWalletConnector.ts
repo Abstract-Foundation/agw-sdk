@@ -2,6 +2,7 @@ import {
   transformEIP1193Provider,
   validChains,
 } from '@abstract-foundation/agw-client';
+import type { CustomPaymasterHandler } from '@abstract-foundation/agw-client/dist/types/types/customPaymaster.js';
 import { toPrivyWalletConnector } from '@privy-io/cross-app-connect/rainbow-kit';
 import type { WalletDetailsParams } from '@rainbow-me/rainbowkit/dist/wallets/Wallet.js';
 import { type CreateConnectorFn } from '@wagmi/core';
@@ -17,6 +18,8 @@ import { AGW_APP_ID, ICON_URL } from './constants.js';
 interface AbstractWalletConnectorOptions {
   /** RainbowKit connector details */
   rkDetails: WalletDetailsParams;
+  /** Optional custom paymaster handler */
+  customPaymasterHandler: CustomPaymasterHandler;
 }
 
 /**
@@ -56,7 +59,7 @@ function abstractWalletConnector(
   Record<string, unknown>,
   Record<string, unknown>
 > {
-  const { rkDetails } = options;
+  const { rkDetails, customPaymasterHandler } = options;
   return (params) => {
     const chains = [...params.chains];
     let defaultChain = params.chains[0];
@@ -105,6 +108,7 @@ function abstractWalletConnector(
         chain,
         transport,
         isPrivyCrossApp: true,
+        customPaymasterHandler,
       });
     };
 

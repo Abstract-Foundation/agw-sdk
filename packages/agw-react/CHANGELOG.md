@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-react
 
+## 1.5.6-beta.2
+
+### Patch Changes
+
+- 4d67035: fix type import
+
 ## 1.5.6-beta.1
 
 ### Patch Changes

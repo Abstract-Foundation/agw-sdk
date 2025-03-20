@@ -6,5 +6,9 @@
     "@abstract-foundation/agw-react": "1.5.5",
     "@abstract-foundation/web3-react-agw": "1.4.3"
   },
-  "changesets": ["fair-cougars-cheer", "real-houses-travel"]
+  "changesets": [
+    "chatty-snakes-add",
+    "fair-cougars-cheer",
+    "real-houses-travel"
+  ]
 }

@@ -1,5 +1,17 @@
 # @abstract-foundation/agw-react
 
+## 1.6.0
+
+### Minor Changes
+
+- a02f759: feat: add paymaster handler in react connector for app-level sponsorship
+
+### Patch Changes
+
+- Updated dependencies [a02f759]
+- Updated dependencies [d6d7b92]
+  - @abstract-foundation/agw-client@1.6.0
+
 ## 1.5.5
 
 ### Patch Changes

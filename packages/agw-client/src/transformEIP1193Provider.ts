@@ -18,7 +18,7 @@ import { toAccount } from 'viem/accounts';
 
 import { createAbstractClient } from './abstractClient.js';
 import { agwCapabilities, type SendCallsParams } from './eip5792.js';
-import { validChains } from './exports/index.js';
+import { type CustomPaymasterHandler, validChains } from './exports/index.js';
 import { getSmartAccountAddressFromInitialSigner } from './utils.js';
 
 interface TransformEIP1193ProviderOptions {
@@ -26,6 +26,7 @@ interface TransformEIP1193ProviderOptions {
   chain: Chain;
   transport?: Transport;
   isPrivyCrossApp?: boolean;
+  customPaymasterHandler?: CustomPaymasterHandler;
 }
 
 async function getAgwAddressFromInitialSigner(
@@ -54,7 +55,8 @@ async function getAgwClient(
   chain: Chain,
   transport: Transport,
   isPrivyCrossApp: boolean,
-  overrideTransport?: Transport,
+  overrideTransport: Transport | undefined,
+  customPaymasterHandler: CustomPaymasterHandler | undefined,
 ) {
   const wallet = createWalletClient({
     account,
@@ -74,6 +76,7 @@ async function getAgwClient(
     transport,
     isPrivyCrossApp,
     publicTransport: overrideTransport,
+    customPaymasterHandler,
   });
 
   return abstractClient;
@@ -87,6 +90,7 @@ export function transformEIP1193Provider(
     chain,
     transport: overrideTransport,
     isPrivyCrossApp = false,
+    customPaymasterHandler,
   } = options;
 
   const transport = custom(provider);
@@ -138,6 +142,7 @@ export function transformEIP1193Provider(
           transport,
           isPrivyCrossApp,
           overrideTransport,
+          customPaymasterHandler,
         );
 
         return abstractClient.signTypedData(JSON.parse(params[1]));
@@ -157,6 +162,7 @@ export function transformEIP1193Provider(
           transport,
           isPrivyCrossApp,
           overrideTransport,
+          customPaymasterHandler,
         );
 
         return await abstractClient.signMessage({
@@ -183,6 +189,7 @@ export function transformEIP1193Provider(
           transport,
           isPrivyCrossApp,
           overrideTransport,
+          customPaymasterHandler,
         );
 
         // Undo the automatic formatting applied by Wagmi's eth_signTransaction
@@ -219,6 +226,7 @@ export function transformEIP1193Provider(
           transport,
           isPrivyCrossApp,
           overrideTransport,
+          customPaymasterHandler,
         );
 
         return await abstractClient.sendTransactionBatch({

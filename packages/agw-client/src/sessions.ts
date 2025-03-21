@@ -6,12 +6,9 @@ import {
   type Hash,
   type Hex,
   keccak256,
-  type PublicClient,
-  type Transport,
 } from 'viem';
 
 import { SessionKeyValidatorAbi } from './abis/SessionKeyValidator.js';
-import { SESSION_KEY_VALIDATOR_ADDRESS } from './constants.js';
 
 export enum LimitType {
   Unlimited = 0,

@@ -156,6 +156,7 @@ export type SessionClientActions<
   ) => Promise<SignTransactionReturnType>;
   writeContract: WalletActions<chain, account>['writeContract'];
   signTypedData: WalletActions<chain, account>['signTypedData'];
+  getSessionStatus: () => Promise<SessionStatus>;
 };
 
 export type LinkableWalletActions<
@@ -219,6 +220,12 @@ export function sessionWalletActions(
         args as any,
         session,
         paymasterHandler,
+      ),
+    getSessionStatus: () =>
+      getSessionStatus(
+        publicClient,
+        parseAccount(client.account).address,
+        session,
       ),
   });
 }

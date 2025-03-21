@@ -49,16 +49,6 @@ export async function assertSessionKeyPolicies<
     return;
   }
 
-  const enableValidation = await isFeatureFlagEnabled(
-    client,
-    account.address,
-    'session-key-validator',
-  );
-
-  if (!enableValidation) {
-    return;
-  }
-
   const session = getSessionFromTransaction(account, transaction);
 
   if (!session) {

@@ -182,7 +182,7 @@ export type CreateSessionMutateAsync<
     | MutateOptions<
         CreateSessionData,
         WriteContractErrorType,
-        CreateSessionVariables<config, config['chains'][number]['id']>,
+        CreateSessionVariables<config, chainId>,
         context
       >
     | undefined,

@@ -1,5 +1,15 @@
 # @abstract-foundation/agw-client
 
+## 1.6.0
+
+### Minor Changes
+
+- a02f759: feat: add paymaster handler in react connector for app-level sponsorship
+
+### Patch Changes
+
+- d6d7b92: feat: Add getSessionStatus function to abstract client and session clients
+
 ## 1.5.0
 
 ### Minor Changes

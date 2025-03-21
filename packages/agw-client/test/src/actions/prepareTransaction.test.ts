@@ -3,7 +3,10 @@ import {
   createPublicClient,
   createWalletClient,
   EIP1193RequestFn,
+  encodeFunctionData,
   http,
+  keccak256,
+  toBytes,
   toHex,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
@@ -14,9 +17,27 @@ import {
   MaxFeePerGasTooLowError,
   prepareTransactionRequest,
 } from '../../../src/actions/prepareTransaction.js';
-import { CONTRACT_DEPLOYER_ADDRESS } from '../../../src/constants.js';
+import {
+  CONTRACT_DEPLOYER_ADDRESS,
+  EOA_VALIDATOR_ADDRESS,
+  SMART_ACCOUNT_FACTORY_ADDRESS,
+} from '../../../src/constants.js';
+import { AccountFactoryAbi } from '../../../src/exports/constants.js';
+import {
+  getInitializerCalldata,
+  isSmartAccountDeployed,
+} from '../../../src/utils.js';
 import { anvilAbstractTestnet } from '../../anvil.js';
 import { address } from '../../constants.js';
+
+vi.mock('../../../src/utils.js');
+vi.mock('viem', async (importOriginal) => {
+  const original = await importOriginal();
+  return {
+    ...(original as any),
+    encodeFunctionData: vi.fn().mockReturnValue('0xmockedEncodedData'),
+  };
+});
 
 const RAW_SIGNATURE =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -81,9 +102,12 @@ const transaction: ZksyncTransactionRequestEIP712 = {
   from: '0x0000000000000000000000000000000000000000',
   paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
   paymasterInput: '0x',
+  value: 1000n,
+  data: '0xTransactionData',
 };
 
-test('minimum', async () => {
+test('minimum, not initial transaction', async () => {
+  vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
   const request = await prepareTransactionRequest(
     baseClient,
     signerClient,
@@ -107,6 +131,10 @@ test('minimum', async () => {
 });
 
 test('is initial transaction', async () => {
+  vi.mocked(isSmartAccountDeployed).mockResolvedValue(false);
+  vi.mocked(getInitializerCalldata).mockReturnValue(
+    '0xmockedInitializerCallData',
+  );
   const request = await prepareTransactionRequest(
     baseClient,
     signerClient,
@@ -120,6 +148,8 @@ test('is initial transaction', async () => {
   expect(request).toEqual({
     ...transaction,
     from: address.signerAddress,
+    to: SMART_ACCOUNT_FACTORY_ADDRESS,
+    data: '0xmockedEncodedData',
     chain: anvilAbstractTestnet.chain,
     chainId: anvilAbstractTestnet.chain.id,
     gas: MOCK_ZKS_ESTIMATE_GAS_LIMIT,
@@ -127,9 +157,28 @@ test('is initial transaction', async () => {
     maxFeePerGas: MOCK_FEE_PER_GAS,
     maxPriorityFeePerGas: 0n,
   });
+
+  expect(getInitializerCalldata).toHaveBeenCalledWith(
+    address.signerAddress,
+    EOA_VALIDATOR_ADDRESS,
+    {
+      target: transaction.to,
+      allowFailure: false,
+      value: transaction.value,
+      callData: transaction.data,
+    },
+  );
+
+  const salt = keccak256(toBytes(address.signerAddress));
+  expect(encodeFunctionData).toHaveBeenCalledWith({
+    abi: AccountFactoryAbi,
+    functionName: 'deployAccount',
+    args: [salt, '0xmockedInitializerCallData'],
+  });
 });
 
 test('with fees', async () => {
+  vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
   const request = await prepareTransactionRequest(
     baseClient,
     signerClient,
@@ -155,6 +204,7 @@ test('with fees', async () => {
 });
 
 test('to contract deployer', async () => {
+  vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
   const request = await prepareTransactionRequest(
     baseClient,
     signerClient,
@@ -180,6 +230,7 @@ test('to contract deployer', async () => {
 });
 
 test('with chainId but not chain', async () => {
+  vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
   const request = await prepareTransactionRequest(
     baseClient,
     signerClient,
@@ -201,6 +252,7 @@ test('with chainId but not chain', async () => {
 });
 
 test('with no chainId or chain', async () => {
+  vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
   const request = await prepareTransactionRequest(
     baseClient,
     signerClient,
@@ -219,6 +271,7 @@ test('with no chainId or chain', async () => {
 });
 
 test('throws if maxFeePerGas is too low', async () => {
+  vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
   const publicClientModified = createPublicClient({
     chain: anvilAbstractTestnet.chain as ChainEIP712,
     transport: anvilAbstractTestnet.clientConfig.transport,

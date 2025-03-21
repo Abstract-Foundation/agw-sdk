@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.5.1-beta.2
+
+### Patch Changes
+
+- 7a30726: Bump beta versions
+
 ## 1.5.1-beta.0
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @abstract-foundation/agw-react
 
+## 1.5.6-beta.3
+
+### Patch Changes
+
+- 7a30726: Bump beta versions
+- Updated dependencies [7a30726]
+  - @abstract-foundation/agw-client@1.5.1-beta.2
+
 ## 1.5.6-beta.2
 
 ### Patch Changes

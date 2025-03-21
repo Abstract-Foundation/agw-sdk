@@ -1,5 +1,13 @@
 # @abstract-foundation/web3-react-agw
 
+## 1.4.4-beta.1
+
+### Patch Changes
+
+- 7a30726: Bump beta versions
+- Updated dependencies [7a30726]
+  - @abstract-foundation/agw-client@1.5.1-beta.2
+
 ## 1.4.4-beta.0
 
 ### Patch Changes

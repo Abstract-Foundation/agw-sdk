@@ -55,8 +55,8 @@ async function getAgwClient(
   chain: Chain,
   transport: Transport,
   isPrivyCrossApp: boolean,
-  overrideTransport?: Transport,
-  customPaymasterHandler?: CustomPaymasterHandler,
+  overrideTransport: Transport | undefined,
+  customPaymasterHandler: CustomPaymasterHandler | undefined,
 ) {
   const wallet = createWalletClient({
     account,
@@ -90,6 +90,7 @@ export function transformEIP1193Provider(
     chain,
     transport: overrideTransport,
     isPrivyCrossApp = false,
+    customPaymasterHandler,
   } = options;
 
   const transport = custom(provider);
@@ -141,6 +142,7 @@ export function transformEIP1193Provider(
           transport,
           isPrivyCrossApp,
           overrideTransport,
+          customPaymasterHandler,
         );
 
         return abstractClient.signTypedData(JSON.parse(params[1]));
@@ -160,6 +162,7 @@ export function transformEIP1193Provider(
           transport,
           isPrivyCrossApp,
           overrideTransport,
+          customPaymasterHandler,
         );
 
         return await abstractClient.signMessage({
@@ -186,6 +189,7 @@ export function transformEIP1193Provider(
           transport,
           isPrivyCrossApp,
           overrideTransport,
+          customPaymasterHandler,
         );
 
         // Undo the automatic formatting applied by Wagmi's eth_signTransaction
@@ -222,6 +226,7 @@ export function transformEIP1193Provider(
           transport,
           isPrivyCrossApp,
           overrideTransport,
+          customPaymasterHandler,
         );
 
         return await abstractClient.sendTransactionBatch({

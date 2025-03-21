@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.6.1
+
+### Patch Changes
+
+- e373f06: chore: remove feature flag check
+
 ## 1.6.0
 
 ### Minor Changes

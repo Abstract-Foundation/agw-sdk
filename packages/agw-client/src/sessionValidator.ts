@@ -16,7 +16,6 @@ import {
   SESSION_KEY_VALIDATOR_ADDRESS,
 } from './constants.js';
 import { AGWAccountAbi } from './exports/constants.js';
-import { isFeatureFlagEnabled } from './featureFlagRegistry.js';
 import { ConstraintCondition, getSessionSpec } from './sessions.js';
 
 const restrictedSelectors = new Set<string>([

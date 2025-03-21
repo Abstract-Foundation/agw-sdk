@@ -16,7 +16,6 @@ import {
   SESSION_KEY_VALIDATOR_ADDRESS,
 } from './constants.js';
 import { AGWAccountAbi } from './exports/constants.js';
-import { isFeatureFlagEnabled } from './featureFlagRegistry.js';
 import { ConstraintCondition, getSessionSpec } from './sessions.js';
 
 const restrictedSelectors = new Set<string>([
@@ -46,16 +45,6 @@ export async function assertSessionKeyPolicies<
 ) {
   // Only validate on Abstract mainnet
   if (chainId !== abstract.id) {
-    return;
-  }
-
-  const enableValidation = await isFeatureFlagEnabled(
-    client,
-    account.address,
-    'session-key-validator',
-  );
-
-  if (!enableValidation) {
     return;
   }
 

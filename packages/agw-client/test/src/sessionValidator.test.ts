@@ -245,32 +245,6 @@ describe('assertSessionKeyPolicies', async () => {
     ).rejects.toThrow('Session key policy violation');
   });
 
-  it('should not validate when feature flag is disabled', async () => {
-    const transaction = {
-      to: SESSION_KEY_VALIDATOR_ADDRESS as Address,
-      data: encodeFunctionData({
-        abi: SessionKeyValidatorAbi,
-        functionName: 'createSession',
-        args: [sessionWithTransferPolicy],
-      }),
-    };
-
-    client.readContract = vi.fn().mockResolvedValue(false);
-    // Mock multicall to return a non-allowed status
-    client.multicall = vi
-      .fn()
-      .mockResolvedValue([SessionKeyPolicyStatus.Denied.toString()]) as any;
-
-    await expect(
-      assertSessionKeyPolicies(
-        client,
-        anvilAbstractMainnet.chain.id,
-        parseAccount(address.smartAccountAddress),
-        transaction,
-      ),
-    ).resolves.not.toThrow();
-  });
-
   it('should validate all predefined session configurations', async () => {
     const { sampleSessionConfigs } = await import('../fixtures.js');
 

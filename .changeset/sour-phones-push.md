@@ -2,4 +2,4 @@
 '@abstract-foundation/agw-client': patch
 ---
 
-Add getSessionStatus function
+feat: Add getSessionStatus function to abstract client and session clients

@@ -1,7 +1,7 @@
 ---
-'@abstract-foundation/web3-react-agw': patch
-'@abstract-foundation/agw-client': patch
-'@abstract-foundation/agw-react': patch
+'@abstract-foundation/web3-react-agw': minor
+'@abstract-foundation/agw-client': minor
+'@abstract-foundation/agw-react': minor
 ---
 
-fix
+feat: add paymaster handler in react connector for app-level sponsorship

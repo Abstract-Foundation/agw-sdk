@@ -1,5 +1,13 @@
 # @abstract-foundation/web3-react-agw
 
+## 1.4.4-beta.2
+
+### Patch Changes
+
+- 11265ca: fix
+- Updated dependencies [11265ca]
+  - @abstract-foundation/agw-client@1.5.1-beta.3
+
 ## 1.4.4-beta.1
 
 ### Patch Changes

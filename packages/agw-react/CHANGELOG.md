@@ -1,5 +1,13 @@
 # @abstract-foundation/agw-react
 
+## 1.5.6-beta.4
+
+### Patch Changes
+
+- 11265ca: fix
+- Updated dependencies [11265ca]
+  - @abstract-foundation/agw-client@1.5.1-beta.3
+
 ## 1.5.6-beta.3
 
 ### Patch Changes

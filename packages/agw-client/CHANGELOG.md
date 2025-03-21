@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.5.1-beta.3
+
+### Patch Changes
+
+- 11265ca: fix
+
 ## 1.5.1-beta.2
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @abstract-foundation/agw-react
 
+## 1.6.1
+
+### Patch Changes
+
+- Updated dependencies [e373f06]
+  - @abstract-foundation/agw-client@1.6.1
+
 ## 1.6.0
 
 ### Minor Changes

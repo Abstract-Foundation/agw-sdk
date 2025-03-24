@@ -63,11 +63,6 @@ export class AbstractGlobalWallet extends Connector {
             this.onError?.(error);
           });
 
-          this.provider.on('disconnect', (error: ProviderRpcError): void => {
-            this.actions.resetState();
-            this.onError?.(error);
-          });
-
           this.provider.on('chainChanged', (chainId: string): void => {
             this.actions.update({ chainId: parseChainId(chainId) });
           });
@@ -148,7 +143,7 @@ export class AbstractGlobalWallet extends Connector {
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: desiredChainIdHex }],
         });
-        this.activate(desiredChainId);
+        await this.activate(desiredChainId);
       } else {
         throw new Error('Invalid chain');
       }

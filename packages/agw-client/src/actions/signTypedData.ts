@@ -5,6 +5,7 @@ import {
   fromRlp,
   hashTypedData,
   type Hex,
+  type PublicClient,
   type Transport,
   type TypedData,
   type TypedDataDefinition,
@@ -34,6 +35,7 @@ import {
 export async function signTypedData(
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
+  publicClient: PublicClient<Transport, ChainEIP712>,
   parameters: Omit<SignTypedDataParameters, 'account' | 'privateKey'>,
   isPrivyCrossApp = false,
 ): Promise<Hex> {
@@ -49,6 +51,7 @@ export async function signTypedData(
     const signedTransaction = await signTransaction(
       client,
       signerClient,
+      publicClient,
       {
         ...transformedTypedData,
         chain: client.chain,
@@ -95,6 +98,7 @@ export async function signTypedDataForSession<
 >(
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
+  publicClient: PublicClient<Transport, ChainEIP712>,
   parameters: TypedDataDefinition<typedData, primaryType>,
   session: SessionConfig,
   paymasterHandler?: CustomPaymasterHandler,
@@ -130,6 +134,7 @@ export async function signTypedDataForSession<
   const { customSignature } = await signEip712TransactionInternal(
     client,
     signerClient,
+    publicClient,
     {
       chain: client.chain,
       ...transactionRequest,

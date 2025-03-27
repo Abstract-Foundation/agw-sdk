@@ -1,6 +1,7 @@
 import { Address } from 'abitype';
 import {
   createClient,
+  createPublicClient,
   createWalletClient,
   EIP1193RequestFn,
   encodeAbiParameters,
@@ -26,6 +27,11 @@ import { address } from '../../constants.js';
 
 const RAW_SIGNATURE =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+
+const publicClient = createPublicClient({
+  chain: anvilAbstractTestnet.chain as ChainEIP712,
+  transport: anvilAbstractTestnet.clientConfig.transport,
+});
 
 const baseClient = createClient({
   account: address.smartAccountAddress,
@@ -100,6 +106,7 @@ test('with useSignerAddress false', async () => {
       {
         chainId: anvilAbstractTestnet.chain.id,
         ...transaction,
+        data: '0x',
         from: address.smartAccountAddress,
         customSignature: signature,
         type: 'eip712' as any,
@@ -110,6 +117,7 @@ test('with useSignerAddress false', async () => {
   const signedTransaction = await signTransaction(
     baseClient,
     signerClient,
+    publicClient,
     {
       ...transaction,
       type: 'eip712',
@@ -130,6 +138,7 @@ test('with useSignerAddress true', async () => {
       {
         chainId: anvilAbstractTestnet.chain.id,
         ...transaction,
+        data: '0x',
         from: address.signerAddress,
         customSignature: signature,
         type: 'eip712' as any,
@@ -140,6 +149,7 @@ test('with useSignerAddress true', async () => {
   const signedTransaction = await signTransaction(
     baseClient,
     signerClient,
+    publicClient,
     {
       ...transaction,
       type: 'eip712',
@@ -156,6 +166,7 @@ test('handles hex values', async () => {
   const signedTransactionWithHexValues = await signTransaction(
     baseClient,
     signerClient,
+    publicClient,
     {
       ...transactionWithHexValues,
       type: 'eip712',
@@ -169,6 +180,7 @@ test('handles hex values', async () => {
   const signedTransactionWithBigIntValues = await signTransaction(
     baseClient,
     signerClient,
+    publicClient,
     {
       ...transactionWithBigIntValues,
       type: 'eip712',
@@ -186,38 +198,38 @@ test('handles hex values', async () => {
 
 test('invalid chain', async () => {
   const invalidChain = mainnet;
-  expect(
-    async () =>
-      await signTransaction(
-        baseClient,
-        signerClient,
-        {
-          ...transaction,
-          type: 'eip712',
-          account: baseClient.account,
-          chain: invalidChain,
-        } as SignEip712TransactionParameters,
-        EOA_VALIDATOR_ADDRESS,
-        false,
-      ),
+  await expect(
+    signTransaction(
+      baseClient,
+      signerClient,
+      publicClient,
+      {
+        ...transaction,
+        type: 'eip712',
+        account: baseClient.account,
+        chain: invalidChain,
+      } as SignEip712TransactionParameters,
+      EOA_VALIDATOR_ADDRESS,
+      false,
+    ),
   ).rejects.toThrowError('Invalid chain specified');
 });
 
 test('no account provided', async () => {
   baseClient.account = undefined as any;
-  expect(
-    async () =>
-      await signTransaction(
-        baseClient,
-        signerClient,
-        {
-          ...transaction,
-          type: 'eip712',
-          chain: anvilAbstractTestnet.chain as ChainEIP712,
-        } as any,
-        EOA_VALIDATOR_ADDRESS,
-        false,
-      ),
+  await expect(
+    signTransaction(
+      baseClient,
+      signerClient,
+      publicClient,
+      {
+        ...transaction,
+        type: 'eip712',
+        chain: anvilAbstractTestnet.chain as ChainEIP712,
+      } as any,
+      EOA_VALIDATOR_ADDRESS,
+      false,
+    ),
   ).rejects.toThrowError(
     'Could not find an Account to execute with this Action.',
   );

@@ -1,4 +1,7 @@
-import { validChains } from '@abstract-foundation/agw-client';
+import {
+  type CustomPaymasterHandler,
+  validChains,
+} from '@abstract-foundation/agw-client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { type Chain, http, type Transport } from 'viem';
@@ -24,7 +27,12 @@ interface AbstractWalletConfig {
    * @type {QueryClient}
    * @default new QueryClient()
    */
-  queryClient: QueryClient;
+  queryClient?: QueryClient;
+  /**
+   * Optional custom paymaster handler.
+   * @type {CustomPaymasterHandler}
+   */
+  customPaymasterHandler?: CustomPaymasterHandler;
 }
 
 /**
@@ -51,6 +59,7 @@ export const AbstractWalletProvider = ({
   chain,
   transport,
   queryClient = new QueryClient(),
+  customPaymasterHandler,
   children,
 }: React.PropsWithChildren<AbstractWalletConfig>) => {
   if (!validChains[chain.id]) {
@@ -60,7 +69,11 @@ export const AbstractWalletProvider = ({
   const wagmiConfig = createConfig({
     chains: [chain],
     ssr: true,
-    connectors: [abstractWalletConnector()],
+    connectors: [
+      abstractWalletConnector({
+        customPaymasterHandler,
+      }),
+    ],
     transports: {
       [chain.id]: transport ?? http(),
     },

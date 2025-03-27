@@ -1,4 +1,5 @@
 import {
+  type CustomPaymasterHandler,
   transformEIP1193Provider,
   validChains,
 } from '@abstract-foundation/agw-client';
@@ -17,6 +18,8 @@ import { AGW_APP_ID, ICON_URL } from './constants.js';
 interface AbstractWalletConnectorOptions {
   /** RainbowKit connector details */
   rkDetails: WalletDetailsParams;
+  /** Optional custom paymaster handler */
+  customPaymasterHandler: CustomPaymasterHandler;
 }
 
 /**
@@ -56,7 +59,7 @@ function abstractWalletConnector(
   Record<string, unknown>,
   Record<string, unknown>
 > {
-  const { rkDetails } = options;
+  const { rkDetails, customPaymasterHandler } = options;
   return (params) => {
     const chains = [...params.chains];
     let defaultChain = params.chains[0];
@@ -105,6 +108,7 @@ function abstractWalletConnector(
         chain,
         transport,
         isPrivyCrossApp: true,
+        customPaymasterHandler,
       });
     };
 

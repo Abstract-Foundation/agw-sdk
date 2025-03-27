@@ -1,7 +1,7 @@
 {
   "name": "@abstract-foundation/web3-react-agw",
   "description": "Abstract Global Wallet for web3-react",
-  "version": "1.4.0",
+  "version": "1.5.1",
   "scripts": {
     "build": "pnpm run clean && pnpm run build:esm+types && pnpm run build:cjs",
     "build:esm+types": "tsc --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types && printf '{\"type\":\"module\"}' > ./dist/esm/package.json",
@@ -52,6 +52,6 @@
     "@types/node": "^22.5.5",
     "@web3-react/core": "^8.2.3",
     "@web3-react/store": "^8.2.3",
-    "viem": "^2.22.14"
+    "viem": "^2.22.23"
   }
 }

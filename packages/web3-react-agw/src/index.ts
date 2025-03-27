@@ -62,7 +62,7 @@ export class AbstractGlobalWallet extends Connector {
             this.actions.resetState();
             this.onError?.(error);
           });
-                      
+                     
           this.provider.on('chainChanged', (chainId: string): void => {
             this.actions.update({ chainId: parseChainId(chainId) });
           });

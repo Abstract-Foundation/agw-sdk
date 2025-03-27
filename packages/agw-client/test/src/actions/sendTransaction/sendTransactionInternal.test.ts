@@ -147,6 +147,7 @@ describe('sendTransactionInternal', () => {
       expect(signTransaction).toHaveBeenCalledWith(
         baseClient,
         signerClient,
+        publicClient,
         expect.objectContaining({
           type: 'eip712',
           to: '0x5432100000000000000000000000000000000000',

@@ -1,5 +1,46 @@
 # @abstract-foundation/web3-react-agw
 
+## 1.5.1
+
+### Patch Changes
+
+- Updated dependencies [e373f06]
+  - @abstract-foundation/agw-client@1.6.1
+
+## 1.5.0
+
+### Minor Changes
+
+- a02f759: feat: add paymaster handler in react connector for app-level sponsorship
+
+### Patch Changes
+
+- Updated dependencies [a02f759]
+- Updated dependencies [d6d7b92]
+  - @abstract-foundation/agw-client@1.6.0
+
+## 1.4.3
+
+### Patch Changes
+
+- Updated dependencies [1eda3ec]
+  - @abstract-foundation/agw-client@1.5.0
+
+## 1.4.2
+
+### Patch Changes
+
+- 70a58fc: Update dependencies
+- Updated dependencies [70a58fc]
+  - @abstract-foundation/agw-client@1.4.2
+
+## 1.4.1
+
+### Patch Changes
+
+- Updated dependencies [30647bd]
+  - @abstract-foundation/agw-client@1.4.1
+
 ## 1.4.0
 
 ### Minor Changes

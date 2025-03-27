@@ -1,5 +1,39 @@
 # @abstract-foundation/agw-client
 
+## 1.6.1
+
+### Patch Changes
+
+- e373f06: chore: remove feature flag check
+
+## 1.6.0
+
+### Minor Changes
+
+- a02f759: feat: add paymaster handler in react connector for app-level sponsorship
+
+### Patch Changes
+
+- d6d7b92: feat: Add getSessionStatus function to abstract client and session clients
+
+## 1.5.0
+
+### Minor Changes
+
+- 1eda3ec: Add session key policy checking to transaction signing logic
+
+## 1.4.2
+
+### Patch Changes
+
+- 70a58fc: Update dependencies
+
+## 1.4.1
+
+### Patch Changes
+
+- 30647bd: Fix undefined data in transaction so it doesn't serialize to 0x00
+
 ## 1.4.0
 
 ### Minor Changes

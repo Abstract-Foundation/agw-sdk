@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import * as deployContractModule from '../../src/actions/deployContract.js';
 import * as prepareTransactionRequestModule from '../../src/actions/prepareTransaction.js';
 import * as sendTransactionModule from '../../src/actions/sendTransaction.js';
+import * as sendTransactionBatchModule from '../../src/actions/sendTransactionBatch.js';
 import * as sendTransactionForSessionModule from '../../src/actions/sendTransactionForSession.js';
 import * as signTransactionModule from '../../src/actions/signTransaction.js';
 import * as writeContractModule from '../../src/actions/writeContract.js';
@@ -24,6 +25,8 @@ vi.mock('../../src/actions/writeContract');
 vi.mock('../../src/actions/prepareTransaction');
 vi.mock('../../src/actions/writeContractForSession');
 vi.mock('../../src/actions/sendTransactionForSession');
+vi.mock('../../src/actions/sendTransactionBatch');
+
 describe('globalWalletActions', () => {
   const mockSignerClient = {
     account: {
@@ -73,7 +76,9 @@ describe('globalWalletActions', () => {
       ],
     };
     await actions.sendTransactionBatch(mockArgs as any);
-    expect(sendTransactionModule.sendTransactionBatch).toHaveBeenCalledWith(
+    expect(
+      sendTransactionBatchModule.sendTransactionBatch,
+    ).toHaveBeenCalledWith(
       mockClient,
       mockSignerClient,
       mockPublicClient,
@@ -95,7 +100,6 @@ describe('globalWalletActions', () => {
       mockPublicClient,
       mockArgs,
       EOA_VALIDATOR_ADDRESS,
-      false,
       {},
       undefined,
       false,

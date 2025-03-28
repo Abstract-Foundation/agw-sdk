@@ -47,7 +47,6 @@ export async function sendTransactionInternal<
     request
   >,
   validator: Address,
-  isInitialTransaction: boolean,
   validationHookData: Record<string, Hex> = {},
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<SendEip712TransactionReturnType> {
@@ -70,7 +69,6 @@ export async function sendTransactionInternal<
       {
         ...parameters,
         parameters: ['gas', 'nonce', 'fees'],
-        isInitialTransaction,
       } as any,
     );
 
@@ -92,7 +90,6 @@ export async function sendTransactionInternal<
         chainId,
       } as any,
       validator,
-      isInitialTransaction,
       validationHookData,
       customPaymasterHandler,
     );

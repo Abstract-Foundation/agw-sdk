@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-react
 
+## 1.6.3
+
+### Patch Changes
+
+- e10d464: Update privy dependencies
+
 ## 1.6.2
 
 ### Patch Changes

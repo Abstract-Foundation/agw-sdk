@@ -11,13 +11,16 @@ import { useGlobalWalletSignerAccount } from './useGlobalWalletSignerAccount.js'
 
 export function useGlobalWalletSignerClient<
   config extends Config = ResolvedRegister['config'],
-  chainId extends
-    config['chains'][number]['id'] = config['chains'][number]['id'],
+  chainId extends config['chains'][number]['id'] = config['chains'][number]['id'],
   selectData = GetWalletClientData<config, chainId>,
 >(
   parameters: UseWalletClientParameters<config, chainId, selectData> = {},
 ): UseWalletClientReturnType<config, chainId, selectData> {
   const { address } = useGlobalWalletSignerAccount();
+
+  if (!address) {
+    throw new Error('No address found for the global wallet signer.');
+  }
 
   const walletClient = useWalletClient({
     ...parameters,

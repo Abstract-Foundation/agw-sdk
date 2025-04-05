@@ -3,7 +3,7 @@ import {
   validChains,
 } from '@abstract-foundation/agw-client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { type Chain, http, type Transport } from 'viem';
 import { createConfig, WagmiProvider } from 'wagmi';
 
@@ -66,19 +66,21 @@ export const AbstractWalletProvider = ({
     throw new Error(`Chain ${chain.id} is not supported`);
   }
 
-  const wagmiConfig = createConfig({
-    chains: [chain],
-    ssr: true,
-    connectors: [
-      abstractWalletConnector({
-        customPaymasterHandler,
-      }),
-    ],
-    transports: {
-      [chain.id]: transport ?? http(),
-    },
-    multiInjectedProviderDiscovery: false,
-  });
+  const wagmiConfig = useMemo(() => {
+    return createConfig({
+      chains: [chain],
+      ssr: true,
+      connectors: [
+        abstractWalletConnector({
+          customPaymasterHandler,
+        }),
+      ],
+      transports: {
+        [chain.id]: transport ?? http(),
+      },
+      multiInjectedProviderDiscovery: false,
+    });
+  }, [chain, transport, customPaymasterHandler]);
 
   return (
     <WagmiProvider config={wagmiConfig}>

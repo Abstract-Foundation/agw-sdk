@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-react
 
+## 1.6.4
+
+### Patch Changes
+
+- 524aa2b: fix: Memoize wagmi config in AbstractWalletProvider
+
 ## 1.6.3
 
 ### Patch Changes

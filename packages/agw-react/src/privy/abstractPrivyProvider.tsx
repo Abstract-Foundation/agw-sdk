@@ -25,9 +25,50 @@ export const agwAppLoginMethod: LoginMethodOrderOption = `privy:${AGW_APP_ID}`;
 interface AgwPrivyProviderProps extends PrivyProviderProps {
   chain: Chain;
   transport?: Transport;
-  queryClient: QueryClient;
+  queryClient?: QueryClient;
 }
 
+/**
+ * Provider component that integrates Abstract Global Wallet with Privy authentication.
+ *
+ * This component wraps your application with the necessary providers to use Abstract Global Wallet
+ * with Privy authentication, including:
+ * - PrivyProvider: Handles user authentication and EOA creation
+ * - WagmiProvider: Provides web3 functionality
+ * - QueryClientProvider: Manages data fetching with TanStack Query
+ * - InjectWagmiConnector: Injects the Abstract wallet into Wagmi
+ *
+ * @param props - Props for the AbstractPrivyProvider component
+ * @param props.chain - The blockchain network to connect to (must be supported by Abstract)
+ * @param props.transport - Optional transport for network requests (defaults to http)
+ * @param props.queryClient - Optional TanStack Query client (defaults to a new QueryClient)
+ * @param props.appId - Your Privy app ID (required)
+ * @param props.config - Optional Privy configuration (defaults to using Abstract as primary login)
+ * @returns A provider component that wraps your application
+ *
+ * @example
+ * ```tsx
+ * import { AbstractPrivyProvider } from "@abstract-foundation/agw-react/privy";
+ * import { abstract } from "viem/chains";
+ *
+ * function App() {
+ *   return (
+ *     <AbstractPrivyProvider
+ *       appId="your-privy-app-id"
+ *       chain={abstract}
+ *     >
+ *       <YourApp />
+ *     </AbstractPrivyProvider>
+ *   );
+ * }
+ * ```
+ *
+ * Once your app is wrapped with this provider, you can use all the Abstract and Wagmi hooks
+ * throughout your application to interact with blockchain and manage user authentication.
+ *
+ * @see {@link useAbstractPrivyLogin} - Hook to login users with Abstract Global Wallet via Privy
+ * @see {@link useAbstractClient} - Hook to get an Abstract client for blockchain interactions
+ */
 export const AbstractPrivyProvider = ({
   chain,
   transport,

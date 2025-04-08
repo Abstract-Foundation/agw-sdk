@@ -31,6 +31,32 @@ export interface IsLinkedAccountParameters {
   address: Address;
 }
 
+/**
+ * Get all accounts linked to an Abstract Global Wallet.
+ *
+ * @example
+ * ```tsx
+ * import { useAbstractClient } from "@abstract-foundation/agw-react";
+ *
+ * export default function LinkedAccounts() {
+ *     const { data: agwClient } = useAbstractClient();
+ *
+ *     async function fetchLinkedAccounts() {
+ *         if (!agwClient) return;
+ *
+ *         const { linkedAccounts } = await agwClient.getLinkedAccounts({
+ *             agwAddress: agwClient.account.address
+ *         });
+ *
+ *         console.log(linkedAccounts); // Array of linked account addresses
+ *     }
+ * }
+ * ```
+ *
+ * @param parameters - Parameters for getting linked accounts
+ * @param parameters.agwAddress - Address of the Abstract Global Wallet to check for linked accounts (required)
+ * @returns An object containing an array of linked account addresses
+ */
 export async function getLinkedAccounts<
   transport extends Transport = Transport,
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
@@ -63,6 +89,33 @@ export async function getLinkedAccounts<
   };
 }
 
+/**
+ * Check if an address is linked to the connected Abstract Global Wallet.
+ *
+ * @example
+ * ```tsx
+ * import { useAbstractClient } from "@abstract-foundation/agw-react";
+ *
+ * export default function CheckLinkedAccount() {
+ *     const { data: agwClient } = useAbstractClient();
+ *     const addressToCheck = "0x...";
+ *
+ *     async function checkIfLinked() {
+ *         if (!agwClient) return;
+ *
+ *         const isLinked = await agwClient.isLinkedAccount({
+ *             address: addressToCheck
+ *         });
+ *
+ *         console.log(isLinked); // true or false
+ *     }
+ * }
+ * ```
+ *
+ * @param parameters - Parameters for checking linked account
+ * @param parameters.address - Address to check if linked to the connected wallet (required)
+ * @returns Boolean indicating if the address is linked to the connected wallet
+ */
 export async function isLinkedAccount(
   client: Client<Transport, ChainEIP712, Account>,
   parameters: IsLinkedAccountParameters,

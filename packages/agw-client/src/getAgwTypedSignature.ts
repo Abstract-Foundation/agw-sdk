@@ -69,7 +69,7 @@ export async function getAgwTypedSignature(
 
   // if the account is already deployed, we can use signature directly
   // otherwise, we provide an ERC-6492 compatible signature
-  if (code !== undefined) {
+  if (code !== '0x') {
     return signature;
   }
 
@@ -77,8 +77,7 @@ export async function getAgwTypedSignature(
   // https://eips.ethereum.org/EIPS/eip-6492
 
   // 1. Generate the salt for account deployment
-  const addressBytes = toBytes(signer.account.address);
-  const salt = keccak256(addressBytes);
+  const salt = keccak256(signer.account.address);
 
   // 2. Generate the ERC-6492 compatible signature with deploy parameters
   return serializeErc6492Signature({

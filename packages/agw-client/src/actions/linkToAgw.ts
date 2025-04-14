@@ -40,6 +40,48 @@ export interface LinkToAgwReturnType {
   getL2TransactionHash: () => Promise<Hash>;
 }
 
+/**
+ * Function to link an Ethereum Mainnet wallet to an Abstract Global Wallet.
+ *
+ * @example
+ * ```tsx
+ * import { linkableWalletActions } from "@abstract-foundation/agw-client";
+ * import { createWalletClient, custom } from "viem";
+ * import { sepolia, abstractTestnet } from "viem/chains";
+ *
+ * export default function LinkWallet() {
+ *   async function linkAgwWallet() {
+ *     // Initialize a Viem Wallet client and extend it with linkableWalletActions
+ *     const client = createWalletClient({
+ *       chain: sepolia,
+ *       transport: custom(window.ethereum!),
+ *     }).extend(linkableWalletActions());
+ *
+ *     // Call linkToAgw with the AGW address
+ *     const { l1TransactionHash, getL2TransactionHash } =
+ *       await client.linkToAgw({
+ *         agwAddress: "0x...", // The AGW address to link to
+ *         enabled: true, // Enable or disable the link
+ *         l2Chain: abstractTestnet,
+ *       });
+ *
+ *     // Get the L2 transaction hash once the L1 transaction is confirmed
+ *     const l2Hash = await getL2TransactionHash();
+ *   }
+ *
+ *   return <button onClick={linkAgwWallet}>Link Wallet</button>;
+ * }
+ * ```
+ *
+ * @param parameters - Parameters for linking a wallet
+ * @param parameters.agwAddress - The address of the Abstract Global Wallet to link to (required)
+ * @param parameters.enabled - Whether to enable or disable the link between the wallets (required)
+ * @param parameters.l2Chain - The Abstract chain to create the link on (e.g. abstractTestnet) (required)
+ * @param parameters.account - The account to use for the transaction
+ * @returns Object containing the L1 transaction hash and a function to get the L2 transaction hash
+ * @returns.l1TransactionHash - The transaction hash of the L1 transaction that initiated the link
+ * @returns.getL2TransactionHash - A function that returns a Promise resolving to the L2 transaction hash once the L1 transaction is confirmed
+ */
 export async function linkToAgw<
   transport extends Transport = Transport,
   chain extends Chain | undefined = Chain | undefined,

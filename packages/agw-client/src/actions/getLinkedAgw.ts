@@ -32,6 +32,41 @@ export interface IsLinkedAccountParameters {
   address: Address;
 }
 
+/**
+ * Get the linked Abstract Global Wallet for an Ethereum Mainnet address.
+ *
+ * @example
+ * ```tsx
+ * import { linkableWalletActions } from "@abstract-foundation/agw-client";
+ * import { createWalletClient, custom } from "viem";
+ * import { sepolia } from "viem/chains";
+ *
+ * export default function CheckLinkedWallet() {
+ *   async function checkLinkedWallet() {
+ *     // Initialize a Viem Wallet client and extend it with linkableWalletActions
+ *     const client = createWalletClient({
+ *       chain: sepolia,
+ *       transport: custom(window.ethereum!),
+ *     }).extend(linkableWalletActions());
+ *
+ *     // Check if an address has a linked AGW
+ *     const { agw } = await client.getLinkedAgw();
+ *
+ *     if (agw) {
+ *       console.log("Linked AGW:", agw);
+ *     } else {
+ *       console.log("No linked AGW found");
+ *     }
+ *   }
+ *
+ *   return <button onClick={checkLinkedWallet}>Check Linked AGW</button>;
+ * }
+ * ```
+ *
+ * @param parameters - Parameters for getting the linked AGW
+ * @param parameters.address - The Ethereum Mainnet address to check for a linked AGW. If not provided, defaults to the connected account's address
+ * @returns Object containing the address of the linked AGW, or undefined if no AGW is linked
+ */
 export async function getLinkedAgw<
   chain extends Chain | undefined = Chain | undefined,
   account extends Account | undefined = Account | undefined,

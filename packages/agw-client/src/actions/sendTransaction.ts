@@ -20,6 +20,47 @@ import type {
 import { sendPrivyTransaction } from './sendPrivyTransaction.js';
 import { sendTransactionInternal } from './sendTransactionInternal.js';
 
+/**
+ * Function to send a transaction using the connected Abstract Global Wallet.
+ *
+ * Transactions are signed by the approved signer account (EOA) of the Abstract Global Wallet
+ * and sent from the AGW smart contract itself.
+ *
+ * @example
+ * ```tsx
+ * import { useAbstractClient } from "@abstract-foundation/agw-react";
+ *
+ * export default function SendTransaction() {
+ *   const { data: agwClient } = useAbstractClient();
+ *
+ *   async function sendTransaction() {
+ *     if (!agwClient) return;
+ *
+ *     const hash = await agwClient.sendTransaction({
+ *       to: "0x273B3527BF5b607dE86F504fED49e1582dD2a1C6",
+ *       data: "0x69",
+ *     });
+ *   }
+ * }
+ * ```
+ *
+ * @param parameters - Transaction parameters
+ * @param parameters.to - The recipient address of the transaction
+ * @param parameters.from - The sender address of the transaction (defaults to the Abstract Global Wallet address)
+ * @param parameters.data - Contract code or a hashed method call with encoded args
+ * @param parameters.gas - Gas provided for transaction execution
+ * @param parameters.nonce - Unique number identifying this transaction
+ * @param parameters.value - Value in wei sent with this transaction
+ * @param parameters.maxFeePerGas - Total fee per gas in wei (gasPrice/baseFeePerGas + maxPriorityFeePerGas)
+ * @param parameters.maxPriorityFeePerGas - Max priority fee per gas (in wei)
+ * @param parameters.gasPerPubdata - The amount of gas to pay per byte of data on Ethereum
+ * @param parameters.factoryDeps - An array of bytecodes of contracts that are dependencies for the transaction
+ * @param parameters.paymaster - Address of the paymaster smart contract that will pay the gas fees (requires paymasterInput)
+ * @param parameters.paymasterInput - Input data to the paymaster (requires paymaster)
+ * @param parameters.customSignature - Custom signature for the transaction
+ * @param parameters.type - Transaction type. For EIP-712 transactions, this should be 'eip712'
+ * @returns The transaction hash of the submitted transaction
+ */
 export async function sendTransaction<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,

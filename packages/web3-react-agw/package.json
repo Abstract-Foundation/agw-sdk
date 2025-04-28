@@ -45,7 +45,7 @@
   ],
   "dependencies": {
     "@abstract-foundation/agw-client": "workspace:^",
-    "@privy-io/cross-app-connect": "^0.1.5",
+    "@privy-io/cross-app-connect": "^0.2.1",
     "@web3-react/types": "^8.2.3"
   },
   "devDependencies": {

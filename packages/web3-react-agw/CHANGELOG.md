@@ -1,5 +1,11 @@
 # @abstract-foundation/web3-react-agw
 
+## 1.5.3
+
+### Patch Changes
+
+- c6cb542: Update privy cross app package
+
 ## 1.5.2
 
 ### Patch Changes

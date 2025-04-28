@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-react
 
+## 1.6.5
+
+### Patch Changes
+
+- c6cb542: Update privy cross app package
+
 ## 1.6.4
 
 ### Patch Changes

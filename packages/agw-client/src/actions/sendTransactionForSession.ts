@@ -21,7 +21,6 @@ import {
   type SessionConfig,
 } from '../sessions.js';
 import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
-import { isSmartAccountDeployed } from '../utils.js';
 import { sendTransactionInternal } from './sendTransactionInternal.js';
 
 export interface SendTransactionForSessionParameters<
@@ -63,14 +62,6 @@ export async function sendTransactionForSession<
   session: SessionConfig,
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<SendEip712TransactionReturnType> {
-  const isDeployed = await isSmartAccountDeployed(
-    publicClient,
-    client.account.address,
-  );
-  if (!isDeployed) {
-    throw new BaseError('Smart account not deployed');
-  }
-
   const selector: Hex | undefined = parameters.data
     ? `0x${parameters.data.slice(2, 10)}`
     : undefined;

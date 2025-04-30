@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.6.3
+
+### Patch Changes
+
+- 764642c: perf: remove reundant rpc call when sending transactions for sessions
+
 ## 1.6.2
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @abstract-foundation/agw-react
 
+## 1.6.6
+
+### Patch Changes
+
+- 764642c: perf: remove reundant rpc call when sending transactions for sessions
+- Updated dependencies [764642c]
+  - @abstract-foundation/agw-client@1.6.3
+
 ## 1.6.5
 
 ### Patch Changes

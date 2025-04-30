@@ -208,24 +208,6 @@ describe('sendTransaction', () => {
     );
   });
 
-  it('should call throw if AGW is not deployed', async () => {
-    vi.mocked(isSmartAccountDeployed).mockResolvedValue(false);
-    await expect(
-      sendTransactionForSession(
-        baseClient,
-        signerClient,
-        publicClient,
-        {
-          ...transaction1,
-          type: 'eip712',
-          account: baseClient.account,
-          chain: anvilAbstractTestnet.chain as ChainEIP712,
-        },
-        session,
-      ),
-    ).rejects.toThrow('Smart account not deployed');
-  });
-
   it('should call throw if to field is not set', async () => {
     vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
     await expect(

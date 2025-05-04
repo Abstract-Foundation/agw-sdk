@@ -329,92 +329,110 @@ export async function prepareTransactionRequest<
     from: initiatorAccount.address,
   };
 
-  let chainId: number | undefined;
-  async function getChainId(): Promise<number> {
-    if (chainId) return chainId;
-    if (chain) return chain.id;
-    if (typeof args.chainId !== 'undefined') return args.chainId;
-    const chainId_ = await getAction(client, getChainId_, 'getChainId')({});
-    chainId = chainId_;
-    return chainId;
+  // Prepare all async operations that can run in parallel
+  const asyncOperations = [];
+
+  // Get chain ID if needed
+  if (parameterNames.includes('chainId')) {
+    asyncOperations.push(
+      (async () => {
+        if (chain) return chain.id;
+        if (typeof args.chainId !== 'undefined') return args.chainId;
+        return getAction(client, getChainId_, 'getChainId')({});
+      })().then((chainId) => {
+        request.chainId = chainId;
+      }),
+    );
   }
 
-  if (parameterNames.includes('chainId')) request.chainId = await getChainId();
-
+  // Get nonce if needed
   if (
     parameterNames.includes('nonce') &&
     typeof nonce === 'undefined' &&
     initiatorAccount
   ) {
-    request.nonce = await getAction(
-      publicClient, // The public client is more reliable for fetching the latest nonce
-      getTransactionCount,
-      'getTransactionCount',
-    )({
-      address: initiatorAccount.address,
-      blockTag: 'pending',
-    });
+    asyncOperations.push(
+      getAction(
+        publicClient,
+        getTransactionCount,
+        'getTransactionCount',
+      )({
+        address: initiatorAccount.address,
+        blockTag: 'pending',
+      }).then((nonce) => {
+        request.nonce = nonce;
+      }),
+    );
   }
 
-  let gasFromFeeEstimation: bigint | undefined;
+  let gasLimitFromFeeEstimation: bigint | undefined;
+  // Estimate fees if needed
   if (parameterNames.includes('fees')) {
     if (
       typeof request.maxFeePerGas === 'undefined' ||
       typeof request.maxPriorityFeePerGas === 'undefined'
     ) {
-      let maxFeePerGas: bigint | undefined;
-      let maxPriorityFeePerGas: bigint | undefined;
-      // Skip fee estimation for contract deployments
-      if (request.to === CONTRACT_DEPLOYER_ADDRESS) {
-        maxFeePerGas = 25000000n;
-        maxPriorityFeePerGas = 0n;
-      } else {
-        const estimateFeeRequest: EstimateFeeParameters<
-          chain,
-          account | undefined,
-          ChainEIP712
-        > = {
-          account: initiatorAccount,
-          to: request.to,
-          value: request.value,
-          data: request.data,
-          gas: request.gas,
-          nonce: request.nonce,
-          chainId: request.chainId,
-          authorizationList: [],
-        };
-        const feeEstimation = await estimateFee(
-          publicClient,
-          estimateFeeRequest,
-        );
-        maxFeePerGas = feeEstimation.maxFeePerGas;
-        maxPriorityFeePerGas = feeEstimation.maxPriorityFeePerGas;
-        gasFromFeeEstimation = feeEstimation.gasLimit;
-      }
+      asyncOperations.push(
+        (async () => {
+          let maxFeePerGas: bigint | undefined;
+          let maxPriorityFeePerGas: bigint | undefined;
+          // Skip fee estimation for contract deployments
+          if (request.to === CONTRACT_DEPLOYER_ADDRESS) {
+            maxFeePerGas = 25000000n;
+            maxPriorityFeePerGas = 0n;
+          } else {
+            const estimateFeeRequest: EstimateFeeParameters<
+              chain,
+              account | undefined,
+              ChainEIP712
+            > = {
+              account: initiatorAccount,
+              to: request.to,
+              value: request.value,
+              data: request.data,
+              gas: request.gas,
+              nonce: request.nonce,
+              chainId: request.chainId,
+              authorizationList: [],
+            };
+            const feeEstimation = await estimateFee(
+              publicClient,
+              estimateFeeRequest,
+            );
+            maxFeePerGas = feeEstimation.maxFeePerGas;
+            maxPriorityFeePerGas = feeEstimation.maxPriorityFeePerGas;
+            gasLimitFromFeeEstimation = feeEstimation.gasLimit;
+          }
 
-      if (
-        typeof args.maxPriorityFeePerGas === 'undefined' &&
-        args.maxFeePerGas &&
-        args.maxFeePerGas < maxPriorityFeePerGas
-      )
-        throw new MaxFeePerGasTooLowError({
-          maxPriorityFeePerGas,
-        });
+          if (
+            typeof args.maxPriorityFeePerGas === 'undefined' &&
+            args.maxFeePerGas &&
+            args.maxFeePerGas < maxPriorityFeePerGas
+          )
+            throw new MaxFeePerGasTooLowError({
+              maxPriorityFeePerGas,
+            });
 
-      request.maxPriorityFeePerGas = maxPriorityFeePerGas;
-      request.maxFeePerGas = maxFeePerGas;
-      // set gas to gasFromFeeEstimation if gas is not already set
-      if (typeof gas === 'undefined') {
-        request.gas = gasFromFeeEstimation;
-      }
+          request.maxPriorityFeePerGas = maxPriorityFeePerGas;
+          request.maxFeePerGas = maxFeePerGas;
+          // set gas to gasFromFeeEstimation if gas is not already set
+          if (typeof gas === 'undefined') {
+            request.gas = gasLimitFromFeeEstimation;
+          }
+        })(),
+      );
     }
   }
 
+  // Wait for all async operations to complete
+  await Promise.all(asyncOperations);
+
+  // Estimate gas limit if needed
   if (
     parameterNames.includes('gas') &&
     typeof gas === 'undefined' &&
-    gasFromFeeEstimation === undefined // if gas was set by fee estimation, don't estimate again
-  )
+    gasLimitFromFeeEstimation === undefined // if gas was set by fee estimation, don't estimate again
+  ) {
     request.gas = await getAction(
       client,
       estimateGas,
@@ -425,6 +443,7 @@ export async function prepareTransactionRequest<
         ? { address: initiatorAccount.address, type: 'json-rpc' }
         : undefined,
     } as EstimateGasParameters);
+  }
 
   assertRequest(request as AssertRequestParameters);
 

@@ -37,7 +37,6 @@ import {
   type EstimateGasErrorType,
   type EstimateGasParameters,
   type GetBlockErrorType,
-  getChainId as getChainId_,
   getTransactionCount,
   type GetTransactionCountErrorType,
 } from 'viem/actions';
@@ -282,12 +281,7 @@ export async function prepareTransactionRequest<
     request
   >,
 ): Promise<PrepareTransactionRequestReturnType> {
-  const {
-    chain,
-    gas,
-    nonce,
-    parameters: parameterNames = defaultParameters,
-  } = args;
+  const { gas, nonce, parameters: parameterNames = defaultParameters } = args;
 
   const isDeployed = await isSmartAccountDeployed(
     publicClient,
@@ -331,19 +325,6 @@ export async function prepareTransactionRequest<
 
   // Prepare all async operations that can run in parallel
   const asyncOperations = [];
-
-  // Get chain ID if needed
-  if (parameterNames.includes('chainId')) {
-    asyncOperations.push(
-      (async () => {
-        if (chain) return chain.id;
-        if (typeof args.chainId !== 'undefined') return args.chainId;
-        return getAction(client, getChainId_, 'getChainId')({});
-      })().then((chainId) => {
-        request.chainId = chainId;
-      }),
-    );
-  }
 
   // Get nonce if needed
   if (

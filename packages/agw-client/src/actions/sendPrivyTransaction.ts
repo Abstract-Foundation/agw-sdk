@@ -17,7 +17,7 @@ import {
 
 import { replaceBigInts } from '../replaceBigInts.js';
 import type { SendTransactionBatchParameters } from '../types/sendTransactionBatch.js';
-
+import type { SignTransactionBatchParameters } from '../types/signTransactionBatch.js';
 export async function sendPrivyTransaction<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
@@ -79,7 +79,9 @@ export async function signPrivyTransaction<
   chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
 >(
   client: Client<Transport, ChainEIP712, Account>,
-  parameters: SignEip712TransactionParameters<chain, account, chainOverride>,
+  parameters:
+    | SignEip712TransactionParameters<chain, account, chainOverride>
+    | SignTransactionBatchParameters<chain, account, chainOverride>,
 ): Promise<SignEip712TransactionReturnType> {
   const { chain: _chain, account: _account, ...request } = parameters;
 

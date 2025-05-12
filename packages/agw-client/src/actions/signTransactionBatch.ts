@@ -2,75 +2,24 @@ import {
   type Account,
   type Address,
   type Client,
-  encodeFunctionData,
+  type Hex,
   type PublicClient,
-  type SendTransactionRequest,
-  type SendTransactionReturnType,
   type Transport,
   type WalletClient,
 } from 'viem';
-import { type ChainEIP712 } from 'viem/zksync';
+import {
+  type ChainEIP712,
+  type SignEip712TransactionReturnType,
+} from 'viem/zksync';
 
-import AGWAccountAbi from '../abis/AGWAccount.js';
-import { EOA_VALIDATOR_ADDRESS } from '../constants.js';
-import { type Call } from '../types/call.js';
 import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
-import type { SendTransactionBatchParameters } from '../types/sendTransactionBatch.js';
 import type { SignTransactionBatchParameters } from '../types/signTransactionBatch.js';
-import { sendPrivyTransaction } from './sendPrivyTransaction.js';
-import { sendTransactionInternal } from './sendTransactionInternal.js';
-
-export function getBatchTransactionObject<
-  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
-  account extends Account | undefined = Account | undefined,
-  chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
-  request extends SendTransactionRequest<
-    chain,
-    chainOverride
-  > = SendTransactionRequest<chain, chainOverride>,
->(
-  address: Address,
-  parameters:
-    | SendTransactionBatchParameters<request>
-    | SignTransactionBatchParameters<chain, account, chainOverride>,
-) {
-  const { calls, paymaster, paymasterInput } = parameters;
-  const batchCalls: Call[] = calls.map((tx) => {
-    if (!tx.to) throw new Error('Transaction target (to) is required');
-    return {
-      target: tx.to,
-      allowFailure: false,
-      value: BigInt(tx.value ?? 0),
-      callData: tx.data ?? '0x',
-    };
-  });
-
-  const batchCallData = encodeFunctionData({
-    abi: AGWAccountAbi,
-    functionName: 'batchCall',
-    args: [batchCalls],
-  });
-
-  // Get cumulative value passed in
-  const totalValue = batchCalls.reduce(
-    (sum, call) => sum + BigInt(call.value),
-    BigInt(0),
-  );
-
-  const batchTransaction = {
-    to: address,
-    data: batchCallData,
-    value: totalValue,
-    paymaster: paymaster,
-    paymasterInput: paymasterInput,
-    type: 'eip712',
-  } as any;
-
-  return batchTransaction;
-}
+import { signPrivyTransaction } from './sendPrivyTransaction.js';
+import { getBatchTransactionObject } from './sendTransactionBatch.js';
+import { signTransaction } from './signTransaction.js';
 
 /**
- * Function to send a batch of transactions in a single call using the connected Abstract Global Wallet.
+ * Function to sign a batch of transactions in a single call using the connected Abstract Global Wallet.
  *
  * @example
  * ```tsx
@@ -137,27 +86,26 @@ export function getBatchTransactionObject<
  * @param parameters.paymasterInput - Input data to the paymaster
  * @returns The transaction hash of the submitted transaction batch
  */
-export async function sendTransactionBatch<
+export async function signTransactionBatch<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  account extends Account | undefined = Account | undefined,
   chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
-  request extends SendTransactionRequest<
-    chain,
-    chainOverride
-  > = SendTransactionRequest<chain, chainOverride>,
 >(
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
-  parameters: SendTransactionBatchParameters<request>,
-  isPrivyCrossApp = false,
+  parameters: SignTransactionBatchParameters<chain, account, chainOverride>,
+  validator: Address,
+  validationHookData: Record<string, Hex> = {},
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
-): Promise<SendTransactionReturnType> {
+  isPrivyCrossApp = false,
+): Promise<SignEip712TransactionReturnType> {
   const { calls, ...rest } = parameters;
   if (calls.length === 0) {
     throw new Error('No calls provided');
   }
   if (isPrivyCrossApp) {
-    return await sendPrivyTransaction(client, parameters);
+    return await signPrivyTransaction(client, parameters);
   }
 
   const batchTransaction = getBatchTransactionObject(
@@ -165,7 +113,7 @@ export async function sendTransactionBatch<
     parameters,
   );
 
-  return sendTransactionInternal(
+  return signTransaction(
     client,
     signerClient,
     publicClient,
@@ -173,8 +121,8 @@ export async function sendTransactionBatch<
       ...batchTransaction,
       ...rest,
     },
-    EOA_VALIDATOR_ADDRESS,
-    {},
+    validator,
+    validationHookData,
     customPaymasterHandler,
   );
 }

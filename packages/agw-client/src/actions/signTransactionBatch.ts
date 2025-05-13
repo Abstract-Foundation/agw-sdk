@@ -26,14 +26,14 @@ import { signTransaction } from './signTransaction.js';
  * import { useAbstractClient } from "@abstract-foundation/agw-react";
  * import { encodeFunctionData, parseUnits } from "viem";
  *
- * export default function SendTransactionBatch() {
+ * export default function SignTransactionBatch() {
  *   const { data: agwClient } = useAbstractClient();
  *
- *   async function sendTransactionBatch() {
+ *   async function signTransactionBatch() {
  *     if (!agwClient) return;
  *
- *     // Batch multiple transactions in a single call
- *     const hash = await agwClient.sendTransactionBatch({
+ *     // Sign a batch of multiple transactions in a single call
+ *     const rawTransaction = await agwClient.signTransactionBatch({
  *       calls: [
  *         // 1. Simple ETH transfer
  *         {
@@ -63,25 +63,16 @@ import { signTransaction } from './signTransaction.js';
  *       ]
  *     });
  *
- *     console.log("Transaction hash:", hash);
+ *     console.log("Serialized transaction:", rawTransaction);
  *   }
  * }
  * ```
  *
- * @param parameters - Parameters for sending a batch of transactions
+ * @param parameters - Parameters for signing a batch of transactions
  * @param parameters.calls - An array of transaction requests. Each transaction can include:
  *   - to: The recipient address (required)
- *   - from: The sender address (defaults to the AGW address)
  *   - data: Contract code or method call with encoded args
- *   - gas: Gas provided for execution
- *   - nonce: Unique transaction identifier
  *   - value: Amount in wei to send
- *   - maxFeePerGas: Total fee per gas
- *   - maxPriorityFeePerGas: Priority fee per gas
- *   - gasPerPubdata: Gas per byte of data
- *   - factoryDeps: Bytecodes of contract dependencies
- *   - customSignature: Custom transaction signature
- *   - type: Transaction type
  * @param parameters.paymaster - Address of the paymaster smart contract that will pay the gas fees
  * @param parameters.paymasterInput - Input data to the paymaster
  * @returns The transaction hash of the submitted transaction batch

@@ -1,0 +1,10 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "@abstract-foundation/agw-client": "1.6.3",
+    "@abstract-foundation/agw-react": "1.6.6",
+    "@abstract-foundation/web3-react-agw": "1.5.4"
+  },
+  "changesets": []
+}

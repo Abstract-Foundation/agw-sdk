@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.6.4
+
+### Patch Changes
+
+- 563c4fc: Add signTransactionBatch method for raw signing of batch transactions
+
 ## 1.6.3
 
 ### Patch Changes

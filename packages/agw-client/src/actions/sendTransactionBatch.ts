@@ -16,17 +16,24 @@ import { EOA_VALIDATOR_ADDRESS } from '../constants.js';
 import { type Call } from '../types/call.js';
 import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
 import type { SendTransactionBatchParameters } from '../types/sendTransactionBatch.js';
+import type { SignTransactionBatchParameters } from '../types/signTransactionBatch.js';
 import { sendPrivyTransaction } from './sendPrivyTransaction.js';
 import { sendTransactionInternal } from './sendTransactionInternal.js';
 
 export function getBatchTransactionObject<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  account extends Account | undefined = Account | undefined,
   chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   request extends SendTransactionRequest<
     chain,
     chainOverride
   > = SendTransactionRequest<chain, chainOverride>,
->(address: Address, parameters: SendTransactionBatchParameters<request>) {
+>(
+  address: Address,
+  parameters:
+    | SendTransactionBatchParameters<request>
+    | SignTransactionBatchParameters<chain, account, chainOverride>,
+) {
   const { calls, paymaster, paymasterInput } = parameters;
   const batchCalls: Call[] = calls.map((tx) => {
     if (!tx.to) throw new Error('Transaction target (to) is required');

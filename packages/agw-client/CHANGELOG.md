@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.7.0-beta.0
+
+### Minor Changes
+
+- 42ac63d: Add batch transaction signing; use privy sign transaction and broadcast result using public client RPC
+
 ## 1.6.4
 
 ### Patch Changes

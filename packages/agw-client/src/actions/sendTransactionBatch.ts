@@ -157,7 +157,7 @@ export async function sendTransactionBatch<
     throw new Error('No calls provided');
   }
   if (isPrivyCrossApp) {
-    const signedTx = await signPrivyTransaction(client, parameters as any); // TODO: fix this
+    const signedTx = await signPrivyTransaction(client, parameters as any);
     return await publicClient.sendRawTransaction({
       serializedTransaction: signedTx,
     });

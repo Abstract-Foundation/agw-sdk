@@ -17,10 +17,7 @@ import { address } from '../../../constants.js';
 vi.mock('../../../../src/actions/sendTransactionInternal');
 vi.mock('../../../../src/actions/sendPrivyTransaction');
 
-import {
-  sendPrivyTransaction,
-  signPrivyTransaction,
-} from '../../../../src/actions/sendPrivyTransaction.js';
+import { signPrivyTransaction } from '../../../../src/actions/sendPrivyTransaction.js';
 import { sendTransactionInternal } from '../../../../src/actions/sendTransactionInternal.js';
 
 // Client setup

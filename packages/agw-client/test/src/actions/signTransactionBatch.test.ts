@@ -70,7 +70,7 @@ signerClient.request = (async ({ method, params }) => {
 
 describe('signTransactionBatch', () => {
   test('signs a batch of EIP-712 transactions correctly', async () => {
-    const transactions: ZksyncTransactionRequestEIP712[] = [
+    const transactions = [
       {
         to: '0xAbc1230000000000000000000000000000000000',
         value: 1n,

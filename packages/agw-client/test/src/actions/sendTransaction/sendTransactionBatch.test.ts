@@ -30,7 +30,10 @@ vi.mock('../../../../src/actions/sendTransactionInternal');
 vi.mock('../../../../src/actions/sendPrivyTransaction');
 
 import AGWAccountAbi from '../../../../src/abis/AGWAccount.js';
-import { sendPrivyTransaction } from '../../../../src/actions/sendPrivyTransaction.js';
+import {
+  sendPrivyTransaction,
+  signPrivyTransaction,
+} from '../../../../src/actions/sendPrivyTransaction.js';
 import { sendTransactionInternal } from '../../../../src/actions/sendTransactionInternal.js';
 
 // Client setup
@@ -238,7 +241,8 @@ describe('sendTransactionBatch', () => {
 
 describe('sendTransactionBatch with isPrivyCrossApp', () => {
   it('should call sendPrivyTransaction', async () => {
-    vi.mocked(sendPrivyTransaction).mockResolvedValue('0x01234');
+    vi.mocked(signPrivyTransaction).mockResolvedValue('0x01abab');
+    vi.spyOn(publicClient, 'sendRawTransaction').mockResolvedValue('0x01234');
 
     const transactionHash = await sendTransactionBatch(
       baseClient,
@@ -251,9 +255,13 @@ describe('sendTransactionBatch with isPrivyCrossApp', () => {
       true,
     );
 
-    expect(sendPrivyTransaction).toHaveBeenCalledWith(baseClient, {
+    expect(signPrivyTransaction).toHaveBeenCalledWith(baseClient, {
       paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
       calls: [transaction1, transaction2],
+    });
+
+    expect(publicClient.sendRawTransaction).toHaveBeenCalledWith({
+      serializedTransaction: '0x01abab',
     });
 
     expect(transactionHash).toBe('0x01234');

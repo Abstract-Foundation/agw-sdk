@@ -17,7 +17,7 @@ import { type Call } from '../types/call.js';
 import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
 import type { SendTransactionBatchParameters } from '../types/sendTransactionBatch.js';
 import type { SignTransactionBatchParameters } from '../types/signTransactionBatch.js';
-import { sendPrivyTransaction } from './sendPrivyTransaction.js';
+import { signPrivyTransaction } from './sendPrivyTransaction.js';
 import { sendTransactionInternal } from './sendTransactionInternal.js';
 
 export function getBatchTransactionObject<
@@ -157,7 +157,10 @@ export async function sendTransactionBatch<
     throw new Error('No calls provided');
   }
   if (isPrivyCrossApp) {
-    return await sendPrivyTransaction(client, parameters);
+    const signedTx = await signPrivyTransaction(client, parameters as any); // TODO: fix this
+    return await publicClient.sendRawTransaction({
+      serializedTransaction: signedTx,
+    });
   }
 
   const batchTransaction = getBatchTransactionObject(

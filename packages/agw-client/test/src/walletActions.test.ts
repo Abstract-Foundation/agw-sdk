@@ -7,6 +7,7 @@ import * as sendTransactionModule from '../../src/actions/sendTransaction.js';
 import * as sendTransactionBatchModule from '../../src/actions/sendTransactionBatch.js';
 import * as sendTransactionForSessionModule from '../../src/actions/sendTransactionForSession.js';
 import * as signTransactionModule from '../../src/actions/signTransaction.js';
+import * as signTransactionBatchModule from '../../src/actions/signTransactionBatch.js';
 import * as writeContractModule from '../../src/actions/writeContract.js';
 import * as writeContractForSessionModule from '../../src/actions/writeContractForSession.js';
 import { EOA_VALIDATOR_ADDRESS } from '../../src/constants.js';
@@ -26,7 +27,7 @@ vi.mock('../../src/actions/prepareTransaction');
 vi.mock('../../src/actions/writeContractForSession');
 vi.mock('../../src/actions/sendTransactionForSession');
 vi.mock('../../src/actions/sendTransactionBatch');
-
+vi.mock('../../src/actions/signTransactionBatch');
 describe('globalWalletActions', () => {
   const mockSignerClient = {
     account: {
@@ -71,7 +72,7 @@ describe('globalWalletActions', () => {
 
   it('should call sendTransactionBatch with correct arguments', async () => {
     const mockArgs = {
-      requests: [
+      calls: [
         { to: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826', value: 100n },
       ],
     };
@@ -95,6 +96,27 @@ describe('globalWalletActions', () => {
     };
     await actions.signTransaction(mockArgs as any);
     expect(signTransactionModule.signTransaction).toHaveBeenCalledWith(
+      mockClient,
+      mockSignerClient,
+      mockPublicClient,
+      mockArgs,
+      EOA_VALIDATOR_ADDRESS,
+      {},
+      undefined,
+      false,
+    );
+  });
+
+  it('should call signTransactionBatch with correct arguments', async () => {
+    const mockArgs = {
+      calls: [
+        { to: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826', value: 100n },
+      ],
+    };
+    await actions.signTransactionBatch(mockArgs as any);
+    expect(
+      signTransactionBatchModule.signTransactionBatch,
+    ).toHaveBeenCalledWith(
       mockClient,
       mockSignerClient,
       mockPublicClient,

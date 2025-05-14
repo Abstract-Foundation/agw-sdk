@@ -27,6 +27,7 @@ import {
   type Eip712WalletActions,
   type SendEip712TransactionParameters,
   type SignEip712TransactionParameters,
+  type SignEip712TransactionReturnType,
 } from 'viem/zksync';
 
 import { type AbstractClient } from './abstractClient.js';
@@ -69,6 +70,7 @@ import { sendTransactionBatch } from './actions/sendTransactionBatch.js';
 import { sendTransactionForSession } from './actions/sendTransactionForSession.js';
 import { signMessage } from './actions/signMessage.js';
 import { signTransaction } from './actions/signTransaction.js';
+import { signTransactionBatch } from './actions/signTransactionBatch.js';
 import { signTransactionForSession } from './actions/signTransactionForSession.js';
 import {
   signTypedData,
@@ -81,6 +83,7 @@ import { type SessionClient, toSessionClient } from './sessionClient.js';
 import type { SessionConfig, SessionStatus } from './sessions.js';
 import type { CustomPaymasterHandler } from './types/customPaymaster.js';
 import type { SendTransactionBatchParameters } from './types/sendTransactionBatch.js';
+import type { SignTransactionBatchParameters } from './types/signTransactionBatch.js';
 
 export type AbstractWalletActions<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
@@ -108,6 +111,9 @@ export type AbstractWalletActions<
   >(
     args: SendTransactionBatchParameters<request>,
   ) => Promise<SendTransactionReturnType>;
+  signTransactionBatch: (
+    args: SignTransactionBatchParameters<chain, account>,
+  ) => Promise<SignEip712TransactionReturnType>;
   prepareAbstractTransactionRequest: <
     chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
     account extends Account | undefined = Account | undefined,
@@ -281,6 +287,17 @@ export function globalWalletActions<
         signerClient,
         publicClient,
         args as SignEip712TransactionParameters<chain, account>,
+        EOA_VALIDATOR_ADDRESS,
+        {},
+        customPaymasterHandler,
+        isPrivyCrossApp,
+      ),
+    signTransactionBatch: (args) =>
+      signTransactionBatch(
+        client,
+        signerClient,
+        publicClient,
+        args as SignTransactionBatchParameters<chain, account>,
         EOA_VALIDATOR_ADDRESS,
         {},
         customPaymasterHandler,

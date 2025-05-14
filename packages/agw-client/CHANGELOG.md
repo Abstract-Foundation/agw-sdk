@@ -1,5 +1,15 @@
 # @abstract-foundation/agw-client
 
+## 1.7.0
+
+### Minor Changes
+
+- 5630049: feat: use privy sign instead of send transaction to bypass confirmation window
+
+### Patch Changes
+
+- 0e9c9e4: perf: parallelize async calls in prepareTransactionRequest
+
 ## 1.6.4
 
 ### Patch Changes

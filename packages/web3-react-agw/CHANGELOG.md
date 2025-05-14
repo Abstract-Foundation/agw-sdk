@@ -1,5 +1,17 @@
 # @abstract-foundation/web3-react-agw
 
+## 1.6.0
+
+### Minor Changes
+
+- 5630049: feat: use privy sign instead of send transaction to bypass confirmation window
+
+### Patch Changes
+
+- Updated dependencies [5630049]
+- Updated dependencies [0e9c9e4]
+  - @abstract-foundation/agw-client@1.7.0
+
 ## 1.5.5
 
 ### Patch Changes

@@ -1,5 +1,6 @@
 import {
   type Account,
+  BaseError,
   type Client,
   type PublicClient,
   type SendTransactionRequest,
@@ -7,17 +8,26 @@ import {
   type WalletClient,
 } from 'viem';
 import {
+  getTransactionError,
+  type GetTransactionErrorParameters,
+  parseAccount,
+} from 'viem/utils';
+import {
   type ChainEIP712,
   type SendEip712TransactionParameters,
   type SendEip712TransactionReturnType,
 } from 'viem/zksync';
 
-import { EOA_VALIDATOR_ADDRESS } from '../constants.js';
+import {
+  EOA_VALIDATOR_ADDRESS,
+  INSUFFICIENT_BALANCE_SELECTOR,
+} from '../constants.js';
+import { InsufficientBalanceError } from '../errors/insufficientBalance.js';
 import type {
   CustomPaymasterHandler,
   PaymasterArgs,
 } from '../types/customPaymaster.js';
-import { sendPrivyTransaction } from './sendPrivyTransaction.js';
+import { signPrivyTransaction } from './sendPrivyTransaction.js';
 import { sendTransactionInternal } from './sendTransactionInternal.js';
 
 /**
@@ -83,28 +93,45 @@ export async function sendTransaction<
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<SendEip712TransactionReturnType> {
   if (isPrivyCrossApp) {
-    let paymasterData: Partial<PaymasterArgs> = {};
-    // SendEip712TransactionParameters doesn't actually have paymaster or paymasterInput fields
-    // defined, so we just have to cast to any here to access them
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const requestAsAny = parameters as any;
-    if (
-      customPaymasterHandler &&
-      !requestAsAny.paymaster &&
-      !requestAsAny.paymasterInput
-    ) {
-      paymasterData = await customPaymasterHandler({
-        ...(parameters as any),
-        from: client.account.address,
-        chainId: parameters.chain?.id ?? client.chain.id,
+    try {
+      let paymasterData: Partial<PaymasterArgs> = {};
+      // SendEip712TransactionParameters doesn't actually have paymaster or paymasterInput fields
+      // defined, so we just have to cast to any here to access them
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const requestAsAny = parameters as any;
+      if (
+        customPaymasterHandler &&
+        !requestAsAny.paymaster &&
+        !requestAsAny.paymasterInput
+      ) {
+        paymasterData = await customPaymasterHandler({
+          ...(parameters as any),
+          from: client.account.address,
+          chainId: parameters.chain?.id ?? client.chain.id,
+        });
+      }
+
+      const updatedParameters = {
+        ...parameters,
+        ...(paymasterData as any),
+      };
+      const signedTx = await signPrivyTransaction(client, updatedParameters);
+      return await publicClient.sendRawTransaction({
+        serializedTransaction: signedTx,
+      });
+    } catch (err) {
+      if (
+        err instanceof Error &&
+        err.message.includes(INSUFFICIENT_BALANCE_SELECTOR)
+      ) {
+        throw new InsufficientBalanceError();
+      }
+      throw getTransactionError(err as BaseError, {
+        ...(parameters as GetTransactionErrorParameters),
+        account: parameters.account ? parseAccount(parameters.account) : null,
+        chain: parameters.chain ?? undefined,
       });
     }
-
-    const updatedParameters = {
-      ...parameters,
-      ...(paymasterData as any),
-    };
-    return await sendPrivyTransaction(client, updatedParameters);
   }
 
   return sendTransactionInternal(

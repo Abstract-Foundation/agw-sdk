@@ -17,7 +17,7 @@ import { address } from '../../../constants.js';
 vi.mock('../../../../src/actions/sendTransactionInternal');
 vi.mock('../../../../src/actions/sendPrivyTransaction');
 
-import { sendPrivyTransaction } from '../../../../src/actions/sendPrivyTransaction.js';
+import { signPrivyTransaction } from '../../../../src/actions/sendPrivyTransaction.js';
 import { sendTransactionInternal } from '../../../../src/actions/sendTransactionInternal.js';
 
 // Client setup
@@ -86,7 +86,9 @@ describe('sendTransaction', () => {
   });
 
   test('sendTransaction calls sendPrivyTransaction correctly', async () => {
-    vi.mocked(sendPrivyTransaction).mockResolvedValue('0x01234');
+    vi.mocked(signPrivyTransaction).mockResolvedValue('0x01abab');
+    vi.spyOn(publicClient, 'sendRawTransaction').mockResolvedValue('0x01234');
+
     const transactionHash = await sendTransaction(
       baseClient,
       signerClient,
@@ -98,10 +100,13 @@ describe('sendTransaction', () => {
       true,
     );
 
-    expect(sendPrivyTransaction).toHaveBeenCalledWith(
+    expect(signPrivyTransaction).toHaveBeenCalledWith(
       baseClient,
       expect.objectContaining(transaction),
     );
+    expect(publicClient.sendRawTransaction).toHaveBeenCalledWith({
+      serializedTransaction: '0x01abab',
+    });
     expect(transactionHash).toBe('0x01234');
   });
 });

@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.7.1
+
+### Patch Changes
+
+- 671a6f9: Export getSessionStatus action
+
 ## 1.7.0
 
 ### Minor Changes

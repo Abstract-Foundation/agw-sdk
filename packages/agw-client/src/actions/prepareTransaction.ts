@@ -335,15 +335,14 @@ export async function prepareTransactionRequest<
   let userBalance: bigint | undefined;
 
   // Get balance if the transaction is not sponsored
-  if (!args.isSponsored) {
-    asyncOperations.push(
-      getBalance(publicClient, {
-        address: initiatorAccount.address,
-      }).then((balance: bigint) => {
-        userBalance = balance;
-      }),
-    );
-  }
+
+  asyncOperations.push(
+    getBalance(publicClient, {
+      address: initiatorAccount.address,
+    }).then((balance: bigint) => {
+      userBalance = balance;
+    }),
+  );
 
   // Get nonce if needed
   if (
@@ -428,12 +427,14 @@ export async function prepareTransactionRequest<
   await Promise.all(asyncOperations);
 
   // Check if user has enough balance
+  const gasCost =
+    args.isSponsored || !request.gas || !request.maxFeePerGas
+      ? 0n
+      : request.gas * request.maxFeePerGas;
+
   if (
-    !args.isSponsored &&
     userBalance !== undefined &&
-    request.gas !== undefined &&
-    request.maxFeePerGas !== undefined &&
-    userBalance < (request.value ?? 0n) + request.gas * request.maxFeePerGas
+    userBalance < (request.value ?? 0n) + gasCost
   ) {
     throw new InsufficientBalanceError();
   }

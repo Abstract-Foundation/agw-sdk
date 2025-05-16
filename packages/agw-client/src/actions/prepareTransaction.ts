@@ -36,6 +36,7 @@ import {
   estimateGas,
   type EstimateGasErrorType,
   type EstimateGasParameters,
+  getBalance,
   type GetBlockErrorType,
   getTransactionCount,
   type GetTransactionCountErrorType,
@@ -58,6 +59,7 @@ import {
   EOA_VALIDATOR_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
 } from '../constants.js';
+import { InsufficientBalanceError } from '../errors/insufficientBalance.js';
 import { AccountFactoryAbi } from '../exports/constants.js';
 import type { Call } from '../types/call.js';
 import { isSmartAccountDeployed } from '../utils.js';
@@ -325,6 +327,16 @@ export async function prepareTransactionRequest<
 
   // Prepare all async operations that can run in parallel
   const asyncOperations = [];
+  let userBalance: bigint | undefined;
+
+  // Get balance
+  asyncOperations.push(
+    getBalance(publicClient, {
+      address: initiatorAccount.address,
+    }).then((balance: bigint) => {
+      userBalance = balance;
+    }),
+  );
 
   // Get nonce if needed
   if (
@@ -407,6 +419,17 @@ export async function prepareTransactionRequest<
 
   // Wait for all async operations to complete
   await Promise.all(asyncOperations);
+
+  // Check if user has enough balance
+  if (
+    userBalance !== undefined &&
+    request.value !== undefined &&
+    request.gas !== undefined &&
+    request.maxFeePerGas !== undefined &&
+    userBalance < request.value + request.gas * request.maxFeePerGas
+  ) {
+    throw new InsufficientBalanceError();
+  }
 
   // Estimate gas limit if needed
   if (

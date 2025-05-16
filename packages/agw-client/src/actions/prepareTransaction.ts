@@ -141,6 +141,11 @@ export type PrepareTransactionRequestRequest<
      * Whether the transaction is the first transaction of the account.
      */
     isInitialTransaction?: boolean;
+
+    /**
+     * Whether the transaction is sponsored.
+     */
+    isSponsored?: boolean;
   };
 
 export type PrepareTransactionRequestParameters<
@@ -281,7 +286,7 @@ export async function prepareTransactionRequest<
     chainOverride,
     accountOverride,
     request
-  >,
+  > & { isSponsored?: boolean },
 ): Promise<PrepareTransactionRequestReturnType> {
   const { gas, nonce, parameters: parameterNames = defaultParameters } = args;
 
@@ -329,14 +334,16 @@ export async function prepareTransactionRequest<
   const asyncOperations = [];
   let userBalance: bigint | undefined;
 
-  // Get balance
-  asyncOperations.push(
-    getBalance(publicClient, {
-      address: initiatorAccount.address,
-    }).then((balance: bigint) => {
-      userBalance = balance;
-    }),
-  );
+  // Get balance if the transaction is not sponsored
+  if (!args.isSponsored) {
+    asyncOperations.push(
+      getBalance(publicClient, {
+        address: initiatorAccount.address,
+      }).then((balance: bigint) => {
+        userBalance = balance;
+      }),
+    );
+  }
 
   // Get nonce if needed
   if (
@@ -422,11 +429,11 @@ export async function prepareTransactionRequest<
 
   // Check if user has enough balance
   if (
+    !args.isSponsored &&
     userBalance !== undefined &&
-    request.value !== undefined &&
     request.gas !== undefined &&
     request.maxFeePerGas !== undefined &&
-    userBalance < request.value + request.gas * request.maxFeePerGas
+    userBalance < (request.value ?? 0n) + request.gas * request.maxFeePerGas
   ) {
     throw new InsufficientBalanceError();
   }

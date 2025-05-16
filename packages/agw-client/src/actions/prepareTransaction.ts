@@ -334,15 +334,19 @@ export async function prepareTransactionRequest<
   const asyncOperations = [];
   let userBalance: bigint | undefined;
 
-  // Get balance if the transaction is not sponsored
-
-  asyncOperations.push(
-    getBalance(publicClient, {
-      address: initiatorAccount.address,
-    }).then((balance: bigint) => {
-      userBalance = balance;
-    }),
-  );
+  // Get balance if the transaction is not sponsored or has a value
+  if (
+    !args.isSponsored ||
+    (request.value !== undefined && request.value > 0n)
+  ) {
+    asyncOperations.push(
+      getBalance(publicClient, {
+        address: initiatorAccount.address,
+      }).then((balance: bigint) => {
+        userBalance = balance;
+      }),
+    );
+  }
 
   // Get nonce if needed
   if (

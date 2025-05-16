@@ -286,7 +286,7 @@ export async function prepareTransactionRequest<
     chainOverride,
     accountOverride,
     request
-  > & { isSponsored?: boolean },
+  >,
 ): Promise<PrepareTransactionRequestReturnType> {
   const { gas, nonce, parameters: parameterNames = defaultParameters } = args;
 

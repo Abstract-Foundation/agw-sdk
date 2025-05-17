@@ -69,6 +69,9 @@ export async function sendTransactionInternal<
       {
         ...parameters,
         parameters: ['gas', 'nonce', 'fees'],
+        isSponsored:
+          customPaymasterHandler !== undefined ||
+          (parameters as any).paymaster !== undefined,
       } as any,
     );
 

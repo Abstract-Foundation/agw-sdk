@@ -6,6 +6,7 @@ import {
   encodeFunctionData,
   http,
   keccak256,
+  parseEther,
   toBytes,
   toHex,
 } from 'viem';
@@ -22,6 +23,7 @@ import {
   EOA_VALIDATOR_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
 } from '../../../src/constants.js';
+import { InsufficientBalanceError } from '../../../src/errors/insufficientBalance.js';
 import { AccountFactoryAbi } from '../../../src/exports/constants.js';
 import {
   getInitializerCalldata,
@@ -36,6 +38,7 @@ vi.mock('viem', async (importOriginal) => {
   return {
     ...(original as any),
     encodeFunctionData: vi.fn().mockReturnValue('0xmockedEncodedData'),
+    getBalance: vi.fn().mockResolvedValue(1000000000000000000n), // 1 ETH
   };
 });
 
@@ -90,6 +93,8 @@ publicClient.request = (async ({ method, params }) => {
       max_fee_per_gas: toHex(MOCK_FEE_PER_GAS),
       max_priority_fee_per_gas: '0x0',
     };
+  } else if (method === 'eth_getBalance') {
+    return toHex(1000000000000000000n); // 1 ETH
   }
   return anvilAbstractTestnet.getClient().request({ method, params } as any);
 }) as EIP1193RequestFn;
@@ -291,4 +296,89 @@ test('throws if maxFeePerGas is too low', async () => {
       maxFeePerGas: 10000n,
     }),
   ).rejects.toThrow(MaxFeePerGasTooLowError);
+});
+
+test.each([
+  {
+    name: 'throws if insufficient balance with value',
+    balance: parseEther('0.09'),
+    value: parseEther('0.1'),
+    isSponsored: false,
+    errorType: InsufficientBalanceError,
+  },
+  {
+    name: 'does not throw if balance is sufficient with value',
+    balance: parseEther('0.09'),
+    value: parseEther('0.001'),
+    isSponsored: false,
+    expectToThrow: false,
+  },
+  {
+    name: 'does not throw if balance is sufficient with no value',
+    balance: parseEther('0.09'),
+    value: undefined,
+    isSponsored: false,
+    expectToThrow: false,
+  },
+  {
+    name: 'throws if balance is insufficient with no value',
+    balance: 25000000100000n - 1n, // 1 wei short
+    value: undefined,
+    isSponsored: false,
+    errorType: InsufficientBalanceError,
+  },
+  {
+    name: 'does not throw if insufficient balance if the transaction is sponsored but lacks gas',
+    balance: parseEther('0.1'),
+    value: parseEther('0.1'),
+    isSponsored: true,
+  },
+  {
+    name: 'throws if the transaction is sponsored but lacks enough value',
+    balance: parseEther('0.09'),
+    value: parseEther('0.1'),
+    isSponsored: true,
+    errorType: InsufficientBalanceError,
+  },
+])('$name', async ({ balance, value, isSponsored, errorType }) => {
+  vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
+
+  // Create a modified public client that returns a specified balance
+  const publicClientWithCustomBalance = createPublicClient({
+    chain: anvilAbstractTestnet.chain as ChainEIP712,
+    transport: anvilAbstractTestnet.clientConfig.transport,
+  });
+
+  publicClientWithCustomBalance.request = (async ({ method, params }) => {
+    if (method === 'zks_estimateFee') {
+      return {
+        gas_limit: 100_000n,
+        gas_per_pubdata_limit: '0x143b',
+        max_fee_per_gas: toHex(MOCK_FEE_PER_GAS),
+        max_priority_fee_per_gas: '0x0',
+      };
+    } else if (method === 'eth_getBalance') {
+      return balance;
+    }
+    return anvilAbstractTestnet.getClient().request({ method, params } as any);
+  }) as EIP1193RequestFn;
+
+  const txRequest = prepareTransactionRequest(
+    baseClient,
+    signerClient,
+    publicClientWithCustomBalance,
+    {
+      ...transaction,
+      ...(value !== undefined && { value }),
+      chain: anvilAbstractTestnet.chain,
+      isInitialTransaction: false,
+      ...(isSponsored && { isSponsored }),
+    },
+  );
+
+  if (errorType) {
+    await expect(txRequest).rejects.toThrow(errorType);
+  } else {
+    await expect(txRequest).resolves.not.toThrow();
+  }
 });

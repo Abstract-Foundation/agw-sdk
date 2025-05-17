@@ -36,6 +36,7 @@ import {
   estimateGas,
   type EstimateGasErrorType,
   type EstimateGasParameters,
+  getBalance,
   type GetBlockErrorType,
   getTransactionCount,
   type GetTransactionCountErrorType,
@@ -58,6 +59,7 @@ import {
   EOA_VALIDATOR_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
 } from '../constants.js';
+import { InsufficientBalanceError } from '../errors/insufficientBalance.js';
 import { AccountFactoryAbi } from '../exports/constants.js';
 import type { Call } from '../types/call.js';
 import { isSmartAccountDeployed } from '../utils.js';
@@ -139,6 +141,11 @@ export type PrepareTransactionRequestRequest<
      * Whether the transaction is the first transaction of the account.
      */
     isInitialTransaction?: boolean;
+
+    /**
+     * Whether the transaction is sponsored.
+     */
+    isSponsored?: boolean;
   };
 
 export type PrepareTransactionRequestParameters<
@@ -325,6 +332,21 @@ export async function prepareTransactionRequest<
 
   // Prepare all async operations that can run in parallel
   const asyncOperations = [];
+  let userBalance: bigint | undefined;
+
+  // Get balance if the transaction is not sponsored or has a value
+  if (
+    !args.isSponsored ||
+    (request.value !== undefined && request.value > 0n)
+  ) {
+    asyncOperations.push(
+      getBalance(publicClient, {
+        address: initiatorAccount.address,
+      }).then((balance: bigint) => {
+        userBalance = balance;
+      }),
+    );
+  }
 
   // Get nonce if needed
   if (
@@ -407,6 +429,19 @@ export async function prepareTransactionRequest<
 
   // Wait for all async operations to complete
   await Promise.all(asyncOperations);
+
+  // Check if user has enough balance
+  const gasCost =
+    args.isSponsored || !request.gas || !request.maxFeePerGas
+      ? 0n
+      : request.gas * request.maxFeePerGas;
+
+  if (
+    userBalance !== undefined &&
+    userBalance < (request.value ?? 0n) + gasCost
+  ) {
+    throw new InsufficientBalanceError();
+  }
 
   // Estimate gas limit if needed
   if (

@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.7.2
+
+### Patch Changes
+
+- 271dc6c: feat: Throw insufficient balance error if the user's balance can not cover the transaction cost + gas
+
 ## 1.7.1
 
 ### Patch Changes

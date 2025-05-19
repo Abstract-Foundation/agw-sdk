@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.7.3
+
+### Patch Changes
+
+- c10b833: fix: add call to transformHexValues in prepareTransaction
+
 ## 1.7.2
 
 ### Patch Changes

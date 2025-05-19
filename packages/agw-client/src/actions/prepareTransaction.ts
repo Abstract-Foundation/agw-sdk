@@ -62,7 +62,7 @@ import {
 import { InsufficientBalanceError } from '../errors/insufficientBalance.js';
 import { AccountFactoryAbi } from '../exports/constants.js';
 import type { Call } from '../types/call.js';
-import { isSmartAccountDeployed } from '../utils.js';
+import { isSmartAccountDeployed, transformHexValues } from '../utils.js';
 import { getInitializerCalldata } from '../utils.js';
 
 export type IsUndefined<T> = [undefined] extends [T] ? true : false;
@@ -288,6 +288,17 @@ export async function prepareTransactionRequest<
     request
   >,
 ): Promise<PrepareTransactionRequestReturnType> {
+  // transform values in case any are provided in hex format (from rpc)
+  transformHexValues(args, [
+    'value',
+    'nonce',
+    'maxFeePerGas',
+    'maxPriorityFeePerGas',
+    'gas',
+    'chainId',
+    'gasPerPubdata',
+  ]);
+
   const { gas, nonce, parameters: parameterNames = defaultParameters } = args;
 
   const isDeployed = await isSmartAccountDeployed(

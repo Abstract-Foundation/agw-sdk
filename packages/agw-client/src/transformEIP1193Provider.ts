@@ -1,5 +1,6 @@
 import {
   type Address,
+  assertCurrentChain,
   type Chain,
   createPublicClient,
   createWalletClient,
@@ -8,16 +9,23 @@ import {
   type EIP1193Provider,
   type EIP1193RequestFn,
   type EIP1474Methods,
+  fromHex,
+  type Hex,
   hexToBigInt,
   hexToNumber,
   isHex,
   toHex,
   type Transport,
 } from 'viem';
-import { toAccount } from 'viem/accounts';
+import { parseAccount, toAccount } from 'viem/accounts';
 
 import { createAbstractClient } from './abstractClient.js';
-import { agwCapabilities, type SendCallsParams } from './eip5792.js';
+import {
+  agwCapabilitiesV2,
+  getReceiptStatus,
+  type SendCallsParams,
+  type WalletCapabilitiesV2,
+} from './eip5792.js';
 import { type CustomPaymasterHandler, validChains } from './exports/index.js';
 import { getSmartAccountAddressFromInitialSigner } from './utils.js';
 
@@ -220,6 +228,28 @@ export function transformEIP1193Provider(
           return await provider.request(e);
         }
 
+        if (
+          sendCallsParams.version === '1.0' ||
+          sendCallsParams.version === undefined
+        ) {
+          sendCallsParams.calls.forEach((call) => {
+            if (call.chainId) {
+              assertCurrentChain({
+                chain,
+                currentChainId: fromHex(call.chainId, 'number'),
+              });
+            }
+          });
+        }
+        if (sendCallsParams.version === '2.0.0') {
+          if (fromHex(sendCallsParams.chainId, 'number') !== chain.id) {
+            return {
+              code: 5710,
+              message: 'Chain not supported',
+            };
+          }
+        }
+
         const abstractClient = await getAgwClient(
           account,
           chain,
@@ -229,14 +259,33 @@ export function transformEIP1193Provider(
           customPaymasterHandler,
         );
 
-        return await abstractClient.sendTransactionBatch({
+        if (
+          sendCallsParams.from !== parseAccount(abstractClient.account).address
+        ) {
+          return {
+            code: 4001,
+            message: 'Unauthorized',
+          };
+        }
+
+        const txHash = await abstractClient.sendTransactionBatch({
           calls: sendCallsParams.calls.map((call) => ({
             to: call.to,
             value: call.value ? hexToBigInt(call.value) : undefined,
             data: call.data,
-            chainId: call.chainId ? hexToBigInt(call.chainId) : undefined,
           })),
         });
+
+        if (
+          sendCallsParams.version === undefined ||
+          sendCallsParams.version === '1.0'
+        ) {
+          return txHash;
+        }
+
+        return {
+          id: txHash,
+        };
       }
       case 'wallet_getCallsStatus': {
         const receipt = await provider.request({
@@ -244,7 +293,10 @@ export function transformEIP1193Provider(
           params,
         });
         return {
-          status: receipt?.status === undefined ? 'PENDING' : 'CONFIRMED',
+          version: '2.0.0',
+          id: params[0],
+          chainId: toHex(chain.id),
+          status: getReceiptStatus(receipt ?? undefined),
           receipts: [receipt],
         };
       }
@@ -277,7 +329,20 @@ export function transformEIP1193Provider(
         if (params[0] === account) {
           return await provider.request(e);
         }
-        return agwCapabilities;
+        const chainIds = params[1] as Hex[] | undefined;
+
+        const capabilities = agwCapabilitiesV2;
+        if (chainIds) {
+          const filteredCapabilities: WalletCapabilitiesV2 = {};
+          for (const chainId of chainIds) {
+            if (capabilities[chainId]) {
+              filteredCapabilities[chainId] = capabilities[chainId];
+            }
+          }
+          return filteredCapabilities;
+        } else {
+          return capabilities;
+        }
       }
       default: {
         return await provider.request(e);

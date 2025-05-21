@@ -1,5 +1,16 @@
 # @abstract-foundation/web3-react-agw
 
+## 1.7.0
+
+### Minor Changes
+
+- 2577a28: feat: Support finalized EIP-5792 spec (wallet_sendCalls)
+
+### Patch Changes
+
+- Updated dependencies [2577a28]
+  - @abstract-foundation/agw-client@1.8.0
+
 ## 1.6.3
 
 ### Patch Changes

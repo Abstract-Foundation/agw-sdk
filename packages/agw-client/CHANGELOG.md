@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.8.0
+
+### Minor Changes
+
+- 2577a28: feat: Support finalized EIP-5792 spec (wallet_sendCalls)
+
 ## 1.7.3
 
 ### Patch Changes

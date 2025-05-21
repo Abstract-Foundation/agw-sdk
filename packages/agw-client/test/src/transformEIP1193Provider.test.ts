@@ -429,6 +429,23 @@ describe('transformEIP1193Provider', () => {
 
       expect(result).toBe(agwCapabilitiesV2);
     });
+
+    it('should handle wallet_getCapabilities for specific chain', async () => {
+      const mockAccounts: Address[] = [
+        '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+      ];
+      const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
+
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
+      const result = await transformedProvider.request({
+        method: 'wallet_getCapabilities',
+        params: [mockSmartAccount as any, [toHex(abstractTestnet.id)]] as any,
+      });
+
+      expect(result).toStrictEqual({
+        '0x2b74': agwCapabilitiesV2['0x2b74'],
+      });
+    });
     it('should pass through wallet_getCapabilities to base client when called with external signer', async () => {
       const mockAccounts: Address[] = [
         '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',

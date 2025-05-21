@@ -17,7 +17,7 @@ interface AtomicCapabilityV1 {
 }
 
 interface AtomicCapabilityV2 {
-  supported: 'supported' | 'ready' | 'unsupported';
+  status: 'supported' | 'ready' | 'unsupported';
 }
 
 interface ChainCapabilitiesV1 {
@@ -65,12 +65,12 @@ export interface SendCallsParamsV2 {
 export const agwCapabilitiesV2: WalletCapabilitiesV2 = {
   '0xab5': {
     atomic: {
-      supported: 'supported',
+      status: 'supported',
     },
   },
   '0x2b74': {
     atomic: {
-      supported: 'supported',
+      status: 'supported',
     },
   },
 };

@@ -12,7 +12,7 @@ import {
   parseAccount,
   privateKeyToAccount,
 } from 'viem/accounts';
-import { abstractTestnet } from 'viem/chains';
+import { abstract, abstractTestnet } from 'viem/chains';
 import { getGeneralPaymasterInput } from 'viem/zksync';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
@@ -552,6 +552,99 @@ describe('transformEIP1193Provider', () => {
 
       expect(result).toStrictEqual({
         id: mockSignedTransaction,
+      });
+    });
+    it('should throw error for chain mismatch in wallet_sendCalls v1.0', async () => {
+      const mockAccounts: Address[] = [
+        '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+      ];
+      const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
+
+      const mockSignedTransaction = '0xsigned';
+
+      const calls: SendCallsParams['calls'] = [
+        {
+          to: privateKeyToAccount(generatePrivateKey()).address,
+          data: '0x12345678',
+          chainId: toHex(abstract.id),
+        },
+        {
+          to: privateKeyToAccount(generatePrivateKey()).address,
+          value: toHex(parseEther('0.01')),
+          chainId: toHex(abstractTestnet.id),
+        },
+      ];
+
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
+      vi.spyOn(
+        abstractClientModule,
+        'createAbstractClient',
+      ).mockResolvedValueOnce({
+        sendTransactionBatch: vi
+          .fn()
+          .mockResolvedValueOnce(mockSignedTransaction),
+        account: parseAccount(mockSmartAccount),
+      } as any);
+
+      expect(
+        transformedProvider.request({
+          method: 'wallet_sendCalls',
+          params: [
+            {
+              version: '1.0',
+              from: mockSmartAccount,
+              calls,
+            },
+          ],
+        }),
+      ).rejects.toThrowError(
+        'The current chain of the wallet (id: 2741) does not match the target chain for the transaction (id: 11124 – Abstract Testnet).',
+      );
+    });
+    it('should return error response for chain mismatch with wallet_sendCalls v2.0.0', async () => {
+      const mockAccounts: Address[] = [
+        '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+      ];
+      const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
+
+      const mockSignedTransaction = '0xsigned';
+
+      const calls: SendCallsParams['calls'] = [
+        {
+          to: privateKeyToAccount(generatePrivateKey()).address,
+          data: '0x12345678',
+        },
+        {
+          to: privateKeyToAccount(generatePrivateKey()).address,
+          value: toHex(parseEther('0.01')),
+        },
+      ];
+
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
+      vi.spyOn(
+        abstractClientModule,
+        'createAbstractClient',
+      ).mockResolvedValueOnce({
+        sendTransactionBatch: vi
+          .fn()
+          .mockResolvedValueOnce(mockSignedTransaction),
+        account: parseAccount(mockSmartAccount),
+      } as any);
+      const result = await transformedProvider.request({
+        method: 'wallet_sendCalls',
+        params: [
+          {
+            version: '2.0.0',
+            from: mockSmartAccount,
+            chainId: toHex(abstract.id),
+            calls,
+          },
+        ],
+      });
+
+      expect(result).toStrictEqual({
+        code: 5710,
+        message: 'Chain not supported',
       });
     });
     it('should pass wallet_sendCalls through to base client when called with external signer', async () => {

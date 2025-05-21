@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.8.1
+
+### Patch Changes
+
+- 52668dd: fix: atomic capability spec mismatch
+
 ## 1.8.0
 
 ### Minor Changes

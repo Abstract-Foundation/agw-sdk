@@ -647,6 +647,52 @@ describe('transformEIP1193Provider', () => {
         message: 'Chain not supported',
       });
     });
+    it('should return error response for invalid account with wallet_sendCalls v2.0.0', async () => {
+      const mockAccounts: Address[] = [
+        '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+      ];
+      const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
+
+      const mockSignedTransaction = '0xsigned';
+
+      const calls: SendCallsParams['calls'] = [
+        {
+          to: privateKeyToAccount(generatePrivateKey()).address,
+          data: '0x12345678',
+        },
+        {
+          to: privateKeyToAccount(generatePrivateKey()).address,
+          value: toHex(parseEther('0.01')),
+        },
+      ];
+
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
+      vi.spyOn(
+        abstractClientModule,
+        'createAbstractClient',
+      ).mockResolvedValueOnce({
+        sendTransactionBatch: vi
+          .fn()
+          .mockResolvedValueOnce(mockSignedTransaction),
+        account: parseAccount(mockSmartAccount),
+      } as any);
+      const result = await transformedProvider.request({
+        method: 'wallet_sendCalls',
+        params: [
+          {
+            version: '2.0.0',
+            from: '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1200', // not smart account
+            chainId: toHex(abstractTestnet.id),
+            calls,
+          },
+        ],
+      });
+
+      expect(result).toStrictEqual({
+        code: 4001,
+        message: 'Unauthorized',
+      });
+    });
     it('should pass wallet_sendCalls through to base client when called with external signer', async () => {
       const mockAccounts: Address[] = [
         '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',

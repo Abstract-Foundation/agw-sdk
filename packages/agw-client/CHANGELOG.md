@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.8.2
+
+### Patch Changes
+
+- dba9b6c: fix: compute tx sponsorship status inside prepareTransactionRequest
+
 ## 1.8.1
 
 ### Patch Changes

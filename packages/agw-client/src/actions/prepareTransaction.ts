@@ -141,11 +141,6 @@ export type PrepareTransactionRequestRequest<
      * Whether the transaction is the first transaction of the account.
      */
     isInitialTransaction?: boolean;
-
-    /**
-     * Whether the transaction is sponsored.
-     */
-    isSponsored?: boolean;
   };
 
 export type PrepareTransactionRequestParameters<
@@ -299,6 +294,17 @@ export async function prepareTransactionRequest<
     'gasPerPubdata',
   ]);
 
+  const isSponsored =
+    'paymaster' in args &&
+    'paymasterInput' in args &&
+    args.paymaster !== undefined &&
+    args.paymasterInput !== undefined;
+
+  if (isSponsored) {
+    console.log(args);
+  }
+
+  console.log('isSponsored', isSponsored);
   const { gas, nonce, parameters: parameterNames = defaultParameters } = args;
 
   const isDeployed = await isSmartAccountDeployed(
@@ -346,10 +352,7 @@ export async function prepareTransactionRequest<
   let userBalance: bigint | undefined;
 
   // Get balance if the transaction is not sponsored or has a value
-  if (
-    !args.isSponsored ||
-    (request.value !== undefined && request.value > 0n)
-  ) {
+  if (!isSponsored || (request.value !== undefined && request.value > 0n)) {
     asyncOperations.push(
       getBalance(publicClient, {
         address: initiatorAccount.address,
@@ -443,7 +446,7 @@ export async function prepareTransactionRequest<
 
   // Check if user has enough balance
   const gasCost =
-    args.isSponsored || !request.gas || !request.maxFeePerGas
+    isSponsored || !request.gas || !request.maxFeePerGas
       ? 0n
       : request.gas * request.maxFeePerGas;
 

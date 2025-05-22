@@ -363,16 +363,29 @@ test.each([
     return anvilAbstractTestnet.getClient().request({ method, params } as any);
   }) as EIP1193RequestFn;
 
+  const txWithoutPaymaster = {
+    ...transaction,
+    ...(value !== undefined && { value }),
+    paymaster: undefined,
+    paymasterInput: undefined,
+  };
+
+  const paymasterArgs = isSponsored
+    ? {
+        paymaster: transaction.paymaster,
+        paymasterInput: transaction.paymasterInput,
+      }
+    : {};
+
   const txRequest = prepareTransactionRequest(
     baseClient,
     signerClient,
     publicClientWithCustomBalance,
     {
-      ...transaction,
-      ...(value !== undefined && { value }),
+      ...txWithoutPaymaster,
+      ...paymasterArgs,
       chain: anvilAbstractTestnet.chain,
       isInitialTransaction: false,
-      ...(isSponsored && { isSponsored }),
     },
   );
 

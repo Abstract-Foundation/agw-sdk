@@ -300,11 +300,6 @@ export async function prepareTransactionRequest<
     args.paymaster !== undefined &&
     args.paymasterInput !== undefined;
 
-  if (isSponsored) {
-    console.log(args);
-  }
-
-  console.log('isSponsored', isSponsored);
   const { gas, nonce, parameters: parameterNames = defaultParameters } = args;
 
   const isDeployed = await isSmartAccountDeployed(

@@ -11,8 +11,7 @@ import {
 import {
   type ChainEIP712,
   type SendEip712TransactionParameters,
-  type SignEip712TransactionParameters,
-  type SignTransactionReturnType,
+  type SendEip712TransactionReturnType,
 } from 'viem/zksync';
 
 import { SESSION_KEY_VALIDATOR_ADDRESS } from '../constants.js';
@@ -22,50 +21,29 @@ import {
   type SessionConfig,
 } from '../sessions.js';
 import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
-import type { OptimisticTransactionParameters } from '../types/optimisticTransaction.js';
-import { isSmartAccountDeployed } from '../utils.js';
-import { signTransaction } from './signTransaction.js';
+import { sendTransactionInternal } from './sendTransactionInternal.js';
 
-export interface SendTransactionForSessionParameters<
+export async function sendOptimisticTransactionForSession<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
   chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
-  request extends SendTransactionRequest<
+  const request extends SendTransactionRequest<
     chain,
     chainOverride
   > = SendTransactionRequest<chain, chainOverride>,
-> {
+>(
+  client: Client<Transport, ChainEIP712, Account>,
+  signerClient: WalletClient<Transport, ChainEIP712, Account>,
+  publicClient: PublicClient<Transport, ChainEIP712>,
   parameters: SendEip712TransactionParameters<
     chain,
     account,
     chainOverride,
     request
-  >;
-  session: SessionConfig;
-}
-
-export async function signTransactionForSession<
-  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
-  account extends Account | undefined = Account | undefined,
-  chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
->(
-  client: Client<Transport, ChainEIP712, Account>,
-  signerClient: WalletClient<Transport, ChainEIP712, Account>,
-  publicClient: PublicClient<Transport, ChainEIP712>,
-  parameters: SignEip712TransactionParameters<chain, account, chainOverride> & {
-    optimistic?: OptimisticTransactionParameters;
-  },
+  >,
   session: SessionConfig,
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
-): Promise<SignTransactionReturnType> {
-  const isDeployed = await isSmartAccountDeployed(
-    publicClient,
-    client.account.address,
-  );
-  if (!isDeployed) {
-    throw new BaseError('Smart account not deployed');
-  }
-
+): Promise<SendEip712TransactionReturnType> {
   const selector: Hex | undefined = parameters.data
     ? `0x${parameters.data.slice(2, 10)}`
     : undefined;
@@ -74,13 +52,11 @@ export async function signTransactionForSession<
     throw new BaseError('Transaction to field is not specified');
   }
 
-  const { optimistic, ...rest } = parameters;
-
-  return await signTransaction(
+  return sendTransactionInternal(
     client,
     signerClient,
     publicClient,
-    rest as SignEip712TransactionParameters<chain, account, chainOverride>,
+    parameters,
     SESSION_KEY_VALIDATOR_ADDRESS,
     {
       [SESSION_KEY_VALIDATOR_ADDRESS]: encodeSessionWithPeriodIds(
@@ -94,7 +70,5 @@ export async function signTransactionForSession<
       ),
     },
     customPaymasterHandler,
-    false,
-    optimistic,
   );
 }

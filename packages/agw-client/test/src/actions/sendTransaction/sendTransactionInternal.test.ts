@@ -176,10 +176,11 @@ describe('sendTransactionInternal', () => {
           data: isDeployed ? '0x1234' : '0xmockedEncodedData',
           paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
           paymasterInput: '0x',
-          chainId: abstractTestnet.id,
         }),
         EOA_VALIDATOR_ADDRESS,
         {},
+        undefined,
+        false,
         undefined,
       );
 
@@ -198,7 +199,8 @@ describe('sendTransactionInternal', () => {
   );
 });
 
-test('sendTransactionInternal with mismatched chain', async () => {
+// skipped because the chain id check is moved into signTransaction
+test.skip('sendTransactionInternal with mismatched chain', async () => {
   const invalidChain = mainnet;
   expect(
     async () =>

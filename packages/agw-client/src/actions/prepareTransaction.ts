@@ -14,6 +14,7 @@ import {
   type GetTransactionRequestKzgParameter,
   type IsNever,
   keccak256,
+  maxUint256,
   type NonceManager,
   type Prettify,
   type PublicClient,
@@ -62,6 +63,7 @@ import {
 import { InsufficientBalanceError } from '../errors/insufficientBalance.js';
 import { AccountFactoryAbi } from '../exports/constants.js';
 import type { Call } from '../types/call.js';
+import type { OptimisticTransactionParameters } from '../types/optimisticTransaction.js';
 import { isSmartAccountDeployed, transformHexValues } from '../utils.js';
 import { getInitializerCalldata } from '../utils.js';
 
@@ -110,6 +112,8 @@ export type PrepareTransactionRequestParameterType =
   | 'nonce'
   | 'sidecars'
   | 'type';
+export type BypassChecksParameterType = 'balance' | 'deployment';
+
 type ParameterTypeToParameters<
   parameterType extends PrepareTransactionRequestParameterType,
 > = parameterType extends 'fees'
@@ -141,6 +145,8 @@ export type PrepareTransactionRequestRequest<
      * Whether the transaction is the first transaction of the account.
      */
     isInitialTransaction?: boolean;
+
+    optimistic?: OptimisticTransactionParameters;
   };
 
 export type PrepareTransactionRequestParameters<
@@ -302,10 +308,12 @@ export async function prepareTransactionRequest<
 
   const { gas, nonce, parameters: parameterNames = defaultParameters } = args;
 
-  const isDeployed = await isSmartAccountDeployed(
-    publicClient,
-    client.account.address,
-  );
+  const isDeployed =
+    args.optimistic?.isDeployed !== undefined
+      ? args.optimistic.isDeployed
+      : args.optimistic !== undefined
+        ? true
+        : await isSmartAccountDeployed(publicClient, client.account.address);
 
   if (!isDeployed) {
     const initialCall = {
@@ -344,10 +352,18 @@ export async function prepareTransactionRequest<
 
   // Prepare all async operations that can run in parallel
   const asyncOperations = [];
-  let userBalance: bigint | undefined;
+  let userBalance: bigint | undefined =
+    args.optimistic?.balance !== undefined
+      ? args.optimistic.balance
+      : args.optimistic !== undefined
+        ? maxUint256
+        : undefined;
 
   // Get balance if the transaction is not sponsored or has a value
-  if (!isSponsored || (request.value !== undefined && request.value > 0n)) {
+  if (
+    userBalance === undefined &&
+    (!isSponsored || (request.value !== undefined && request.value > 0n))
+  ) {
     asyncOperations.push(
       getBalance(publicClient, {
         address: initiatorAccount.address,

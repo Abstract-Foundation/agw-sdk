@@ -22,7 +22,7 @@ import {
   type SessionConfig,
 } from '../sessions.js';
 import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
-import { isSmartAccountDeployed } from '../utils.js';
+import type { OptimisticTransactionParameters } from '../types/optimisticTransaction.js';
 import { signTransaction } from './signTransaction.js';
 
 export interface SendTransactionForSessionParameters<
@@ -51,18 +51,12 @@ export async function signTransactionForSession<
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
-  parameters: SignEip712TransactionParameters<chain, account, chainOverride>,
+  parameters: SignEip712TransactionParameters<chain, account, chainOverride> & {
+    optimistic?: OptimisticTransactionParameters;
+  },
   session: SessionConfig,
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<SignTransactionReturnType> {
-  const isDeployed = await isSmartAccountDeployed(
-    publicClient,
-    client.account.address,
-  );
-  if (!isDeployed) {
-    throw new BaseError('Smart account not deployed');
-  }
-
   const selector: Hex | undefined = parameters.data
     ? `0x${parameters.data.slice(2, 10)}`
     : undefined;
@@ -71,11 +65,13 @@ export async function signTransactionForSession<
     throw new BaseError('Transaction to field is not specified');
   }
 
+  const { optimistic, ...rest } = parameters;
+
   return await signTransaction(
     client,
     signerClient,
     publicClient,
-    parameters,
+    rest as SignEip712TransactionParameters<chain, account, chainOverride>,
     SESSION_KEY_VALIDATOR_ADDRESS,
     {
       [SESSION_KEY_VALIDATOR_ADDRESS]: encodeSessionWithPeriodIds(
@@ -89,5 +85,7 @@ export async function signTransactionForSession<
       ),
     },
     customPaymasterHandler,
+    false,
+    optimistic,
   );
 }

@@ -217,7 +217,7 @@ export function sessionWalletActions(
         client,
         signerClient,
         publicClient,
-        args,
+        args as any,
         session,
         paymasterHandler,
       ),

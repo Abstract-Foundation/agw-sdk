@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.9.0-beta.0
+
+### Minor Changes
+
+- 5743064: feat: add optimistic transaction parameters to sign transaction for session to reduce rpc calls
+
 ## 1.8.2
 
 ### Patch Changes

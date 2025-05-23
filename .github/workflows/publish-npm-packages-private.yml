@@ -34,6 +34,6 @@ jobs:
         run: pnpm build
 
       - name: Publish packages
-        run: pnpm -r publish --no-git-checks --access restricted ${{ github.event.release.prerelease == true && '--tag next' || '--tag latest' }}
+        run: pnpm -r publish --no-git-checks --access restricted --tag 'experimental'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

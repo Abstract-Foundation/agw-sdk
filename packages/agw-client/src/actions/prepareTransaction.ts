@@ -112,8 +112,6 @@ export type PrepareTransactionRequestParameterType =
   | 'nonce'
   | 'sidecars'
   | 'type';
-export type BypassChecksParameterType = 'balance' | 'deployment';
-
 type ParameterTypeToParameters<
   parameterType extends PrepareTransactionRequestParameterType,
 > = parameterType extends 'fees'

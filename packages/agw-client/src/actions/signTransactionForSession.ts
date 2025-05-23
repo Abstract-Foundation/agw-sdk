@@ -23,7 +23,6 @@ import {
 } from '../sessions.js';
 import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
 import type { OptimisticTransactionParameters } from '../types/optimisticTransaction.js';
-import { isSmartAccountDeployed } from '../utils.js';
 import { signTransaction } from './signTransaction.js';
 
 export interface SendTransactionForSessionParameters<

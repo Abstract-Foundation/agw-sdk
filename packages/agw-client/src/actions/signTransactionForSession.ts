@@ -58,14 +58,6 @@ export async function signTransactionForSession<
   session: SessionConfig,
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<SignTransactionReturnType> {
-  const isDeployed = await isSmartAccountDeployed(
-    publicClient,
-    client.account.address,
-  );
-  if (!isDeployed) {
-    throw new BaseError('Smart account not deployed');
-  }
-
   const selector: Hex | undefined = parameters.data
     ? `0x${parameters.data.slice(2, 10)}`
     : undefined;

@@ -69,7 +69,7 @@
 
 ### Patch Changes
 
-- 764642c: perf: remove reundant rpc call when sending transactions for sessions
+- 764642c: perf: remove redundant rpc call when sending transactions for sessions
 - Updated dependencies [764642c]
   - @abstract-foundation/agw-client@1.6.3
 

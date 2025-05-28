@@ -52,11 +52,13 @@ import {
   type ChainEIP712,
   estimateFee,
   type EstimateFeeParameters,
+  type EstimateFeeReturnType,
 } from 'viem/zksync';
 
 import {
   CONTRACT_DEPLOYER_ADDRESS,
   EOA_VALIDATOR_ADDRESS,
+  INSUFFICIENT_BALANCE_SELECTOR,
   SMART_ACCOUNT_FACTORY_ADDRESS,
 } from '../constants.js';
 import { InsufficientBalanceError } from '../errors/insufficientBalance.js';
@@ -407,10 +409,21 @@ export async function prepareTransactionRequest<
               chainId: request.chainId,
               authorizationList: [],
             };
-            const feeEstimation = await estimateFee(
-              publicClient,
-              estimateFeeRequest,
-            );
+            let feeEstimation: EstimateFeeReturnType | undefined;
+            try {
+              feeEstimation = await estimateFee(
+                publicClient,
+                estimateFeeRequest,
+              );
+            } catch (error) {
+              if (
+                error instanceof Error &&
+                error.message.includes(INSUFFICIENT_BALANCE_SELECTOR)
+              ) {
+                throw new InsufficientBalanceError();
+              }
+              throw error;
+            }
             maxFeePerGas = feeEstimation.maxFeePerGas;
             maxPriorityFeePerGas = feeEstimation.maxPriorityFeePerGas;
             gasLimitFromFeeEstimation = feeEstimation.gasLimit;

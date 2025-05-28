@@ -8,6 +8,7 @@ import {
   type DeriveChain,
   encodeFunctionData,
   type ExactPartial,
+  ExecutionRevertedError,
   formatGwei,
   type FormattedTransactionRequest,
   type GetChainParameter,
@@ -17,6 +18,7 @@ import {
   type NonceManager,
   type Prettify,
   type PublicClient,
+  RpcRequestError,
   type SendTransactionParameters,
   toBytes,
   type TransactionRequest,
@@ -421,6 +423,13 @@ export async function prepareTransactionRequest<
                 error.message.includes(INSUFFICIENT_BALANCE_SELECTOR)
               ) {
                 throw new InsufficientBalanceError();
+              } else if (
+                error instanceof RpcRequestError &&
+                error.details.includes('execution reverted')
+              ) {
+                throw new ExecutionRevertedError({
+                  message: `${error.data}`,
+                });
               }
               throw error;
             }

@@ -1,5 +1,13 @@
 # @abstract-foundation/agw-react
 
+## 1.8.4
+
+### Patch Changes
+
+- ba09e60: feat: apply session key policies to batch transactions
+- Updated dependencies [ba09e60]
+  - @abstract-foundation/agw-client@1.8.4
+
 ## 1.8.3
 
 ### Patch Changes

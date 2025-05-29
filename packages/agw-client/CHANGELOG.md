@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.8.5
+
+### Patch Changes
+
+- 47ad545: fix(EIP-5792): don't return null receipt in wallet_getCallsStatus
+
 ## 1.8.4
 
 ### Patch Changes

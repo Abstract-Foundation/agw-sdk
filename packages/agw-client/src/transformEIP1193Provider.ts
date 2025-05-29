@@ -297,7 +297,8 @@ export function transformEIP1193Provider(
           id: params[0],
           chainId: toHex(chain.id),
           status: getReceiptStatus(receipt ?? undefined),
-          receipts: [receipt],
+          atomic: true, // AGW will always process multiple calls as an atomic batch
+          receipts: receipt != null ? [receipt] : undefined,
         };
       }
       case 'wallet_addEthereumChain':

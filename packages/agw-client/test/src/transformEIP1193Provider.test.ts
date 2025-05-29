@@ -800,5 +800,35 @@ describe('transformEIP1193Provider', () => {
         params: [mockTxHash],
       });
     });
+    it('should return undefined receipts on wallet_getCallsStatus for null eth_getTransactionReceipt result', async () => {
+      const mockTxHash = '0xtxhash';
+
+      const originalMock = mockProvider.request as Mock;
+      originalMock.mockImplementation((request) => {
+        if (request.method === 'eth_getTransactionReceipt') {
+          return Promise.resolve(null);
+        }
+        return originalMock.getMockImplementation()?.(request);
+      });
+
+      const result = await transformedProvider.request({
+        method: 'wallet_getCallsStatus',
+        params: [mockTxHash],
+      });
+
+      expect(result).toStrictEqual({
+        version: '2.0.0',
+        id: mockTxHash,
+        chainId: toHex(abstractTestnet.id),
+        status: 100,
+        atomic: true,
+        receipts: undefined,
+      });
+
+      expect(mockProvider.request).toHaveBeenCalledWith({
+        method: 'eth_getTransactionReceipt',
+        params: [mockTxHash],
+      });
+    });
   });
 });

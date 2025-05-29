@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.8.3
+
+### Patch Changes
+
+- 815071a: fix: catch insufficient funds error from zks_estimateFee
+
 ## 1.8.2
 
 ### Patch Changes

@@ -11,6 +11,7 @@ import { ChainEIP712 } from 'viem/zksync';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SessionKeyValidatorAbi } from '../../src/abis/SessionKeyValidator.js';
+import { getBatchTransactionObject } from '../../src/actions/sendTransactionBatch.js';
 import {
   SESSION_KEY_POLICY_REGISTRY_ADDRESS,
   SESSION_KEY_VALIDATOR_ADDRESS,
@@ -111,6 +112,13 @@ const simpleSessionTestCases: {
   },
 ];
 
+const batchSessionTestCases = [
+  {
+    batch: true,
+  },
+  { batch: false },
+];
+
 describe('assertSessionKeyPolicies', async () => {
   beforeEach(() => {
     vi.mocked(client.multicall).mockClear();
@@ -158,122 +166,31 @@ describe('assertSessionKeyPolicies', async () => {
     });
   });
 
-  it('should return early when no session can be parsed from the transaction', async () => {
-    const transaction = {
-      to: '0x1234567890123456789012345678901234567890' as Address,
-      data: '0x12345678' as Hex,
-    };
+  batchSessionTestCases.forEach(({ batch }) => {
+    function formatTransaction(transaction) {
+      if (batch) {
+        return getBatchTransactionObject(address.smartAccountAddress, {
+          calls: [
+            {
+              to: address.randomAddress,
+              value: 1000n,
+            },
+            transaction,
+          ],
+        });
+      }
+      return transaction;
+    }
 
-    // Reset the multicall mock to track if it gets called
-    client.multicall = vi.fn().mockResolvedValue(['1']);
+    it(`should return early when no session can be parsed from the transaction (${batch ? 'batch' : 'single'})`, async () => {
+      const transaction = formatTransaction({
+        to: '0x1234567890123456789012345678901234567890' as Address,
+        data: '0x12345678' as Hex,
+      });
 
-    await expect(
-      assertSessionKeyPolicies(
-        client,
-        anvilAbstractMainnet.chain.id,
-        parseAccount(address.smartAccountAddress),
-        transaction,
-      ),
-    ).resolves.not.toThrow();
+      // Reset the multicall mock to track if it gets called
+      client.multicall = vi.fn().mockResolvedValue(['1']);
 
-    // Verify that multicall was not called since we returned early
-    expect(client.multicall).not.toHaveBeenCalled();
-  });
-
-  // Test for transfer policies validation
-  it('should validate transfer policies correctly', async () => {
-    const transaction = {
-      to: SESSION_KEY_VALIDATOR_ADDRESS as Address,
-      data: encodeFunctionData({
-        abi: SessionKeyValidatorAbi,
-        functionName: 'createSession',
-        args: [sessionWithTransferPolicy],
-      }),
-    };
-
-    getCallPolicy.mockReturnValue(
-      encodedPolicyStatus[SessionKeyPolicyStatus.Allowed],
-    );
-
-    // Reset the multicall mock to track if it gets called with the right arguments
-    client.multicall = vi.fn().mockResolvedValue(['1']);
-
-    await expect(
-      assertSessionKeyPolicies(
-        client,
-        anvilAbstractMainnet.chain.id,
-        parseAccount(address.smartAccountAddress),
-        transaction,
-      ),
-    ).resolves.not.toThrow();
-
-    // Verify that multicall was called with the correct arguments
-    expect(client.multicall).toHaveBeenCalledWith(
-      expect.objectContaining({
-        contracts: expect.arrayContaining([
-          expect.objectContaining({
-            functionName: 'getTransferPolicyStatus',
-            args: [sessionTargetAddress],
-          }),
-        ]),
-      }),
-    );
-  });
-
-  it('should throw when policy status is not allowed', async () => {
-    const transaction = {
-      to: SESSION_KEY_VALIDATOR_ADDRESS as Address,
-      data: encodeFunctionData({
-        abi: SessionKeyValidatorAbi,
-        functionName: 'createSession',
-        args: [sessionWithTransferPolicy],
-      }),
-    };
-
-    // Mock multicall to return a non-allowed status
-    client.multicall = vi
-      .fn()
-      .mockResolvedValue([SessionKeyPolicyStatus.Denied.toString()]) as any;
-
-    await expect(
-      assertSessionKeyPolicies(
-        client,
-        anvilAbstractMainnet.chain.id,
-        parseAccount(address.smartAccountAddress),
-        transaction,
-      ),
-    ).rejects.toThrow('Session key policy violation');
-  });
-
-  it('should validate all predefined session configurations', async () => {
-    const { sampleSessionConfigs } = await import('../fixtures.js');
-
-    for (const sessionConfig of sampleSessionConfigs) {
-      const transaction = {
-        to: SESSION_KEY_VALIDATOR_ADDRESS as Address,
-        data: encodeFunctionData({
-          abi: SessionKeyValidatorAbi,
-          functionName: 'createSession',
-          args: [sessionConfig],
-        }),
-      };
-
-      // Mock the policy status to be allowed for this test
-      getCallPolicy.mockReturnValue(
-        encodedPolicyStatus[SessionKeyPolicyStatus.Allowed],
-      );
-
-      // Reset the multicall mock to return allowed status for all calls
-      client.multicall = vi
-        .fn()
-        .mockResolvedValue(
-          Array(
-            (sessionConfig.callPolicies?.length || 0) +
-              (sessionConfig.transferPolicies?.length || 0),
-          ).fill(SessionKeyPolicyStatus.Allowed.toString()),
-        );
-
-      // Test that the session configuration is valid
       await expect(
         assertSessionKeyPolicies(
           client,
@@ -282,87 +199,196 @@ describe('assertSessionKeyPolicies', async () => {
           transaction,
         ),
       ).resolves.not.toThrow();
-    }
-  });
 
-  it('should detect policy violations in session configurations', async () => {
-    const { sampleSessionConfigs } = await import('../fixtures.js');
+      // Verify that multicall was not called since we returned early
+      expect(client.multicall).not.toHaveBeenCalled();
+    });
 
-    const sessionConfig = sampleSessionConfigs[0];
+    // Test for transfer policies validation
+    it(`should validate transfer policies correctly (${batch ? 'batch' : 'single'})`, async () => {
+      const transaction = formatTransaction({
+        to: SESSION_KEY_VALIDATOR_ADDRESS as Address,
+        data: encodeFunctionData({
+          abi: SessionKeyValidatorAbi,
+          functionName: 'createSession',
+          args: [sessionWithTransferPolicy],
+        }),
+      });
 
-    const transaction = {
-      to: SESSION_KEY_VALIDATOR_ADDRESS as Address,
-      data: encodeFunctionData({
-        abi: SessionKeyValidatorAbi,
-        functionName: 'createSession',
-        args: [sessionConfig],
-      }),
-    };
+      getCallPolicy.mockReturnValue(
+        encodedPolicyStatus[SessionKeyPolicyStatus.Allowed],
+      );
 
-    getCallPolicy.mockReturnValue(
-      encodedPolicyStatus[SessionKeyPolicyStatus.Denied],
-    );
+      // Reset the multicall mock to track if it gets called with the right arguments
+      client.multicall = vi.fn().mockResolvedValue(['1']);
 
-    client.multicall = vi
-      .fn()
-      .mockResolvedValue([SessionKeyPolicyStatus.Denied.toString()]);
+      await expect(
+        assertSessionKeyPolicies(
+          client,
+          anvilAbstractMainnet.chain.id,
+          parseAccount(address.smartAccountAddress),
+          transaction,
+        ),
+      ).resolves.not.toThrow();
 
-    await expect(
-      assertSessionKeyPolicies(
-        client,
-        anvilAbstractMainnet.chain.id,
-        parseAccount(address.smartAccountAddress),
-        transaction,
-      ),
-    ).rejects.toThrow('Session key policy violation');
-  });
+      // Verify that multicall was called with the correct arguments
+      expect(client.multicall).toHaveBeenCalledWith(
+        expect.objectContaining({
+          contracts: expect.arrayContaining([
+            expect.objectContaining({
+              functionName: 'getTransferPolicyStatus',
+              args: [sessionTargetAddress],
+            }),
+          ]),
+        }),
+      );
+    });
 
-  it('should detect mixed policy statuses correctly', async () => {
-    const { sampleSessionConfigs } = await import('../fixtures.js');
+    it(`should throw when policy status is not allowed (${batch ? 'batch' : 'single'})`, async () => {
+      const transaction = formatTransaction({
+        to: SESSION_KEY_VALIDATOR_ADDRESS as Address,
+        data: encodeFunctionData({
+          abi: SessionKeyValidatorAbi,
+          functionName: 'createSession',
+          args: [sessionWithTransferPolicy],
+        }),
+      });
 
-    // Find a session with multiple policies
-    const sessionConfig =
-      sampleSessionConfigs.find(
-        (s) =>
-          (s.callPolicies?.length || 0) + (s.transferPolicies?.length || 0) > 1,
-      ) || sampleSessionConfigs[0];
+      // Mock multicall to return a non-allowed status
+      client.multicall = vi
+        .fn()
+        .mockResolvedValue([SessionKeyPolicyStatus.Denied.toString()]) as any;
 
-    const transaction = {
-      to: SESSION_KEY_VALIDATOR_ADDRESS as Address,
-      data: encodeFunctionData({
-        abi: SessionKeyValidatorAbi,
-        functionName: 'createSession',
-        args: [sessionConfig],
-      }),
-    };
+      await expect(
+        assertSessionKeyPolicies(
+          client,
+          anvilAbstractMainnet.chain.id,
+          parseAccount(address.smartAccountAddress),
+          transaction,
+        ),
+      ).rejects.toThrow('Session key policy violation');
+    });
 
-    // Mock the policy status to be allowed for eth_call
-    getCallPolicy.mockReturnValue(
-      encodedPolicyStatus[SessionKeyPolicyStatus.Allowed],
-    );
+    it(`should validate all predefined session configurations (${batch ? 'batch' : 'single'})`, async () => {
+      const { sampleSessionConfigs } = await import('../fixtures.js');
 
-    // Mock multicall to return mixed statuses (first allowed, second denied)
-    const statuses = Array(
-      (sessionConfig.callPolicies?.length || 0) +
-        (sessionConfig.transferPolicies?.length || 0),
-    ).fill(SessionKeyPolicyStatus.Allowed.toString());
+      for (const sessionConfig of sampleSessionConfigs) {
+        const transaction = formatTransaction({
+          to: SESSION_KEY_VALIDATOR_ADDRESS as Address,
+          data: encodeFunctionData({
+            abi: SessionKeyValidatorAbi,
+            functionName: 'createSession',
+            args: [sessionConfig],
+          }),
+        });
 
-    // Set the second policy to be denied
-    if (statuses.length > 1) {
-      statuses[1] = SessionKeyPolicyStatus.Denied.toString();
-    }
+        // Mock the policy status to be allowed for this test
+        getCallPolicy.mockReturnValue(
+          encodedPolicyStatus[SessionKeyPolicyStatus.Allowed],
+        );
 
-    client.multicall = vi.fn().mockResolvedValue(statuses);
+        // Reset the multicall mock to return allowed status for all calls
+        client.multicall = vi
+          .fn()
+          .mockResolvedValue(
+            Array(
+              (sessionConfig.callPolicies?.length || 0) +
+                (sessionConfig.transferPolicies?.length || 0),
+            ).fill(SessionKeyPolicyStatus.Allowed.toString()),
+          );
 
-    // Test that the session validation throws an error
-    await expect(
-      assertSessionKeyPolicies(
-        client,
-        anvilAbstractMainnet.chain.id,
-        parseAccount(address.smartAccountAddress),
-        transaction,
-      ),
-    ).rejects.toThrow('Session key policy violation');
+        // Test that the session configuration is valid
+        await expect(
+          assertSessionKeyPolicies(
+            client,
+            anvilAbstractMainnet.chain.id,
+            parseAccount(address.smartAccountAddress),
+            transaction,
+          ),
+        ).resolves.not.toThrow();
+      }
+    });
+
+    it(`should detect policy violations in session configurations (${batch ? 'batch' : 'single'})`, async () => {
+      const { sampleSessionConfigs } = await import('../fixtures.js');
+
+      const sessionConfig = sampleSessionConfigs[0];
+
+      const transaction = formatTransaction({
+        to: SESSION_KEY_VALIDATOR_ADDRESS as Address,
+        data: encodeFunctionData({
+          abi: SessionKeyValidatorAbi,
+          functionName: 'createSession',
+          args: [sessionConfig],
+        }),
+      });
+
+      getCallPolicy.mockReturnValue(
+        encodedPolicyStatus[SessionKeyPolicyStatus.Denied],
+      );
+
+      client.multicall = vi
+        .fn()
+        .mockResolvedValue([SessionKeyPolicyStatus.Denied.toString()]);
+
+      await expect(
+        assertSessionKeyPolicies(
+          client,
+          anvilAbstractMainnet.chain.id,
+          parseAccount(address.smartAccountAddress),
+          transaction,
+        ),
+      ).rejects.toThrow('Session key policy violation');
+    });
+
+    it(`should detect mixed policy statuses correctly (${batch ? 'batch' : 'single'})`, async () => {
+      const { sampleSessionConfigs } = await import('../fixtures.js');
+
+      // Find a session with multiple policies
+      const sessionConfig =
+        sampleSessionConfigs.find(
+          (s) =>
+            (s.callPolicies?.length || 0) + (s.transferPolicies?.length || 0) >
+            1,
+        ) || sampleSessionConfigs[0];
+
+      const transaction = formatTransaction({
+        to: SESSION_KEY_VALIDATOR_ADDRESS as Address,
+        data: encodeFunctionData({
+          abi: SessionKeyValidatorAbi,
+          functionName: 'createSession',
+          args: [sessionConfig],
+        }),
+      });
+
+      // Mock the policy status to be allowed for eth_call
+      getCallPolicy.mockReturnValue(
+        encodedPolicyStatus[SessionKeyPolicyStatus.Allowed],
+      );
+
+      // Mock multicall to return mixed statuses (first allowed, second denied)
+      const statuses = Array(
+        (sessionConfig.callPolicies?.length || 0) +
+          (sessionConfig.transferPolicies?.length || 0),
+      ).fill(SessionKeyPolicyStatus.Allowed.toString());
+
+      // Set the second policy to be denied
+      if (statuses.length > 1) {
+        statuses[1] = SessionKeyPolicyStatus.Denied.toString();
+      }
+
+      client.multicall = vi.fn().mockResolvedValue(statuses);
+
+      // Test that the session validation throws an error
+      await expect(
+        assertSessionKeyPolicies(
+          client,
+          anvilAbstractMainnet.chain.id,
+          parseAccount(address.smartAccountAddress),
+          transaction,
+        ),
+      ).rejects.toThrow('Session key policy violation');
+    });
   });
 });
 

@@ -28,6 +28,7 @@ import {
 import { AccountNotFoundError } from '../errors/account.js';
 import { assertSessionKeyPolicies } from '../sessionValidator.js';
 import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
+import type { OptimisticTransactionParameters } from '../types/optimisticTransaction.js';
 import { VALID_CHAINS } from '../utils.js';
 import { transformHexValues } from '../utils.js';
 import { signPrivyTransaction } from './sendPrivyTransaction.js';
@@ -45,6 +46,7 @@ export async function signTransaction<
   validationHookData: Record<string, Hex> = {},
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
   isPrivyCrossApp = false,
+  optimisticData: OptimisticTransactionParameters | undefined = undefined,
 ): Promise<SignEip712TransactionReturnType> {
   const chain = client.chain;
 
@@ -63,6 +65,7 @@ export async function signTransaction<
     validator,
     validationHookData,
     customPaymasterHandler,
+    optimisticData,
   );
 
   return chain.serializers.transaction(
@@ -87,6 +90,7 @@ export async function signEip712TransactionInternal<
   validator: Address,
   validationHookData: Record<string, Hex> = {},
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
+  optimisticData: OptimisticTransactionParameters | undefined = undefined,
 ): Promise<{
   transaction: UnionRequiredBy<TransactionRequestEIP712, 'from'> & {
     chainId: number;
@@ -132,7 +136,9 @@ export async function signEip712TransactionInternal<
   if (!chain?.custom?.getEip712Domain)
     throw new BaseError('`getEip712Domain` not found on chain.');
 
-  const chainId = await getAction(client, getChainId, 'getChainId')({});
+  const chainId = optimisticData
+    ? chain.id
+    : await getAction(client, getChainId, 'getChainId')({});
   if (chain !== null)
     assertCurrentChain({
       currentChainId: chainId,
@@ -175,16 +181,18 @@ export async function signEip712TransactionInternal<
   } else {
     const hookData: Hex[] = [];
     if (!useSignerAddress) {
-      const validationHooks = await getAction(
-        client,
-        readContract,
-        'readContract',
-      )({
-        address: client.account.address,
-        abi: AGWAccountAbi,
-        functionName: 'listHooks',
-        args: [true],
-      });
+      const validationHooks =
+        optimisticData?.validationHooks ??
+        (await getAction(
+          client,
+          readContract,
+          'readContract',
+        )({
+          address: client.account.address,
+          abi: AGWAccountAbi,
+          functionName: 'listHooks',
+          args: [true],
+        }));
       for (const hook of validationHooks) {
         hookData.push(validationHookData[hook] ?? '0x');
       }

@@ -26,6 +26,26 @@
       "types": "./dist/types/exports/index.d.ts",
       "import": "./dist/esm/exports/index.js",
       "require": "./dist/cjs/exports/index.js"
+    },
+    "./mainnet": {
+      "types": "./dist/types/exports/mainnet.d.ts",
+      "import": "./dist/esm/exports/mainnet.js",
+      "require": "./dist/cjs/exports/mainnet.js"
+    },
+    "./testnet": {
+      "types": "./dist/types/exports/testnet.d.ts",
+      "import": "./dist/esm/exports/testnet.js",
+      "require": "./dist/cjs/exports/testnet.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "mainnet": [
+        "./dist/types/exports/mainnet.d.ts"
+      ],
+      "testnet": [
+        "./dist/types/exports/testnet.d.ts"
+      ]
     }
   },
   "files": [

@@ -67,7 +67,7 @@
   },
   "peerDependencies": {
     "@privy-io/cross-app-connect": "^0.2.1",
-    "@privy-io/react-auth": "^2.8.2",
+    "@privy-io/react-auth": "^2.13.8",
     "@tanstack/react-query": "^5",
     "react": ">=18",
     "secp256k1": ">=5.0.1",
@@ -78,9 +78,11 @@
   },
   "devDependencies": {
     "@abstract-foundation/agw-client": "workspace:*",
+    "@babel/core": "^7.27.4",
+    "@babel/preset-env": "^7.27.2",
     "@privy-io/cross-app-connect": "^0.2.1",
-    "@privy-io/react-auth": "^2.8.2",
-    "@rainbow-me/rainbowkit": "^2.2.3",
+    "@privy-io/react-auth": "^2.13.8",
+    "@rainbow-me/rainbowkit": "^2.2.5",
     "@tanstack/query-core": "^5.56.2",
     "@types/react": ">=18.3.1",
     "@types/react-dom": ">=18.3.0",

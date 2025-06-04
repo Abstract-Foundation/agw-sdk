@@ -30,19 +30,21 @@ const eip6963info: EIP6963ProviderInfo = {
   rdns: 'xyz.abs.privy',
 };
 
-interface AnnounceProviderParams {
+export interface AnnounceProviderParameters {
   chain: Chain;
   transport?: Transport;
   customPaymasterHandler?: CustomPaymasterHandler;
 }
 
+export type AnnounceProviderReturnType = () => void;
+
 export function announceProvider({
   chain,
   transport,
   customPaymasterHandler,
-}: AnnounceProviderParams) {
+}: AnnounceProviderParameters): AnnounceProviderReturnType {
   if (typeof window === 'undefined') {
-    return;
+    return () => void 0;
   }
 
   const privyProvider = toPrivyWalletProvider({
@@ -62,10 +64,14 @@ export function announceProvider({
     customPaymasterHandler,
   });
 
-  window.dispatchEvent(
-    new EIP6963AnnounceProviderEvent({
-      info: eip6963info,
-      provider: abstractProvider,
-    }),
-  );
+  const event = new EIP6963AnnounceProviderEvent({
+    info: eip6963info,
+    provider: abstractProvider,
+  });
+
+  window.dispatchEvent(event);
+
+  const handler = () => window.dispatchEvent(event);
+  window.addEventListener('eip6963:requestProvider', handler);
+  return () => window.removeEventListener('eip6963:requestProvider', handler);
 }

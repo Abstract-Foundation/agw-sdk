@@ -1,0 +1,66 @@
+{
+  "name": "@abstract-foundation/agw-web",
+  "description": "Abstract Global Wallet for the web (generic EIP-6963 provider)",
+  "version": "1.8.4",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abstract-foundation/agw-sdk.git",
+    "directory": "packages/agw-web"
+  },
+  "scripts": {
+    "build": "pnpm run clean && pnpm run build:esm+types && pnpm run build:cjs",
+    "build:esm+types": "tsc --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types && printf '{\"type\":\"module\"}' > ./dist/esm/package.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json && printf '{\"type\":\"commonjs\"}' > ./dist/cjs/package.json",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "debug": "tsc-watch --sourceMap true --outDir ./dist/esm --declaration --declarationMap --declarationDir ./dist/types",
+    "test:build": "publint && attw --pack --ignore-rules false-cjs"
+  },
+  "main": "./dist/cjs/exports/index.js",
+  "module": "./dist/esm/exports/index.js",
+  "types": "./dist/types/exports/index.d.ts",
+  "typings": "./dist/types/exports/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/exports/index.d.ts",
+      "import": "./dist/esm/exports/index.js",
+      "require": "./dist/cjs/exports/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "package.json"
+  ],
+  "dependencies": {
+    "@abstract-foundation/agw-client": "workspace:*"
+  },
+  "peerDependencies": {
+    "@privy-io/cross-app-connect": "^0.2.1",
+    "viem": "^2.22.23"
+  },
+  "devDependencies": {
+    "@abstract-foundation/agw-client": "workspace:*",
+    "@privy-io/cross-app-connect": "^0.2.1",
+    "viem": "^2.22.23"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    },
+    "@rainbow-me/rainbowkit": {
+      "optional": true
+    }
+  },
+  "keywords": [
+    "eth",
+    "ethereum",
+    "smart-account",
+    "abstract",
+    "account-abstraction",
+    "global-wallet",
+    "wallet",
+    "web3"
+  ]
+}

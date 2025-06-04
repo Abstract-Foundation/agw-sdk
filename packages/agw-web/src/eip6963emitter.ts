@@ -1,0 +1,71 @@
+import {
+  type CustomPaymasterHandler,
+  transformEIP1193Provider,
+} from '@abstract-foundation/agw-client';
+import { toPrivyWalletProvider } from '@privy-io/cross-app-connect';
+import { type Chain, type EIP1193Provider, http, type Transport } from 'viem';
+
+interface EIP6963ProviderInfo {
+  uuid: string;
+  name: string;
+  icon: string;
+  rdns: string;
+}
+
+interface EIP6963ProviderDetail {
+  info: EIP6963ProviderInfo;
+  provider: EIP1193Provider;
+}
+
+class EIP6963AnnounceProviderEvent extends CustomEvent<EIP6963ProviderDetail> {
+  constructor(detail: EIP6963ProviderDetail) {
+    super('eip6963:announceProvider', { detail });
+  }
+}
+
+const eip6963info: EIP6963ProviderInfo = {
+  uuid: '2306fd26-fcfb-4f9e-87da-0d1e237e917c',
+  name: 'Abstract Global Wallet',
+  icon: 'data:image/svg;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNjAiIGhlaWdodD0iMTYxIiBmaWxsPSJub25lIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgeT0iLjk1MyIgZmlsbD0iIzAwREU3MyIgcng9IjQwIi8+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIHk9Ii45NTMiIGZpbGw9InVybCgjYSkiIGZpbGwtb3BhY2l0eT0iLjIiIHJ4PSI0MCIvPjxnIGZpbHRlcj0idXJsKCNiKSI+PHBhdGggZmlsbD0iI0Y3RjlGMyIgZD0ibTM4LjA5NSA5Ni4zNjcgMjQuNjUtNi42MDIuMDEzLS4wMTQgMTQuMjUyLTI0LjY5LTYuNTk4LTI0LjY2My0xMS41NzkgMy4wOTcgNi41OTkgMjQuNjYyYTguMTE0IDguMTE0IDAgMCAxLS44MTcgNi4yMDggOC4xMDYgOC4xMDYgMCAwIDEtNC45NjYgMy44MTVMMzUgODQuNzgybDMuMDk1IDExLjU4NVoiLz48cGF0aCBmaWxsPSJ1cmwoI2MpIiBmaWxsLW9wYWNpdHk9Ii4yIiBkPSJtMzguMDk1IDk2LjM2NyAyNC42NS02LjYwMi4wMTMtLjAxNCAxNC4yNTItMjQuNjktNi41OTgtMjQuNjYzLTExLjU3OSAzLjA5NyA2LjU5OSAyNC42NjJhOC4xMTQgOC4xMTQgMCAwIDEtLjgxNyA2LjIwOCA4LjEwNiA4LjEwNiAwIDAgMS00Ljk2NiAzLjgxNUwzNSA4NC43ODJsMy4wOTUgMTEuNTg1WiIvPjxwYXRoIGZpbGw9IiNGN0Y5RjMiIGQ9Im05Ny4yNTYgODkuNzY1IDI0LjY0OSA2LjYwMkwxMjUgODQuNzgybC0yNC42NDktNi42MDJhOC4xMDcgOC4xMDcgMCAwIDEtNC45NjYtMy44MTUgOC4xMTQgOC4xMTQgMCAwIDEtLjgxNy02LjIwOGw2LjU5OS0yNC42NjItMTEuNTc5LTMuMDk3TDgyLjk5IDY1LjA2bDE0LjI1MiAyNC42OTEuMDE0LjAxNFoiLz48cGF0aCBmaWxsPSJ1cmwoI2QpIiBmaWxsLW9wYWNpdHk9Ii4yIiBkPSJtOTcuMjU2IDg5Ljc2NSAyNC42NDkgNi42MDJMMTI1IDg0Ljc4MmwtMjQuNjQ5LTYuNjAyYTguMTA3IDguMTA3IDAgMCAxLTQuOTY2LTMuODE1IDguMTE0IDguMTE0IDAgMCAxLS44MTctNi4yMDhsNi41OTktMjQuNjYyLTExLjU3OS0zLjA5N0w4Mi45OSA2NS4wNmwxNC4yNTIgMjQuNjkxLjAxNC4wMTRaIi8+PHBhdGggZmlsbD0iI0Y3RjlGMyIgZD0ibTk0LjI0NSA5NC45NzQgMTguMDUxIDE4LjA2LTguNDcgOC40NzQtMTguMDUtMTguMDZhOC4wOSA4LjA5IDAgMCAwLTUuNzgzLTIuMzkzIDguMDkgOC4wOSAwIDAgMC01Ljc4MiAyLjM5M2wtMTguMDUxIDE4LjA2LTguNDctOC40NzQgMTguMDUxLTE4LjA2aDI4LjUwNFoiLz48cGF0aCBmaWxsPSJ1cmwoI2UpIiBmaWxsLW9wYWNpdHk9Ii4yIiBkPSJtOTQuMjQ1IDk0Ljk3NCAxOC4wNTEgMTguMDYtOC40NyA4LjQ3NC0xOC4wNS0xOC4wNmE4LjA5IDguMDkgMCAwIDAtNS43ODMtMi4zOTMgOC4wOSA4LjA5IDAgMCAwLTUuNzgyIDIuMzkzbC0xOC4wNTEgMTguMDYtOC40Ny04LjQ3NCAxOC4wNTEtMTguMDZoMjguNTA0WiIvPjwvZz48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImEiIHgxPSI4MCIgeDI9IjgwIiB5MT0iLjk1MyIgeTI9Ijg4LjQ1MyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPjxzdG9wIHN0b3AtY29sb3I9IiM4MEZGQzIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM4MEZGQzIiIHN0b3Atb3BhY2l0eT0iMCIvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJjIiB4MT0iODAiIHgyPSI4MCIgeTE9IjQwLjM5OCIgeTI9IjEyMS41MDgiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj48c3RvcCBzdG9wLW9wYWNpdHk9IjAiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3Atb3BhY2l0eT0iLjc1Ii8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9ImQiIHgxPSI4MCIgeDI9IjgwIiB5MT0iNDAuMzk4IiB5Mj0iMTIxLjUwOCIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPjxzdG9wIHN0b3Atb3BhY2l0eT0iMCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1vcGFjaXR5PSIuNzUiLz48L2xpbmVhckdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0iZSIgeDE9IjgwIiB4Mj0iODAiIHkxPSI0MC4zOTgiIHkyPSIxMjEuNTA4IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHN0b3Agc3RvcC1vcGFjaXR5PSIwIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLW9wYWNpdHk9Ii43NSIvPjwvbGluZWFyR3JhZGllbnQ+PGZpbHRlciBpZD0iYiIgd2lkdGg9IjEwNiIgaGVpZ2h0PSI5Ny4xMSIgeD0iMjciIHk9IjM2LjM5OCIgY29sb3ItaW50ZXJwb2xhdGlvbi1maWx0ZXJzPSJzUkdCIiBmaWx0ZXJVbml0cz0idXNlclNwYWNlT25Vc2UiPjxmZUZsb29kIGZsb29kLW9wYWNpdHk9IjAiIHJlc3VsdD0iQmFja2dyb3VuZEltYWdlRml4Ii8+PGZlQ29sb3JNYXRyaXggaW49IlNvdXJjZUFscGhhIiByZXN1bHQ9ImhhcmRBbHBoYSIgdmFsdWVzPSIwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAxMjcgMCIvPjxmZU9mZnNldCBkeT0iNCIvPjxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjQiLz48ZmVDb21wb3NpdGUgaW4yPSJoYXJkQWxwaGEiIG9wZXJhdG9yPSJvdXQiLz48ZmVDb2xvck1hdHJpeCB2YWx1ZXM9IjAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAuMzUgMCIvPjxmZUJsZW5kIGluMj0iQmFja2dyb3VuZEltYWdlRml4IiByZXN1bHQ9ImVmZmVjdDFfZHJvcFNoYWRvd181MV8xNTYiLz48ZmVCbGVuZCBpbj0iU291cmNlR3JhcGhpYyIgaW4yPSJlZmZlY3QxX2Ryb3BTaGFkb3dfNTFfMTU2IiByZXN1bHQ9InNoYXBlIi8+PC9maWx0ZXI+PC9kZWZzPjwvc3ZnPg==',
+  rdns: 'xyz.abs.privy',
+};
+
+interface AnnounceProviderParams {
+  chain: Chain;
+  transport?: Transport;
+  customPaymasterHandler?: CustomPaymasterHandler;
+}
+
+export function announceProvider({
+  chain,
+  transport,
+  customPaymasterHandler,
+}: AnnounceProviderParams) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const privyProvider = toPrivyWalletProvider({
+    chainId: chain.id,
+    providerAppId: 'cm04asygd041fmry9zmcyn5o5',
+    chains: [chain],
+    transports: {
+      [chain.id]: transport ?? http(),
+    },
+  }) as EIP1193Provider;
+
+  const abstractProvider = transformEIP1193Provider({
+    provider: privyProvider,
+    chain,
+    transport: transport ?? http(),
+    isPrivyCrossApp: true,
+    customPaymasterHandler,
+  });
+
+  window.dispatchEvent(
+    new EIP6963AnnounceProviderEvent({
+      info: eip6963info,
+      provider: abstractProvider,
+    }),
+  );
+}

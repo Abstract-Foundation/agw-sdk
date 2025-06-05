@@ -67,9 +67,10 @@ export async function getAgwTypedSignature(
     address: account.address,
   });
 
-  // if the account is already deployed, we can use signature directly
-  // otherwise, we provide an ERC-6492 compatible signature
-  if (code !== undefined) {
+ // getCode returns "0x" when there is no contract code.
+// If code !== "0x", the account is already deployed → return the raw signature.
+// Otherwise, build an ERC-6492-compatible signature for deployment.
+  if (code !== '0x') {
     return signature;
   }
 

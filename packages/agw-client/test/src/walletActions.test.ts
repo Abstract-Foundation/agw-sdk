@@ -19,15 +19,15 @@ import {
 import { address } from '../constants.js';
 
 // Mock the imported modules
-vi.mock('../../src/actions/sendTransaction');
-vi.mock('../../src/actions/signTransaction');
-vi.mock('../../src/actions/deployContract');
-vi.mock('../../src/actions/writeContract');
-vi.mock('../../src/actions/prepareTransaction');
-vi.mock('../../src/actions/writeContractForSession');
-vi.mock('../../src/actions/sendTransactionForSession');
-vi.mock('../../src/actions/sendTransactionBatch');
-vi.mock('../../src/actions/signTransactionBatch');
+vi.mock('../../src/actions/sendTransaction.js');
+vi.mock('../../src/actions/signTransaction.js');
+vi.mock('../../src/actions/deployContract.js');
+vi.mock('../../src/actions/writeContract.js');
+vi.mock('../../src/actions/prepareTransaction.js');
+vi.mock('../../src/actions/writeContractForSession.js');
+vi.mock('../../src/actions/sendTransactionForSession.js');
+vi.mock('../../src/actions/sendTransactionBatch.js');
+vi.mock('../../src/actions/signTransactionBatch.js');
 describe('globalWalletActions', () => {
   const mockSignerClient = {
     account: {

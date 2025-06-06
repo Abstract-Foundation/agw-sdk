@@ -2079,7 +2079,7 @@ packages:
       {
         integrity: sha512-z10PF9JV6SbjFq+/rYabM+8CVlMokgl8RFGvieSGNTmrkQanfHn+15XBrhG3BgUfvmTeSeyShfOHpG0i9zEdcg==,
       }
-    deprecated: Motion One for Vue is deprecated. Use Oku Motion instead https://oku-ui.com/motion
+    deprecated: Motion One for Vue is deprecated. Use Oku Motion instead https://motion.oku-ui.com
 
   '@noble/ciphers@1.2.1':
     resolution:

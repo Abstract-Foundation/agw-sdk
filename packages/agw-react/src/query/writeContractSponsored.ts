@@ -19,7 +19,7 @@ export function writeContractSponsoredMutationOptions<config extends Config>(
 ) {
   return {
     mutationFn(variables) {
-      return writeContract(config, variables);
+      return writeContract(variables);
     },
     mutationKey: ['writeContract'],
   } as const satisfies MutationOptions<

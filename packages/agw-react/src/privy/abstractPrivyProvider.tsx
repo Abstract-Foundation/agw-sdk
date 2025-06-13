@@ -7,7 +7,7 @@ import {
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { type Chain, type Transport } from 'viem';
-import { createConfig, http, WagmiProvider } from 'wagmi';
+import { createConfig, http, WagmiConfig } from 'wagmi';
 
 import { AGW_APP_ID } from '../constants.js';
 import { InjectWagmiConnector } from './injectWagmiConnector.js';
@@ -34,7 +34,7 @@ interface AgwPrivyProviderProps extends PrivyProviderProps {
  * This component wraps your application with the necessary providers to use Abstract Global Wallet
  * with Privy authentication, including:
  * - PrivyProvider: Handles user authentication and EOA creation
- * - WagmiProvider: Provides web3 functionality
+ * - WagmiConfig: Provides web3 functionality
  * - QueryClientProvider: Manages data fetching with TanStack Query
  * - InjectWagmiConnector: Injects the Abstract wallet into Wagmi
  *
@@ -103,13 +103,13 @@ export const AbstractPrivyProvider = ({
   }
   return (
     <PrivyProvider {...props}>
-      <WagmiProvider config={wagmiConfig}>
+      <WagmiConfig config={wagmiConfig}>
         <QueryClientProvider client={queryClient}>
           <InjectWagmiConnector chain={chain} transport={transport}>
             {props.children}
           </InjectWagmiConnector>
         </QueryClientProvider>
-      </WagmiProvider>
+      </WagmiConfig>
     </PrivyProvider>
   );
 };

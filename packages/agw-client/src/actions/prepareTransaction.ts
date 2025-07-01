@@ -40,6 +40,7 @@ import {
   type EstimateGasParameters,
   getBalance,
   type GetBlockErrorType,
+  getChainId as getChainId_,
   getTransactionCount,
   type GetTransactionCountErrorType,
 } from 'viem/actions';
@@ -304,7 +305,13 @@ export async function prepareTransactionRequest<
     args.paymaster !== undefined &&
     args.paymasterInput !== undefined;
 
-  const { gas, nonce, parameters: parameterNames = defaultParameters } = args;
+  const {
+    gas,
+    nonce,
+    chain,
+    nonceManager,
+    parameters: parameterNames = defaultParameters,
+  } = args;
 
   const isDeployed = await isSmartAccountDeployed(
     publicClient,
@@ -361,24 +368,47 @@ export async function prepareTransactionRequest<
     );
   }
 
+  let chainId: number | undefined;
+  async function getChainId(): Promise<number> {
+    if (chainId) return chainId;
+    if (chain) return chain.id;
+    if (typeof args.chainId !== 'undefined') return args.chainId;
+    const chainId_ = await getAction(client, getChainId_, 'getChainId')({});
+    chainId = chainId_;
+    return chainId;
+  }
+
   // Get nonce if needed
   if (
     parameterNames.includes('nonce') &&
     typeof nonce === 'undefined' &&
     initiatorAccount
   ) {
-    asyncOperations.push(
-      getAction(
-        publicClient,
-        getTransactionCount,
-        'getTransactionCount',
-      )({
-        address: initiatorAccount.address,
-        blockTag: 'pending',
-      }).then((nonce) => {
-        request.nonce = nonce;
-      }),
-    );
+    if (nonceManager) {
+      asyncOperations.push(
+        (async () => {
+          const chainId = await getChainId();
+          request.nonce = await nonceManager.consume({
+            address: initiatorAccount.address,
+            chainId,
+            client: publicClient,
+          });
+        })(),
+      );
+    } else {
+      asyncOperations.push(
+        getAction(
+          publicClient,
+          getTransactionCount,
+          'getTransactionCount',
+        )({
+          address: initiatorAccount.address,
+          blockTag: 'pending',
+        }).then((nonce) => {
+          request.nonce = nonce;
+        }),
+      );
+    }
   }
 
   let gasLimitFromFeeEstimation: bigint | undefined;
@@ -496,6 +526,7 @@ export async function prepareTransactionRequest<
 
   delete request.parameters;
   delete request.isInitialTransaction;
+  delete request.nonceManager;
 
   return request as any;
 }

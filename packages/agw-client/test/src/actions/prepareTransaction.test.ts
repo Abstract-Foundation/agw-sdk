@@ -1,11 +1,14 @@
 import {
   createClient,
+  createNonceManager,
   createPublicClient,
   createWalletClient,
   EIP1193RequestFn,
   encodeFunctionData,
   http,
   keccak256,
+  NonceManager,
+  nonceManager,
   parseEther,
   toBytes,
   toHex,
@@ -270,6 +273,44 @@ test('with no chainId or chain', async () => {
   });
 });
 
+test('with nonce manager', async () => {
+  const mockConsume = vi.fn().mockResolvedValue(MOCK_NONCE);
+  const fakeNonceManager: NonceManager = {
+    consume: mockConsume,
+    increment: vi.fn(),
+    get: vi.fn(),
+    reset: vi.fn(),
+  };
+
+  const request = await prepareTransactionRequest(
+    baseClient,
+    signerClient,
+    publicClient,
+    {
+      ...transaction,
+      chain: anvilAbstractTestnet.chain,
+      isInitialTransaction: false,
+      nonceManager: fakeNonceManager,
+    },
+  );
+
+  expect(request).toEqual({
+    ...transaction,
+    chain: anvilAbstractTestnet.chain,
+    from: address.smartAccountAddress,
+    gas: MOCK_ZKS_ESTIMATE_GAS_LIMIT,
+    nonce: MOCK_NONCE,
+    maxFeePerGas: MOCK_FEE_PER_GAS,
+    maxPriorityFeePerGas: 0n,
+  });
+
+  expect(mockConsume).toHaveBeenCalledWith({
+    address: address.smartAccountAddress,
+    chainId: anvilAbstractTestnet.chain.id,
+    client: publicClient,
+  });
+});
+
 test('throws if maxFeePerGas is too low', async () => {
   vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
   const publicClientModified = createPublicClient({
@@ -395,3 +436,6 @@ test.each([
     await expect(txRequest).resolves.not.toThrow();
   }
 });
+function jsonRpc(): import('viem').NonceManagerSource {
+  throw new Error('Function not implemented.');
+}

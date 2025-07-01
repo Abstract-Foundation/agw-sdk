@@ -72,6 +72,7 @@ export async function sendTransactionInternal<
         isSponsored:
           customPaymasterHandler !== undefined ||
           (parameters as any).paymaster !== undefined,
+        nonceManager: account.nonceManager,
       } as any,
     );
 

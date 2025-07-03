@@ -1,4 +1,4 @@
-import { toAccount } from 'viem/accounts';
+import { parseAccount, toAccount } from 'viem/accounts';
 import { ChainEIP712 } from 'viem/zksync';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -30,6 +30,7 @@ import {
   createClient,
   createPublicClient,
   createWalletClient,
+  nonceManager,
   parseEther,
   toFunctionSelector,
 } from 'viem';
@@ -40,7 +41,10 @@ vi.mock('../../src/utils', () => ({
     .mockResolvedValue('0x0000000000000000000000000000000000012345'),
 }));
 
-import { toSessionClient } from '../../src/sessionClient.js';
+import {
+  createSessionClient,
+  toSessionClient,
+} from '../../src/sessionClient.js';
 import { LimitType, LimitZero } from '../../src/sessions.js';
 import { SessionConfig } from '../../src/sessions.js';
 import { getSmartAccountAddressFromInitialSigner } from '../../src/utils.js';
@@ -78,9 +82,22 @@ describe('createSessionClient', () => {
     vi.mocked(createPublicClient).mockReturnValue(mockPublicClient as any);
   });
 
-  const testSessionClient = (sessionClient: any, expectedTransport: any) => {
+  const testSessionClient = (args: {
+    sessionClient: any;
+    expectedTransport: any;
+    nonceManager?: any;
+  }) => {
+    const { sessionClient, expectedTransport, nonceManager } = args;
+
+    const expectedAccount = nonceManager
+      ? {
+          ...toAccount(address.smartAccountAddress),
+          nonceManager,
+        }
+      : toAccount(address.smartAccountAddress);
+
     expect(createClient).toHaveBeenCalledWith({
-      account: toAccount(address.smartAccountAddress),
+      account: expectedAccount,
       chain: anvilAbstractTestnet.chain as ChainEIP712,
       transport: expectedTransport,
     });
@@ -109,6 +126,27 @@ describe('createSessionClient', () => {
       session,
     });
 
-    testSessionClient(sessionClient, mockTransport);
+    testSessionClient({ sessionClient, expectedTransport: mockTransport });
+  });
+
+  it('creates client with custom nonce manager', async () => {
+    const mockTransport = expect.any(Function);
+
+    const defaultNonceManager = nonceManager;
+
+    const sessionClient = createSessionClient({
+      account: address.smartAccountAddress,
+      signer: toAccount(address.sessionSignerAddress),
+      session,
+      chain: anvilAbstractTestnet.chain as ChainEIP712,
+      nonceManager: defaultNonceManager,
+      transport: mockTransport,
+    });
+
+    testSessionClient({
+      sessionClient,
+      expectedTransport: mockTransport,
+      nonceManager: defaultNonceManager,
+    });
   });
 });

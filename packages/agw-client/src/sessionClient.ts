@@ -7,6 +7,7 @@ import {
   createWalletClient,
   custom,
   http,
+  type NonceManager,
   type Transport,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
@@ -20,14 +21,21 @@ import {
   sessionWalletActions,
 } from './walletActions.js';
 
-interface CreateSessionClientParameters {
-  account: Account | Address;
+type GetNonceManagerParameter<account extends Account | Address = Address> =
+  account extends Account
+    ? { nonceManager?: never }
+    : { nonceManager?: NonceManager };
+
+type CreateSessionClientParameters<
+  account extends Account | Address = Address,
+> = {
+  account: account;
   chain: ChainEIP712;
   signer: Account;
   session: SessionConfig;
   transport?: Transport;
   paymasterHandler?: CustomPaymasterHandler;
-}
+} & GetNonceManagerParameter<account>;
 
 export type SessionClient = Client<Transport, ChainEIP712, Account> &
   SessionClientActions;
@@ -144,16 +152,20 @@ export function toSessionClient({
  * @param params.session - The session configuration created by createSession (required)
  * @param params.transport - The transport configuration for connecting to the network (defaults to HTTP if not provided)
  * @param params.paymasterHandler - Optional custom paymaster handler
+ * @param params.nonceManager - Optional nonce manager
  * @returns A new SessionClient instance that uses the session key for signing transactions
  */
-export function createSessionClient({
+export function createSessionClient<
+  account extends Account | Address = Address,
+>({
   account,
   signer,
   chain,
   transport,
   session,
   paymasterHandler,
-}: CreateSessionClientParameters) {
+  nonceManager,
+}: CreateSessionClientParameters<account>) {
   if (!transport) {
     transport = http();
   }
@@ -163,8 +175,14 @@ export function createSessionClient({
     chain,
   });
 
+  const parsedAccount: Account =
+    typeof account === 'string' ? toAccount(account) : account;
+  if (nonceManager) {
+    parsedAccount.nonceManager = nonceManager;
+  }
+
   const baseClient = createClient({
-    account: typeof account === 'string' ? toAccount(account) : account,
+    account: parsedAccount,
     chain: chain,
     transport,
   });

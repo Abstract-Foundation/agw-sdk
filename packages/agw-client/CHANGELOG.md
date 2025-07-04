@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.8.6
+
+### Patch Changes
+
+- d892fbc: feat: Add optional nonce manager param when creating session client
+
 ## 1.8.5
 
 ### Patch Changes

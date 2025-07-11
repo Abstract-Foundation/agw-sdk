@@ -41,12 +41,11 @@ export function convertBigIntToString(value: any): any {
   } else if (Array.isArray(value)) {
     return value.map(convertBigIntToString);
   } else if (typeof value === 'object' && value !== null) {
-    return Object.fromEntries(
-      Object.entries(value).map(([key, val]) => [
-        key,
-        convertBigIntToString(val),
-      ]),
-    );
+    const result: Record<string, any> = {};
+    for (const key in value) {
+      result[key] = convertBigIntToString(value[key]);
+    }
+    return result;
   }
   return value;
 }

@@ -97,7 +97,7 @@ export async function isSmartAccountDeployed<
   const bytecode = await publicClient.getCode({
     address: address,
   });
-  return bytecode !== undefined;
+  return bytecode !== undefined && bytecode !== '0x';
 }
 
 export function getInitializerCalldata(

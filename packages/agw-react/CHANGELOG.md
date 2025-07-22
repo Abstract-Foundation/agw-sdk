@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-react
 
+## 1.8.7
+
+### Patch Changes
+
+- 06916d4: chore: pull minimal type defs from rainbowkit to remove dependency
+
 ## 1.8.6
 
 ### Patch Changes

@@ -68,9 +68,6 @@
   "peerDependenciesMeta": {
     "typescript": {
       "optional": true
-    },
-    "@rainbow-me/rainbowkit": {
-      "optional": true
     }
   },
   "keywords": [

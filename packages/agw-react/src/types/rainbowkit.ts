@@ -86,7 +86,3 @@ export type RainbowKitDetails = Omit<Wallet, 'createConnector' | 'hidden'> & {
 export interface WalletDetailsParams {
   rkDetails: RainbowKitDetails;
 }
-
-export type CreateConnector = (walletDetails: {
-  rkDetails: RainbowKitDetails;
-}) => CreateConnectorFn;

@@ -1,7 +1,6 @@
-import { type Wallet } from '@rainbow-me/rainbowkit';
-
 import { abstractWalletConnector } from './abstractWalletConnector.js';
 import { ICON_URL } from './constants.js';
+import { type Wallet } from './types/rainbowkit.js';
 
 /**
  * Create a RainbowKit wallet for Abstract Global Wallet

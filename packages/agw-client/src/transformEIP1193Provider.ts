@@ -17,7 +17,8 @@ import {
   toHex,
   type Transport,
 } from 'viem';
-import { parseAccount, toAccount } from 'viem/accounts';
+import { toAccount } from 'viem/accounts';
+import { parseAccount } from 'viem/utils';
 
 import { createAbstractClient } from './abstractClient.js';
 import {

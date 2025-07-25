@@ -32,7 +32,12 @@ interface ChainCapabilitiesV2 {
 
 type WalletCapabilitiesV1 = Record<`0x${string}`, ChainCapabilitiesV1>;
 
-export type WalletCapabilitiesV2 = Record<`0x${string}`, ChainCapabilitiesV2>;
+type WalletCapabilitiesV2 = Record<`0x${string}`, ChainCapabilitiesV2>;
+
+export type WalletCapabilities = Record<
+  `0x${string}`,
+  ChainCapabilitiesV1 & ChainCapabilitiesV2
+>;
 
 export type SendCallsParams = SendCallsParamsV1 | SendCallsParamsV2;
 
@@ -59,16 +64,22 @@ export interface SendCallsParamsV2 {
     data?: Hex | undefined;
     value?: Hex | undefined;
   }[];
-  capabilities: Record<string, any>;
+  capabilities: WalletCapabilitiesV2 | undefined;
 }
 
-export const agwCapabilitiesV2: WalletCapabilitiesV2 = {
+export const agwCapabilitiesV2: WalletCapabilities = {
   '0xab5': {
+    atomicBatch: {
+      supported: true,
+    },
     atomic: {
       status: 'supported',
     },
   },
   '0x2b74': {
+    atomicBatch: {
+      supported: true,
+    },
     atomic: {
       status: 'supported',
     },

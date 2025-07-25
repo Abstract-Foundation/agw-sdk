@@ -18,6 +18,7 @@ import {
   type SignEip712TransactionParameters,
   type SignEip712TransactionReturnType,
   type TransactionRequestEIP712,
+  type ZksyncTransactionRequest,
 } from 'viem/zksync';
 
 import AGWAccountAbi from '../abis/AGWAccount.js';
@@ -31,6 +32,11 @@ import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
 import { VALID_CHAINS } from '../utils.js';
 import { transformHexValues } from '../utils.js';
 import { signPrivyTransaction } from './sendPrivyTransaction.js';
+
+// Type helper to allow direct assignment of eip712 transaction type
+type TransactionWithType = ZksyncTransactionRequest & {
+  type?: 'eip712';
+};
 
 export async function signTransaction<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
@@ -98,8 +104,10 @@ export async function signEip712TransactionInternal<
     chain = client.chain,
     ...transaction
   } = args;
-  // TODO: open up typing to allow for eip712 transactions
-  transaction.type = 'eip712' as any;
+  
+  // Apply eip712 transaction type properly
+  (transaction as TransactionWithType).type = 'eip712';
+  
   transformHexValues(transaction, [
     'value',
     'nonce',
@@ -116,7 +124,7 @@ export async function signEip712TransactionInternal<
     });
   const smartAccount = parseAccount(account_);
   const useSignerAddress =
-    (transaction as any).from === signerClient.account.address;
+    (transaction as TransactionWithType).from === signerClient.account.address;
   const fromAccount = useSignerAddress ? signerClient.account : smartAccount;
 
   assertEip712Request({

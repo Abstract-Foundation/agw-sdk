@@ -1,5 +1,12 @@
 # @abstract-foundation/agw-client
 
+## 1.8.7
+
+### Patch Changes
+
+- b184c83: expose legacy atomicBatch capability for consumers using old version of EIP5792
+- 690eb46: fix typing on AbstractWalletActions.getLinkedAccounts
+
 ## 1.8.6
 
 ### Patch Changes

@@ -23,7 +23,6 @@ import {
 import AGWAccountAbi from '../abis/AGWAccount.js';
 import {
   assertEip712Request,
-  type AssertEip712RequestParameters,
 } from '../eip712.js';
 import { AccountNotFoundError } from '../errors/account.js';
 import { assertSessionKeyPolicies } from '../sessionValidator.js';
@@ -98,9 +97,10 @@ export async function signEip712TransactionInternal<
     chain = client.chain,
     ...transaction
   } = args;
-  // TODO: open up typing to allow for eip712 transactions
-  transaction.type = 'eip712' as any;
-  transformHexValues(transaction, [
+  // Explicitly type the transaction to allow EIP-712 type assignment
+  const eip712Transaction = transaction as TransactionRequestEIP712 & { type: 'eip712' };
+  eip712Transaction.type = 'eip712';
+  transformHexValues(eip712Transaction, [
     'value',
     'nonce',
     'maxFeePerGas',
@@ -116,13 +116,13 @@ export async function signEip712TransactionInternal<
     });
   const smartAccount = parseAccount(account_);
   const useSignerAddress =
-    (transaction as any).from === signerClient.account.address;
+    eip712Transaction.from === signerClient.account.address;
   const fromAccount = useSignerAddress ? signerClient.account : smartAccount;
 
   assertEip712Request({
     account: fromAccount,
     chain,
-    ...(transaction as AssertEip712RequestParameters),
+    ...eip712Transaction,
   });
 
   if (!chain || VALID_CHAINS[chain.id] === undefined) {
@@ -143,13 +143,13 @@ export async function signEip712TransactionInternal<
     publicClient,
     chainId,
     fromAccount,
-    transaction,
+    eip712Transaction,
   );
 
   const transactionWithPaymaster = await getTransactionWithPaymasterData(
     chainId,
     fromAccount,
-    transaction,
+    eip712Transaction,
     customPaymasterHandler,
   );
 

@@ -93,13 +93,15 @@ export async function signEip712TransactionInternal<
   };
   customSignature: Hex;
 }> {
+  // ensure the transaction type is set to eip712
+  args.type = 'eip712';
+
   const {
     account: account_ = client.account,
     chain = client.chain,
     ...transaction
   } = args;
-  // TODO: open up typing to allow for eip712 transactions
-  transaction.type = 'eip712' as any;
+
   transformHexValues(transaction, [
     'value',
     'nonce',

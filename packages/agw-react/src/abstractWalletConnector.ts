@@ -101,7 +101,11 @@ function abstractWalletConnector(
         chainId,
       });
 
-      const transport = params.transports?.[chainId] ?? http();
+      const transport =
+        params.transports?.[chainId] ??
+        http(undefined, {
+          batch: true,
+        });
 
       return transformEIP1193Provider({
         provider,

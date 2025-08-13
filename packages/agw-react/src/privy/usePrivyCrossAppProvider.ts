@@ -40,7 +40,9 @@ interface UsePrivyCrossAppEIP1193Props {
 
 export const usePrivyCrossAppProvider = ({
   chain,
-  transport = http(),
+  transport = http(undefined, {
+    batch: true,
+  }),
 }: UsePrivyCrossAppEIP1193Props) => {
   const {
     loginWithCrossAppAccount,

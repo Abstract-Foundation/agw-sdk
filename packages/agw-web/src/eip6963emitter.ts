@@ -37,14 +37,22 @@ export function announceProvider({
     providerAppId: 'cm04asygd041fmry9zmcyn5o5',
     chains: [chain],
     transports: {
-      [chain.id]: transport ?? http(),
+      [chain.id]:
+        transport ??
+        http(undefined, {
+          batch: true,
+        }),
     },
   }) as EIP1193Provider;
 
   const abstractProvider = transformEIP1193Provider({
     provider: privyProvider,
     chain,
-    transport: transport ?? http(),
+    transport:
+      transport ??
+      http(undefined, {
+        batch: true,
+      }),
     isPrivyCrossApp: true,
     customPaymasterHandler,
   });

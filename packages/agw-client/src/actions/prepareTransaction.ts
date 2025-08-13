@@ -41,6 +41,7 @@ import {
   getBalance,
   type GetBlockErrorType,
   getChainId as getChainId_,
+  getGasPrice,
   getTransactionCount,
   type GetTransactionCountErrorType,
 } from 'viem/actions';
@@ -51,15 +52,9 @@ import {
   type GetTransactionType,
   parseAccount,
 } from 'viem/utils';
-import {
-  type ChainEIP712,
-  estimateFee,
-  type EstimateFeeParameters,
-  type EstimateFeeReturnType,
-} from 'viem/zksync';
+import { type ChainEIP712, getGasPerPubdata } from 'viem/zksync';
 
 import {
-  CONTRACT_DEPLOYER_ADDRESS,
   EOA_VALIDATOR_ADDRESS,
   INSUFFICIENT_BALANCE_SELECTOR,
   SMART_ACCOUNT_FACTORY_ADDRESS,
@@ -411,7 +406,6 @@ export async function prepareTransactionRequest<
     }
   }
 
-  let gasLimitFromFeeEstimation: bigint | undefined;
   // Estimate fees if needed
   if (parameterNames.includes('fees')) {
     if (
@@ -420,72 +414,57 @@ export async function prepareTransactionRequest<
     ) {
       asyncOperations.push(
         (async () => {
-          let maxFeePerGas: bigint | undefined;
-          let maxPriorityFeePerGas: bigint | undefined;
-          // Skip fee estimation for contract deployments
-          if (request.to === CONTRACT_DEPLOYER_ADDRESS) {
-            maxFeePerGas = 25000000n;
-            maxPriorityFeePerGas = 0n;
-          } else {
-            const estimateFeeRequest: EstimateFeeParameters<
-              chain,
-              account | undefined,
-              ChainEIP712
-            > = {
-              account: initiatorAccount,
-              to: request.to,
-              value: request.value,
-              data: request.data,
-              gas: request.gas,
-              nonce: request.nonce,
-              chainId: request.chainId,
-              authorizationList: [],
-            };
-            let feeEstimation: EstimateFeeReturnType | undefined;
-            try {
-              feeEstimation = await estimateFee(
-                publicClient,
-                estimateFeeRequest,
-              );
-            } catch (error) {
-              if (
-                error instanceof Error &&
-                error.message.includes(INSUFFICIENT_BALANCE_SELECTOR)
-              ) {
-                throw new InsufficientBalanceError();
-              } else if (
-                error instanceof RpcRequestError &&
-                error.details.includes('execution reverted')
-              ) {
-                throw new ExecutionRevertedError({
-                  message: `${error.data}`,
-                });
-              }
-              throw error;
-            }
-            maxFeePerGas = feeEstimation.maxFeePerGas;
-            maxPriorityFeePerGas = feeEstimation.maxPriorityFeePerGas;
-            gasLimitFromFeeEstimation = feeEstimation.gasLimit;
-          }
-
-          if (
-            typeof args.maxPriorityFeePerGas === 'undefined' &&
-            args.maxFeePerGas &&
-            args.maxFeePerGas < maxPriorityFeePerGas
-          )
-            throw new MaxFeePerGasTooLowError({
-              maxPriorityFeePerGas,
-            });
-
-          request.maxPriorityFeePerGas = maxPriorityFeePerGas;
-          request.maxFeePerGas = maxFeePerGas;
-          // set gas to gasFromFeeEstimation if gas is not already set
-          if (typeof gas === 'undefined') {
-            request.gas = gasLimitFromFeeEstimation;
-          }
+          request.maxFeePerGas = await getGasPrice(publicClient);
+          request.maxPriorityFeePerGas = 0n;
         })(),
       );
     }
+
+    if (
+      (request.type as any) === 'eip712' &&
+      typeof (request as any).gasPerPubdata === 'undefined'
+    ) {
+      asyncOperations.push(
+        (async () => {
+          (request as any).gasPerPubdata = await getGasPerPubdata(publicClient);
+        })(),
+      );
+    }
+  }
+
+  // Estimate gas limit if needed
+  if (parameterNames.includes('gas') && typeof gas === 'undefined') {
+    asyncOperations.push(
+      (async () => {
+        try {
+          request.gas = await getAction(
+            client,
+            estimateGas,
+            'estimateGas',
+          )({
+            ...request,
+            account: initiatorAccount
+              ? { address: initiatorAccount.address, type: 'json-rpc' }
+              : undefined,
+          } as EstimateGasParameters);
+        } catch (error) {
+          if (
+            error instanceof Error &&
+            error.message.includes(INSUFFICIENT_BALANCE_SELECTOR)
+          ) {
+            throw new InsufficientBalanceError();
+          } else if (
+            error instanceof RpcRequestError &&
+            error.details.includes('execution reverted')
+          ) {
+            throw new ExecutionRevertedError({
+              message: `${error.data}`,
+            });
+          }
+          throw error;
+        }
+      })(),
+    );
   }
 
   // Wait for all async operations to complete
@@ -502,24 +481,6 @@ export async function prepareTransactionRequest<
     userBalance < (request.value ?? 0n) + gasCost
   ) {
     throw new InsufficientBalanceError();
-  }
-
-  // Estimate gas limit if needed
-  if (
-    parameterNames.includes('gas') &&
-    typeof gas === 'undefined' &&
-    gasLimitFromFeeEstimation === undefined // if gas was set by fee estimation, don't estimate again
-  ) {
-    request.gas = await getAction(
-      client,
-      estimateGas,
-      'estimateGas',
-    )({
-      ...request,
-      account: initiatorAccount
-        ? { address: initiatorAccount.address, type: 'json-rpc' }
-        : undefined,
-    } as EstimateGasParameters);
   }
 
   assertRequest(request as AssertRequestParameters);

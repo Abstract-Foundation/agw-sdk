@@ -167,7 +167,9 @@ export function createSessionClient<
   nonceManager,
 }: CreateSessionClientParameters<account>) {
   if (!transport) {
-    transport = http();
+    transport = http(undefined, {
+      batch: true,
+    });
   }
 
   const publicClient = createPublicClient({

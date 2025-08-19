@@ -40,7 +40,9 @@ interface UsePrivyCrossAppEIP1193Props {
 
 export const usePrivyCrossAppProvider = ({
   chain,
-  transport = http(),
+  transport = http(undefined, {
+    batch: true,
+  }),
 }: UsePrivyCrossAppEIP1193Props) => {
   const {
     loginWithCrossAppAccount,
@@ -92,7 +94,6 @@ export const usePrivyCrossAppProvider = ({
     eth_protocolVersion: true,
     eth_sendRawTransaction: true,
     eth_uninstallFilter: true,
-    zks_estimateFee: true,
   };
   const passthrough = (method: EIP1474MethodNames) =>
     !!passthroughMethods[method];

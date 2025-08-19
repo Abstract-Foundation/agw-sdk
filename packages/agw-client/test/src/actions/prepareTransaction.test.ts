@@ -48,7 +48,6 @@ vi.mock('viem', async (importOriginal) => {
 const RAW_SIGNATURE =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 const MOCK_ETH_ESTIMATE_GAS_LIMIT = 158774n;
-const MOCK_ZKS_ESTIMATE_GAS_LIMIT = 1403904n;
 const MOCK_FEE_PER_GAS = 250000001n;
 const MOCK_NONCE = 34;
 
@@ -90,12 +89,11 @@ const publicClient = createPublicClient({
 
 publicClient.request = (async ({ method, params }) => {
   if (method === 'zks_estimateFee') {
-    return {
-      gas_limit: toHex(MOCK_ZKS_ESTIMATE_GAS_LIMIT),
-      gas_per_pubdata_limit: '0x143b',
-      max_fee_per_gas: toHex(MOCK_FEE_PER_GAS),
-      max_priority_fee_per_gas: '0x0',
-    };
+    throw new Error('zks_estimateFee not supported');
+  } else if (method === 'eth_estimateGas') {
+    return toHex(MOCK_ETH_ESTIMATE_GAS_LIMIT);
+  } else if (method === 'eth_gasPrice') {
+    return toHex(MOCK_FEE_PER_GAS);
   } else if (method === 'eth_getBalance') {
     return toHex(1000000000000000000n); // 1 ETH
   }
@@ -130,7 +128,7 @@ test('minimum, not initial transaction', async () => {
     ...transaction,
     chain: anvilAbstractTestnet.chain,
     from: address.smartAccountAddress,
-    gas: MOCK_ZKS_ESTIMATE_GAS_LIMIT,
+    gas: MOCK_ETH_ESTIMATE_GAS_LIMIT,
     nonce: MOCK_NONCE,
     maxFeePerGas: MOCK_FEE_PER_GAS,
     maxPriorityFeePerGas: 0n,
@@ -158,7 +156,7 @@ test('is initial transaction', async () => {
     to: SMART_ACCOUNT_FACTORY_ADDRESS,
     data: '0xmockedEncodedData',
     chain: anvilAbstractTestnet.chain,
-    gas: MOCK_ZKS_ESTIMATE_GAS_LIMIT,
+    gas: MOCK_ETH_ESTIMATE_GAS_LIMIT,
     nonce: MOCK_NONCE,
     maxFeePerGas: MOCK_FEE_PER_GAS,
     maxPriorityFeePerGas: 0n,
@@ -228,7 +226,7 @@ test('to contract deployer', async () => {
     from: address.smartAccountAddress,
     gas: MOCK_ETH_ESTIMATE_GAS_LIMIT,
     nonce: MOCK_NONCE,
-    maxFeePerGas: 25000000n, // Default fee for contract deployments
+    maxFeePerGas: MOCK_FEE_PER_GAS,
     maxPriorityFeePerGas: 0n,
   });
 });
@@ -248,7 +246,7 @@ test('with chainId but not chain', async () => {
     ...transaction,
     from: address.smartAccountAddress,
     chainId: anvilAbstractTestnet.chain.id,
-    gas: MOCK_ZKS_ESTIMATE_GAS_LIMIT,
+    gas: MOCK_ETH_ESTIMATE_GAS_LIMIT,
     nonce: MOCK_NONCE,
     maxFeePerGas: MOCK_FEE_PER_GAS,
     maxPriorityFeePerGas: 0n,
@@ -266,7 +264,7 @@ test('with no chainId or chain', async () => {
   expect(request).toEqual({
     ...transaction,
     from: address.smartAccountAddress,
-    gas: MOCK_ZKS_ESTIMATE_GAS_LIMIT,
+    gas: MOCK_ETH_ESTIMATE_GAS_LIMIT,
     nonce: MOCK_NONCE,
     maxFeePerGas: MOCK_FEE_PER_GAS,
     maxPriorityFeePerGas: 0n,
@@ -298,7 +296,7 @@ test('with nonce manager', async () => {
     ...transaction,
     chain: anvilAbstractTestnet.chain,
     from: address.smartAccountAddress,
-    gas: MOCK_ZKS_ESTIMATE_GAS_LIMIT,
+    gas: MOCK_ETH_ESTIMATE_GAS_LIMIT,
     nonce: MOCK_NONCE,
     maxFeePerGas: MOCK_FEE_PER_GAS,
     maxPriorityFeePerGas: 0n,
@@ -309,34 +307,6 @@ test('with nonce manager', async () => {
     chainId: anvilAbstractTestnet.chain.id,
     client: publicClient,
   });
-});
-
-test('throws if maxFeePerGas is too low', async () => {
-  vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
-  const publicClientModified = createPublicClient({
-    chain: anvilAbstractTestnet.chain as ChainEIP712,
-    transport: anvilAbstractTestnet.clientConfig.transport,
-  });
-
-  publicClientModified.request = (async ({ method, params }) => {
-    if (method === 'zks_estimateFee') {
-      return {
-        gas_limit: '0x156c00',
-        gas_per_pubdata_limit: '0x143b',
-        max_fee_per_gas: toHex(MOCK_FEE_PER_GAS),
-        max_priority_fee_per_gas: '0xffffff', // this shouldn't happen in production
-      };
-    }
-    return anvilAbstractTestnet.getClient().request({ method, params } as any);
-  }) as EIP1193RequestFn;
-
-  await expect(
-    prepareTransactionRequest(baseClient, signerClient, publicClientModified, {
-      ...transaction,
-      chain: anvilAbstractTestnet.chain,
-      maxFeePerGas: 10000n,
-    }),
-  ).rejects.toThrow(MaxFeePerGasTooLowError);
 });
 
 test.each([
@@ -392,12 +362,11 @@ test.each([
 
   publicClientWithCustomBalance.request = (async ({ method, params }) => {
     if (method === 'zks_estimateFee') {
-      return {
-        gas_limit: 100_000n,
-        gas_per_pubdata_limit: '0x143b',
-        max_fee_per_gas: toHex(MOCK_FEE_PER_GAS),
-        max_priority_fee_per_gas: '0x0',
-      };
+      throw new Error('zks_estimateFee not supported');
+    } else if (method === 'eth_estimateGas') {
+      return toHex(100_000n);
+    } else if (method === 'eth_gasPrice') {
+      return toHex(MOCK_FEE_PER_GAS);
     } else if (method === 'eth_getBalance') {
       return balance;
     }

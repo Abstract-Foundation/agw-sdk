@@ -19,13 +19,17 @@ export const abstractLocalNode = defineChain({
 
 export const abstractClientLocalNode = createClient({
   chain: abstractLocalNode,
-  transport: http(),
+  transport: http(undefined, {
+    batch: true,
+  }),
 });
 
 export const abstractClientLocalNodeWithAccount = createClient({
   account: accounts[0].address,
   chain: abstractLocalNode,
-  transport: http(),
+  transport: http(undefined, {
+    batch: true,
+  }),
 });
 
 export function getAbstractMockProvider(

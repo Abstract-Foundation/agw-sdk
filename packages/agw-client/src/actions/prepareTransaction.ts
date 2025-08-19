@@ -408,10 +408,7 @@ export async function prepareTransactionRequest<
 
   // Estimate fees if needed
   if (parameterNames.includes('fees')) {
-    if (
-      typeof request.maxFeePerGas === 'undefined' ||
-      typeof request.maxPriorityFeePerGas === 'undefined'
-    ) {
+    if (typeof request.maxFeePerGas === 'undefined') {
       asyncOperations.push(
         (async () => {
           request.maxFeePerGas = await getGasPrice(publicClient);

@@ -47,12 +47,7 @@ const transaction = {
 
 publicClient.request = (async ({ method, params }) => {
   if (method === 'zks_estimateFee') {
-    return {
-      gas_limit: '0x156c00',
-      gas_per_pubdata_limit: '0x143b',
-      max_fee_per_gas: '0xee6b280',
-      max_priority_fee_per_gas: '0x0',
-    };
+    throw new Error('zks_estimateFee not supported');
   }
   return anvilAbstractTestnet.getClient().request({ method, params } as any);
 }) as EIP1193RequestFn;

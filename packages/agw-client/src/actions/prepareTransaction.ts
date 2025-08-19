@@ -32,7 +32,7 @@ import {
   type UnionRequiredBy,
   type WalletClient,
 } from 'viem';
-import { type ParseAccountErrorType } from 'viem/accounts';
+import type { ParseAccountErrorType } from 'viem/accounts';
 import {
   type EstimateFeesPerGasErrorType,
   estimateGas,
@@ -52,7 +52,7 @@ import {
   type GetTransactionType,
   parseAccount,
 } from 'viem/utils';
-import { type ChainEIP712, getGasPerPubdata } from 'viem/zksync';
+import type { ChainEIP712 } from 'viem/zksync';
 
 import {
   EOA_VALIDATOR_ADDRESS,

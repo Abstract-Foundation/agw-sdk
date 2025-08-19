@@ -419,17 +419,6 @@ export async function prepareTransactionRequest<
         })(),
       );
     }
-
-    if (
-      (request.type as any) === 'eip712' &&
-      typeof (request as any).gasPerPubdata === 'undefined'
-    ) {
-      asyncOperations.push(
-        (async () => {
-          (request as any).gasPerPubdata = await getGasPerPubdata(publicClient);
-        })(),
-      );
-    }
   }
 
   // Estimate gas limit if needed

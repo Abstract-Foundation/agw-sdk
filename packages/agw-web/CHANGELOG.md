@@ -1,5 +1,16 @@
 # @abstract-foundation/agw-web
 
+## 1.9.0
+
+### Minor Changes
+
+- 0cf9c93: Remove usage of deprecated zks_estimateFee method
+
+### Patch Changes
+
+- Updated dependencies [0cf9c93]
+  - @abstract-foundation/agw-client@1.9.0
+
 ## 1.8.8
 
 ### Patch Changes

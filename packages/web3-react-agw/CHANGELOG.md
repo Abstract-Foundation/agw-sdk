@@ -1,5 +1,12 @@
 # @abstract-foundation/web3-react-agw
 
+## 1.7.8
+
+### Patch Changes
+
+- Updated dependencies [0cf9c93]
+  - @abstract-foundation/agw-client@1.9.0
+
 ## 1.7.7
 
 ### Patch Changes

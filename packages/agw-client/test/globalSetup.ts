@@ -1,7 +1,20 @@
-import * as executionInstances from './anvil.js';
+// Polyfill Promise.withResolvers for Node.js versions that do not include it
+if (typeof (Promise as any).withResolvers !== 'function') {
+  (Promise as any).withResolvers = function <T>() {
+    let resolve!: (value: T | PromiseLike<T>) => void;
+    let reject!: (reason?: any) => void;
+    const promise = new Promise<T>((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return { promise, resolve, reject };
+  };
+}
 
 export default async function () {
   if (process.env.SKIP_GLOBAL_SETUP) return;
+
+  const executionInstances = await import('./anvil.js');
 
   // Using this proxy, we can parallelize our test suite by spawning multiple "on demand" anvil
   // instances and proxying requests to them. Especially for local development, this is much faster
@@ -21,8 +34,8 @@ export default async function () {
   // We still need to remember to reset the anvil instance between test files. This is generally
   // handled in `setup.ts` but may require additional resetting (e.g. via `afterAll`), in case of
   // any custom per-test adjustments that persist beyond `anvil_reset`.
-  const shutdown = await Promise.all([
-    ...Object.values(executionInstances).map((instance) => instance.start()),
-  ]);
-  return () => Promise.all(shutdown.map((fn) => fn()));
+  const shutdown = await Promise.all(
+    Object.values(executionInstances).map((instance: any) => instance.start()),
+  );
+  return () => Promise.all(shutdown.map((fn: any) => fn()));
 }

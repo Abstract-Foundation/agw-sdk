@@ -1,4 +1,7 @@
-import { transformEIP1193Provider } from '@abstract-foundation/agw-client';
+import {
+  transformEIP1193Provider,
+  validChains,
+} from '@abstract-foundation/agw-client';
 import type {
   Actions,
   AddEthereumChainParameter,
@@ -7,15 +10,10 @@ import type {
   ProviderRpcError,
 } from '@web3-react/types';
 import { Connector } from '@web3-react/types';
-import { type Chain, type EIP1193Provider } from 'viem';
-import { abstract, abstractTestnet } from 'viem/chains';
+import { type EIP1193Provider } from 'viem';
+import { abstractTestnet } from 'viem/chains';
 
 const AGW_APP_ID = 'cm04asygd041fmry9zmcyn5o5';
-
-const VALID_CHAINS: Record<number, Chain> = {
-  [abstractTestnet.id]: abstractTestnet,
-  [abstract.id]: abstract,
-};
 
 function parseChainId(chainId: string | number) {
   return typeof chainId === 'string' ? Number.parseInt(chainId, 16) : chainId;
@@ -136,7 +134,7 @@ export class AbstractGlobalWallet extends Connector {
         });
 
       // if we're here, we can try to switch networks
-      const desiredChain = VALID_CHAINS[desiredChainId];
+      const desiredChain = validChains[desiredChainId];
       if (desiredChain) {
         const desiredChainIdHex = `0x${desiredChainId.toString(16)}`;
         await this.provider.request({

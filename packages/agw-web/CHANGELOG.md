@@ -1,5 +1,12 @@
 # @abstract-foundation/agw-web
 
+## 1.9.1
+
+### Patch Changes
+
+- Updated dependencies [0120894]
+  - @abstract-foundation/agw-client@1.9.1
+
 ## 1.9.0
 
 ### Minor Changes

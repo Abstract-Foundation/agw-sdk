@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.9.1
+
+### Patch Changes
+
+- 0120894: feat: allow zksync era as a valid chain
+
 ## 1.9.0
 
 ### Minor Changes

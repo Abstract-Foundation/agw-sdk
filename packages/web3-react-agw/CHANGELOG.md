@@ -1,5 +1,13 @@
 # @abstract-foundation/web3-react-agw
 
+## 1.7.9
+
+### Patch Changes
+
+- 0120894: chore: Update to use shared validChains from core lib
+- Updated dependencies [0120894]
+  - @abstract-foundation/agw-client@1.9.1
+
 ## 1.7.8
 
 ### Patch Changes

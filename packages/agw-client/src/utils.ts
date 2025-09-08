@@ -21,10 +21,7 @@ import {
   zksync,
   zksyncSepoliaTestnet,
 } from 'viem/chains';
-import {
-  type ChainEIP712,
-  type SignEip712TransactionParameters,
-} from 'viem/zksync';
+import type { ChainEIP712, SignEip712TransactionParameters } from 'viem/zksync';
 
 import AccountFactoryAbi from './abis/AccountFactory.js';
 import { AGWRegistryAbi } from './abis/AGWRegistryAbi.js';
@@ -33,7 +30,7 @@ import {
   SMART_ACCOUNT_FACTORY_ADDRESS,
 } from './constants.js';
 import { isEIP712Transaction } from './eip712.js';
-import { type Call } from './types/call.js';
+import type { Call } from './types/call.js';
 
 export const VALID_CHAINS: Record<number, Chain> = {
   [abstractTestnet.id]: abstractTestnet,

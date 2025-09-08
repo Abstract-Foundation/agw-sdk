@@ -15,7 +15,12 @@ import {
   type UnionRequiredBy,
 } from 'viem';
 import { parseAccount } from 'viem/accounts';
-import { abstract, abstractTestnet } from 'viem/chains';
+import {
+  abstract,
+  abstractTestnet,
+  zksync,
+  zksyncSepoliaTestnet,
+} from 'viem/chains';
 import {
   type ChainEIP712,
   type SignEip712TransactionParameters,
@@ -33,6 +38,8 @@ import { type Call } from './types/call.js';
 export const VALID_CHAINS: Record<number, Chain> = {
   [abstractTestnet.id]: abstractTestnet,
   [abstract.id]: abstract,
+  [zksync.id]: zksync,
+  [zksyncSepoliaTestnet.id]: zksyncSepoliaTestnet,
 };
 
 export function convertBigIntToString(value: any): any {

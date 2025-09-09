@@ -5,8 +5,8 @@ import {
   type Client,
   encodeAbiParameters,
   type Hex,
-  parseAbiParameters,
   type PublicClient,
+  parseAbiParameters,
   type Transport,
   type UnionRequiredBy,
   type WalletClient,
@@ -22,14 +22,13 @@ import {
 
 import AGWAccountAbi from '../abis/AGWAccount.js';
 import {
-  assertEip712Request,
   type AssertEip712RequestParameters,
+  assertEip712Request,
 } from '../eip712.js';
 import { AccountNotFoundError } from '../errors/account.js';
 import { assertSessionKeyPolicies } from '../sessionValidator.js';
 import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
-import { VALID_CHAINS } from '../utils.js';
-import { transformHexValues } from '../utils.js';
+import { transformHexValues, VALID_CHAINS } from '../utils.js';
 import { signPrivyTransaction } from './sendPrivyTransaction.js';
 
 export async function signTransaction<

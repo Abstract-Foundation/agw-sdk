@@ -1,4 +1,3 @@
-import { toBytes, toHex, zeroAddress } from 'viem';
 import {
   createClient,
   createWalletClient,
@@ -9,11 +8,15 @@ import {
   keccak256,
   parseAbiParameters,
   serializeErc6492Signature,
+  toBytes,
+  toHex,
+  zeroAddress,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
 import { getCode } from 'viem/actions';
 import { ChainEIP712 } from 'viem/zksync';
 import { describe, expect, it, vi } from 'vitest';
+
 vi.mock('viem/actions', async (importOriginal) => {
   const actual = await importOriginal();
   return {
@@ -21,6 +24,7 @@ vi.mock('viem/actions', async (importOriginal) => {
     getCode: vi.fn(),
   };
 });
+
 import AccountFactoryAbi from '../../../src/abis/AccountFactory.js';
 import { signMessage } from '../../../src/actions/signMessage.js';
 import {

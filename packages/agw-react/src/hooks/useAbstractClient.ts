@@ -1,6 +1,6 @@
 import {
-  createAbstractClient,
   type CustomPaymasterHandler,
+  createAbstractClient,
 } from '@abstract-foundation/agw-client';
 import { useQuery } from '@tanstack/react-query';
 import { custom, useChains, useConfig } from 'wagmi';

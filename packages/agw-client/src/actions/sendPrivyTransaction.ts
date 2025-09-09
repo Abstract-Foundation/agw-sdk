@@ -5,8 +5,8 @@ import {
   type SendTransactionRequest,
   type SignMessageParameters,
   type SignTypedDataParameters,
-  toHex,
   type Transport,
+  toHex,
 } from 'viem';
 import {
   type ChainEIP712,

@@ -1,5 +1,5 @@
 import { createServer } from 'prool';
-import { anvil, type AnvilParameters } from 'prool/instances';
+import { type AnvilParameters, anvil } from 'prool/instances';
 import {
   type Account,
   type Address,

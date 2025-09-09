@@ -47,22 +47,12 @@
   },
   "typesVersions": {
     "*": {
-      "actions": [
-        "./dist/types/exports/actions.d.ts"
-      ],
-      "constants": [
-        "./dist/types/exports/constants.d.ts"
-      ],
-      "sessions": [
-        "./dist/types/exports/sessions.d.ts"
-      ]
+      "actions": ["./dist/types/exports/actions.d.ts"],
+      "constants": ["./dist/types/exports/constants.d.ts"],
+      "sessions": ["./dist/types/exports/sessions.d.ts"]
     }
   },
-  "files": [
-    "dist",
-    "src",
-    "package.json"
-  ],
+  "files": ["dist", "src", "package.json"],
   "peerDependencies": {
     "abitype": "^1.0.0",
     "typescript": ">=5.0.4",

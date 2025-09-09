@@ -46,22 +46,12 @@
   },
   "typesVersions": {
     "*": {
-      "connectors": [
-        "dist/types/exports/connectors.d.ts"
-      ],
-      "privy": [
-        "dist/types/exports/privy.d.ts"
-      ],
-      "thirdweb": [
-        "dist/types/exports/thirdweb.d.ts"
-      ]
+      "connectors": ["dist/types/exports/connectors.d.ts"],
+      "privy": ["dist/types/exports/privy.d.ts"],
+      "thirdweb": ["dist/types/exports/thirdweb.d.ts"]
     }
   },
-  "files": [
-    "dist",
-    "src",
-    "package.json"
-  ],
+  "files": ["dist", "src", "package.json"],
   "dependencies": {
     "@abstract-foundation/agw-client": "workspace:*"
   },

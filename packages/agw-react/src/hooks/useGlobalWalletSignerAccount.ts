@@ -1,9 +1,9 @@
 import {
   type Config,
   type ResolvedRegister,
-  useAccount,
   type UseAccountParameters,
   type UseAccountReturnType,
+  useAccount,
 } from 'wagmi';
 
 /**

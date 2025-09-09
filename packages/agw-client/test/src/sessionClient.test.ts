@@ -45,8 +45,7 @@ import {
   createSessionClient,
   toSessionClient,
 } from '../../src/sessionClient.js';
-import { LimitType, LimitZero } from '../../src/sessions.js';
-import { SessionConfig } from '../../src/sessions.js';
+import { LimitType, LimitZero, SessionConfig } from '../../src/sessions.js';
 import { getSmartAccountAddressFromInitialSigner } from '../../src/utils.js';
 
 const MOCK_CONTRACT_ADDRESS = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
@@ -73,7 +72,6 @@ const session: SessionConfig = {
 
 describe('createSessionClient', () => {
   const signer = toAccount(address.signerAddress);
-  const sessionSigner = toAccount(address.sessionSignerAddress);
   const mockWalletClient = vi.fn();
   const mockPublicClient = vi.fn();
 

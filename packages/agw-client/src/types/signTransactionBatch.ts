@@ -1,5 +1,4 @@
-import type { GetChainParameter } from 'viem';
-import type { Account, Address, Hex } from 'viem';
+import type { Account, Address, GetChainParameter, Hex } from 'viem';
 import type { GetAccountParameter } from 'viem/_types/types/account';
 import type { ChainEIP712, SignEip712TransactionParameters } from 'viem/zksync';
 

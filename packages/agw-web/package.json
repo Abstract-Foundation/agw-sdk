@@ -40,19 +40,11 @@
   },
   "typesVersions": {
     "*": {
-      "mainnet": [
-        "./dist/types/exports/mainnet.d.ts"
-      ],
-      "testnet": [
-        "./dist/types/exports/testnet.d.ts"
-      ]
+      "mainnet": ["./dist/types/exports/mainnet.d.ts"],
+      "testnet": ["./dist/types/exports/testnet.d.ts"]
     }
   },
-  "files": [
-    "dist",
-    "src",
-    "package.json"
-  ],
+  "files": ["dist", "src", "package.json"],
   "dependencies": {
     "@abstract-foundation/agw-client": "workspace:*"
   },

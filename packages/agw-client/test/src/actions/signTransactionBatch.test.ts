@@ -22,6 +22,7 @@ import { signTransactionBatch } from '../../../src/actions/signTransactionBatch.
 import { EOA_VALIDATOR_ADDRESS } from '../../../src/constants.js';
 import { anvilAbstractTestnet } from '../../anvil.js';
 import { address } from '../../constants.js';
+
 const RAW_SIGNATURE =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 

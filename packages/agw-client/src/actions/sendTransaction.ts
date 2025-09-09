@@ -8,8 +8,8 @@ import {
   type WalletClient,
 } from 'viem';
 import {
-  getTransactionError,
   type GetTransactionErrorParameters,
+  getTransactionError,
   parseAccount,
 } from 'viem/utils';
 import {

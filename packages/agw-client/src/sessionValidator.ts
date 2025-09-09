@@ -2,8 +2,8 @@ import {
   type Account,
   BaseError,
   type PublicClient,
-  toFunctionSelector,
   type Transport,
+  toFunctionSelector,
 } from 'viem';
 import { abstract } from 'viem/chains';
 import { decodeAbiParameters, decodeFunctionData } from 'viem/utils';

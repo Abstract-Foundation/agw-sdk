@@ -29,8 +29,7 @@ vi.mock('../../../src/actions/sendTransactionForSession', () => ({
 
 import { sendTransactionForSession } from '../../../src/actions/sendTransactionForSession.js';
 import { writeContractForSession } from '../../../src/actions/writeContractForSession.js';
-import { LimitType, SessionConfig } from '../../../src/sessions.js';
-import { LimitZero } from '../../../src/sessions.js';
+import { LimitType, LimitZero, SessionConfig } from '../../../src/sessions.js';
 import { isSmartAccountDeployed } from '../../../src/utils.js';
 
 const baseClient = createClient({

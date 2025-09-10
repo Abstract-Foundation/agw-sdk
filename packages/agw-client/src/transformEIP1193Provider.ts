@@ -24,7 +24,7 @@ import {
   agwCapabilitiesV2,
   getReceiptStatus,
   type SendCallsParams,
-  type WalletCapabilitiesV2,
+  type WalletCapabilities,
 } from './eip5792.js';
 import { type CustomPaymasterHandler, validChains } from './exports/index.js';
 import { getSmartAccountAddressFromInitialSigner } from './utils.js';
@@ -297,7 +297,8 @@ export function transformEIP1193Provider(
           id: params[0],
           chainId: toHex(chain.id),
           status: getReceiptStatus(receipt ?? undefined),
-          receipts: [receipt],
+          atomic: true, // AGW will always process multiple calls as an atomic batch
+          receipts: receipt != null ? [receipt] : undefined,
         };
       }
       case 'wallet_addEthereumChain':
@@ -333,7 +334,7 @@ export function transformEIP1193Provider(
 
         const capabilities = agwCapabilitiesV2;
         if (chainIds) {
-          const filteredCapabilities: WalletCapabilitiesV2 = {};
+          const filteredCapabilities: WalletCapabilities = {};
           for (const chainId of chainIds) {
             if (capabilities[chainId]) {
               filteredCapabilities[chainId] = capabilities[chainId];

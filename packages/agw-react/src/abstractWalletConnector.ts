@@ -4,7 +4,6 @@ import {
   validChains,
 } from '@abstract-foundation/agw-client';
 import { toPrivyWalletConnector } from '@privy-io/cross-app-connect/rainbow-kit';
-import type { WalletDetailsParams } from '@rainbow-me/rainbowkit/dist/wallets/Wallet.js';
 import { type CreateConnectorFn } from '@wagmi/core';
 import {
   type EIP1193EventMap,
@@ -14,6 +13,7 @@ import {
 } from 'viem';
 
 import { AGW_APP_ID, ICON_URL } from './constants.js';
+import type { WalletDetailsParams } from './types/rainbowkit.js';
 
 interface AbstractWalletConnectorOptions {
   /** RainbowKit connector details */
@@ -101,7 +101,11 @@ function abstractWalletConnector(
         chainId,
       });
 
-      const transport = params.transports?.[chainId] ?? http();
+      const transport =
+        params.transports?.[chainId] ??
+        http(undefined, {
+          batch: true,
+        });
 
       return transformEIP1193Provider({
         provider,

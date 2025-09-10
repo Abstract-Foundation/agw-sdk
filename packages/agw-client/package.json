@@ -1,7 +1,7 @@
 {
   "name": "@abstract-foundation/agw-client",
   "description": "Abstract Global Wallet Client SDK",
-  "version": "1.8.3",
+  "version": "1.9.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -74,14 +74,14 @@
   "peerDependencies": {
     "abitype": "^1.0.0",
     "typescript": ">=5.0.4",
-    "viem": "^2.22.23"
+    "viem": "^2.33.3"
   },
   "devDependencies": {
     "@types/node": "^22.5.5",
-    "@vitest/coverage-v8": "^2.1.9",
+    "@vitest/coverage-v8": "^3.2.4",
     "prool": "^0.0.23",
-    "viem": "^2.22.23",
-    "vitest": "^2.1.9"
+    "viem": "^2.33.3",
+    "vitest": "^3.2.4"
   },
   "peerDependenciesMeta": {
     "typescript": {

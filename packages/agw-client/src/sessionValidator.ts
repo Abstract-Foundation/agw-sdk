@@ -12,6 +12,9 @@ import type { ChainEIP712, SignEip712TransactionParameters } from 'viem/zksync';
 import { SessionKeyPolicyRegistryAbi } from './abis/SessionKeyPolicyRegistry.js';
 import { SessionKeyValidatorAbi } from './abis/SessionKeyValidator.js';
 import {
+  ADD_MODULE_SELECTOR,
+  BATCH_CALL_SELECTOR,
+  CREATE_SESSION_SELECTOR,
   SESSION_KEY_POLICY_REGISTRY_ADDRESS,
   SESSION_KEY_VALIDATOR_ADDRESS,
 } from './constants.js';
@@ -48,91 +51,121 @@ export async function assertSessionKeyPolicies<
     return;
   }
 
-  const session = getSessionFromTransaction(account, transaction);
+  const sessions = [];
 
-  if (!session) {
+  if (
+    transaction.to === account.address &&
+    transaction.data?.substring(0, 10) === BATCH_CALL_SELECTOR
+  ) {
+    const batchCall = decodeFunctionData({
+      abi: AGWAccountAbi,
+      data: transaction.data,
+    });
+    if (batchCall.functionName === 'batchCall') {
+      for (const call of batchCall.args[0]) {
+        const subTransaction = {
+          ...transaction,
+          to: call.target,
+          data: call.callData,
+        };
+        const session = getSessionFromTransaction(account, subTransaction);
+        if (session) {
+          sessions.push(session);
+        }
+      }
+    }
+  } else {
+    const session = getSessionFromTransaction(account, transaction);
+    if (session) {
+      sessions.push(session);
+    }
+  }
+
+  if (sessions.length === 0) {
     // no session can be parsed from the transaction
     return;
   }
 
-  const callPolicies = session.callPolicies;
-  const transferPolicies = session.transferPolicies;
+  for (const session of sessions) {
+    const callPolicies = session.callPolicies;
+    const transferPolicies = session.transferPolicies;
 
-  const checks = [];
+    const checks = [];
 
-  for (const callPolicy of callPolicies) {
-    if (restrictedSelectors.has(callPolicy.selector)) {
-      const destinationConstraints = callPolicy.constraints.filter(
-        (c) => c.index === 0n && c.condition === ConstraintCondition.Equal,
-      );
-
-      if (destinationConstraints.length === 0) {
-        throw new BaseError(
-          `Unconstrained token approval/transfer destination in call policy. Selector: ${callPolicy.selector}; Target: ${callPolicy.target}`,
+    for (const callPolicy of callPolicies) {
+      if (restrictedSelectors.has(callPolicy.selector)) {
+        const destinationConstraints = callPolicy.constraints.filter(
+          (c) => c.index === 0n && c.condition === ConstraintCondition.Equal,
         );
-      }
 
-      for (const constraint of destinationConstraints) {
-        const [target] = decodeAbiParameters(
-          [
-            {
-              type: 'address',
+        if (destinationConstraints.length === 0) {
+          throw new BaseError(
+            `Unconstrained token approval/transfer destination in call policy. Selector: ${callPolicy.selector}; Target: ${callPolicy.target}`,
+          );
+        }
+
+        for (const constraint of destinationConstraints) {
+          const [target] = decodeAbiParameters(
+            [
+              {
+                type: 'address',
+              },
+            ],
+            constraint.refValue,
+          );
+
+          checks.push({
+            target,
+            check: {
+              address: SESSION_KEY_POLICY_REGISTRY_ADDRESS,
+              abi: SessionKeyPolicyRegistryAbi,
+              functionName: 'getApprovalTargetStatus',
+              args: [
+                callPolicy.target, // token address
+                target, // allowed spender
+              ],
             },
-          ],
-          constraint.refValue,
-        );
-
+          });
+        }
+      } else {
         checks.push({
-          target,
+          target: callPolicy.target,
           check: {
             address: SESSION_KEY_POLICY_REGISTRY_ADDRESS,
             abi: SessionKeyPolicyRegistryAbi,
-            functionName: 'getApprovalTargetStatus',
-            args: [
-              callPolicy.target, // token address
-              target, // allowed spender
-            ],
+            functionName: 'getCallPolicyStatus',
+            args: [callPolicy.target, callPolicy.selector],
           },
         });
       }
-    } else {
+    }
+
+    for (const transferPolicy of transferPolicies) {
       checks.push({
-        target: callPolicy.target,
+        target: transferPolicy.target,
         check: {
           address: SESSION_KEY_POLICY_REGISTRY_ADDRESS,
           abi: SessionKeyPolicyRegistryAbi,
-          functionName: 'getCallPolicyStatus',
-          args: [callPolicy.target, callPolicy.selector],
+          functionName: 'getTransferPolicyStatus',
+          args: [transferPolicy.target],
         },
       });
     }
-  }
 
-  for (const transferPolicy of transferPolicies) {
-    checks.push({
-      target: transferPolicy.target,
-      check: {
-        address: SESSION_KEY_POLICY_REGISTRY_ADDRESS,
-        abi: SessionKeyPolicyRegistryAbi,
-        functionName: 'getTransferPolicyStatus',
-        args: [transferPolicy.target],
-      },
+    const results = await client.multicall({
+      contracts: checks.map((c) => c.check),
+      allowFailure: false,
     });
-  }
 
-  const results = await client.multicall({
-    contracts: checks.map((c) => c.check),
-    allowFailure: false,
-  });
+    for (let i = 0; i < checks.length; i++) {
+      const result = results[i];
+      const check = checks[i];
 
-  for (let i = 0; i < checks.length; i++) {
-    const result = results[i];
-    const check = checks[i];
-
-    if (Number(result) !== SessionKeyPolicyStatus.Allowed) {
-      throw new BaseError(
-        `Session key policy violation. Target: ${check?.target}; Status: ${SessionKeyPolicyStatus[Number(result)]}`,
-      );
+      if (Number(result) !== SessionKeyPolicyStatus.Allowed) {
+        throw new BaseError(
+          `Session key policy violation. Target: ${check?.target}; Status: ${SessionKeyPolicyStatus[Number(result)]}`,
+        );
+      }
     }
   }
 }
@@ -150,7 +183,7 @@ function getSessionFromTransaction<
 ) {
   if (
     transaction.to === SESSION_KEY_VALIDATOR_ADDRESS &&
-    transaction.data?.substring(0, 10) === '0x5a0694d2' // createSession(SessionLib.SessionSpec memory sessionSpec)
+    transaction.data?.substring(0, 10) === CREATE_SESSION_SELECTOR
   ) {
     const sessionSpec = decodeFunctionData({
       abi: SessionKeyValidatorAbi,
@@ -163,7 +196,7 @@ function getSessionFromTransaction<
 
   if (
     transaction.to === account?.address &&
-    transaction.data?.substring(0, 10) === '0xd3bdf4b5' // addModule(bytes moduleAndData)
+    transaction.data?.substring(0, 10) === ADD_MODULE_SELECTOR
   ) {
     const moduleAndData = decodeFunctionData({
       abi: AGWAccountAbi,

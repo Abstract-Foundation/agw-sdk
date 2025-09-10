@@ -84,7 +84,11 @@ export const AbstractPrivyProvider = ({
     ssr: true,
     connectors: [],
     transports: {
-      [chain.id]: transport ?? http(),
+      [chain.id]:
+        transport ??
+        http(undefined, {
+          batch: true,
+        }),
     },
     multiInjectedProviderDiscovery: false,
   });

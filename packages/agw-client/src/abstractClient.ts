@@ -83,7 +83,9 @@ export async function createAbstractClient({
   transport,
   address,
   isPrivyCrossApp = false,
-  publicTransport = http(),
+  publicTransport = http(undefined, {
+    batch: true,
+  }),
   customPaymasterHandler,
 }: CreateAbstractClientParameters): Promise<AbstractClient> {
   if (!transport) {

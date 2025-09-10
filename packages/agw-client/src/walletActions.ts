@@ -91,9 +91,7 @@ export type AbstractWalletActions<
   account extends Account | undefined = Account | undefined,
 > = Eip712WalletActions<chain, account> & {
   getChainId: () => Promise<GetChainIdReturnType>;
-  getLinkedAccounts: (
-    args: GetLinkedAccountsParameters,
-  ) => Promise<GetLinkedAccountsReturnType>;
+  getLinkedAccounts: () => Promise<GetLinkedAccountsReturnType>;
   isLinkedAccount: (args: IsLinkedAccountParameters) => Promise<boolean>;
   createSession: (
     args: CreateSessionParameters,

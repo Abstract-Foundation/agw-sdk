@@ -110,12 +110,16 @@ export async function linkToAgw<
 
   const l1PublicClient = createPublicClient({
     chain: client.chain,
-    transport: http(),
+    transport: http(undefined, {
+      batch: true,
+    }),
   });
 
   const l2PublicClient = createPublicClient({
     chain: l2Chain,
-    transport: http(),
+    transport: http(undefined, {
+      batch: true,
+    }),
   }).extend(publicActionsL2());
 
   const l2Value = 0n;

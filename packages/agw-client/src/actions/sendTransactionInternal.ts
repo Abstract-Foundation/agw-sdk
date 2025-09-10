@@ -70,6 +70,7 @@ export async function sendTransactionInternal<
       {
         ...parameters,
         parameters: ['gas', 'nonce', 'fees'],
+        nonceManager: account.nonceManager,
         optimistic: optimisticData,
       } as any,
     );

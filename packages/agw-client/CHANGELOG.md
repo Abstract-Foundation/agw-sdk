@@ -1,5 +1,42 @@
 # @abstract-foundation/agw-client
 
+## 1.9.1
+
+### Patch Changes
+
+- 0120894: feat: allow zksync era as a valid chain
+
+## 1.9.0
+
+### Minor Changes
+
+- 0cf9c93: Remove usage of deprecated zks_estimateFee method
+
+## 1.8.7
+
+### Patch Changes
+
+- b184c83: expose legacy atomicBatch capability for consumers using old version of EIP5792
+- 690eb46: fix typing on AbstractWalletActions.getLinkedAccounts
+
+## 1.8.6
+
+### Patch Changes
+
+- d892fbc: feat: Add optional nonce manager param when creating session client
+
+## 1.8.5
+
+### Patch Changes
+
+- 47ad545: fix(EIP-5792): don't return null receipt in wallet_getCallsStatus
+
+## 1.8.4
+
+### Patch Changes
+
+- ba09e60: feat: apply session key policies to batch transactions
+
 ## 1.8.3
 
 ### Patch Changes

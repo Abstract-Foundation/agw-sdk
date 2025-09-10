@@ -52,6 +52,7 @@ export const address = {
   signerAddress: '0x8888888888888888888888888888888888888888',
   sessionSignerAddress: '0x9999999999999999999999999999999999999999',
   validatorAddress: '0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E',
+  randomAddress: '0x2c59721AAdcC643a3C1Ac3bB2dB0b305b30067f2',
 } as const;
 
 export const poolId =

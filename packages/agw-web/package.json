@@ -1,12 +1,12 @@
 {
-  "name": "@abstract-foundation/agw-react",
-  "description": "Abstract Global Wallet React Components",
+  "name": "@abstract-foundation/agw-web",
+  "description": "Abstract Global Wallet for the web (generic EIP-6963 provider)",
   "version": "1.9.1",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/abstract-foundation/agw-sdk.git",
-    "directory": "packages/agw-react"
+    "directory": "packages/agw-web"
   },
   "scripts": {
     "build": "pnpm run clean && pnpm run build:esm+types && pnpm run build:cjs",
@@ -27,33 +27,24 @@
       "import": "./dist/esm/exports/index.js",
       "require": "./dist/cjs/exports/index.js"
     },
-    "./connectors": {
-      "types": "./dist/types/exports/connectors.d.ts",
-      "import": "./dist/esm/exports/connectors.js",
-      "require": "./dist/cjs/exports/connectors.js"
+    "./mainnet": {
+      "types": "./dist/types/exports/mainnet.d.ts",
+      "import": "./dist/esm/exports/mainnet.js",
+      "require": "./dist/cjs/exports/mainnet.js"
     },
-    "./privy": {
-      "types": "./dist/types/exports/privy.d.ts",
-      "import": "./dist/esm/exports/privy.js",
-      "require": "./dist/cjs/exports/privy.js"
-    },
-    "./thirdweb": {
-      "types": "./dist/types/exports/thirdweb.d.ts",
-      "import": "./dist/esm/exports/thirdweb.js",
-      "require": "./dist/cjs/exports/thirdweb.js"
-    },
-    "./package.json": "./package.json"
+    "./testnet": {
+      "types": "./dist/types/exports/testnet.d.ts",
+      "import": "./dist/esm/exports/testnet.js",
+      "require": "./dist/cjs/exports/testnet.js"
+    }
   },
   "typesVersions": {
     "*": {
-      "connectors": [
-        "dist/types/exports/connectors.d.ts"
+      "mainnet": [
+        "./dist/types/exports/mainnet.d.ts"
       ],
-      "privy": [
-        "dist/types/exports/privy.d.ts"
-      ],
-      "thirdweb": [
-        "dist/types/exports/thirdweb.d.ts"
+      "testnet": [
+        "./dist/types/exports/testnet.d.ts"
       ]
     }
   },
@@ -67,35 +58,15 @@
   },
   "peerDependencies": {
     "@privy-io/cross-app-connect": "^0.2.2",
-    "@privy-io/react-auth": "^2.21.2",
-    "@tanstack/react-query": "^5",
-    "react": ">=18",
-    "secp256k1": ">=5.0.1",
-    "typescript": ">=5.0.4",
-    "thirdweb": "^5.68.0",
-    "viem": "^2.33.3",
-    "wagmi": "^2.14.11"
+    "viem": "^2.33.3"
   },
   "devDependencies": {
     "@abstract-foundation/agw-client": "workspace:*",
-    "@babel/core": "^7.27.4",
-    "@babel/preset-env": "^7.27.2",
     "@privy-io/cross-app-connect": "^0.2.2",
-    "@privy-io/react-auth": "^2.13.8",
-    "@tanstack/query-core": "^5.56.2",
-    "@types/react": ">=18.3.1",
-    "@types/react-dom": ">=18.3.0",
-    "@wagmi/core": "^2.16.4",
-    "react": ">=18.3.1",
-    "react-dom": ">=18.3.1",
-    "thirdweb": "^5.68.0",
     "viem": "^2.33.3"
   },
   "peerDependenciesMeta": {
     "typescript": {
-      "optional": true
-    },
-    "thirdweb": {
       "optional": true
     }
   },

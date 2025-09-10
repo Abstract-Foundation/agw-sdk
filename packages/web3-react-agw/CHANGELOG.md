@@ -1,5 +1,50 @@
 # @abstract-foundation/web3-react-agw
 
+## 1.7.9
+
+### Patch Changes
+
+- 0120894: chore: Update to use shared validChains from core lib
+- Updated dependencies [0120894]
+  - @abstract-foundation/agw-client@1.9.1
+
+## 1.7.8
+
+### Patch Changes
+
+- Updated dependencies [0cf9c93]
+  - @abstract-foundation/agw-client@1.9.0
+
+## 1.7.7
+
+### Patch Changes
+
+- Updated dependencies [b184c83]
+- Updated dependencies [690eb46]
+  - @abstract-foundation/agw-client@1.8.7
+
+## 1.7.6
+
+### Patch Changes
+
+- Updated dependencies [d892fbc]
+  - @abstract-foundation/agw-client@1.8.6
+
+## 1.7.5
+
+### Patch Changes
+
+- Updated dependencies [47ad545]
+  - @abstract-foundation/agw-client@1.8.5
+
+## 1.7.4
+
+### Patch Changes
+
+- ba09e60: feat: apply session key policies to batch transactions
+- Updated dependencies [ba09e60]
+  - @abstract-foundation/agw-client@1.8.4
+
 ## 1.7.3
 
 ### Patch Changes

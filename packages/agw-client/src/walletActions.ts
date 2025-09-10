@@ -82,6 +82,7 @@ import { EOA_VALIDATOR_ADDRESS } from './constants.js';
 import { type SessionClient, toSessionClient } from './sessionClient.js';
 import type { SessionConfig, SessionStatus } from './sessions.js';
 import type { CustomPaymasterHandler } from './types/customPaymaster.js';
+import type { SignOptimisticEip712TransactionParameters } from './types/optimisticTransaction.js';
 import type { SendTransactionBatchParameters } from './types/sendTransactionBatch.js';
 import type { SignTransactionBatchParameters } from './types/signTransactionBatch.js';
 
@@ -154,7 +155,11 @@ export type SessionClientActions<
     >,
   ) => Promise<SendTransactionReturnType>;
   signTransaction: (
-    args: SignEip712TransactionParameters<chain, account, chainOverride>,
+    args: SignOptimisticEip712TransactionParameters<
+      chain,
+      account,
+      chainOverride
+    >,
   ) => Promise<SignTransactionReturnType>;
   writeContract: WalletActions<chain, account>['writeContract'];
   signTypedData: WalletActions<chain, account>['signTypedData'];
@@ -210,7 +215,7 @@ export function sessionWalletActions(
         client,
         signerClient,
         publicClient,
-        args,
+        args as any,
         session,
         paymasterHandler,
       ),

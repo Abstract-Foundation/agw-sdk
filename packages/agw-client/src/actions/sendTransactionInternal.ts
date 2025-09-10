@@ -10,9 +10,8 @@ import {
   type Transport,
   type WalletClient,
 } from 'viem';
-import { getChainId, sendRawTransaction } from 'viem/actions';
+import { sendRawTransaction } from 'viem/actions';
 import {
-  assertCurrentChain,
   getAction,
   getTransactionError,
   type GetTransactionErrorParameters,
@@ -28,6 +27,7 @@ import { INSUFFICIENT_BALANCE_SELECTOR } from '../constants.js';
 import { AccountNotFoundError } from '../errors/account.js';
 import { InsufficientBalanceError } from '../errors/insufficientBalance.js';
 import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
+import type { OptimisticTransactionParameters } from '../types/optimisticTransaction.js';
 import { prepareTransactionRequest } from './prepareTransaction.js';
 import { signTransaction } from './signTransaction.js';
 
@@ -49,6 +49,7 @@ export async function sendTransactionInternal<
   validator: Address,
   validationHookData: Record<string, Hex> = {},
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
+  optimisticData: OptimisticTransactionParameters | undefined = undefined,
 ): Promise<SendEip712TransactionReturnType> {
   const { chain = client.chain } = parameters;
 
@@ -69,33 +70,21 @@ export async function sendTransactionInternal<
       {
         ...parameters,
         parameters: ['gas', 'nonce', 'fees'],
-        isSponsored:
-          customPaymasterHandler !== undefined ||
-          (parameters as any).paymaster !== undefined,
         nonceManager: account.nonceManager,
+        optimistic: optimisticData,
       } as any,
     );
-
-    let chainId: number | undefined;
-    if (chain !== null) {
-      chainId = await getAction(signerClient, getChainId, 'getChainId')({});
-      assertCurrentChain({
-        currentChainId: chainId,
-        chain,
-      });
-    }
 
     const serializedTransaction = await signTransaction(
       client,
       signerClient,
       publicClient,
-      {
-        ...request,
-        chainId,
-      } as any,
+      request as any,
       validator,
       validationHookData,
       customPaymasterHandler,
+      false,
+      optimisticData,
     );
     return await getAction(
       client,

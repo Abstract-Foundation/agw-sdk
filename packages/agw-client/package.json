@@ -34,6 +34,11 @@
       "import": "./dist/esm/exports/actions.js",
       "require": "./dist/cjs/exports/actions.js"
     },
+    "./experimental": {
+      "types": "./dist/types/exports/experimental.d.ts",
+      "import": "./dist/esm/exports/experimental.js",
+      "require": "./dist/cjs/exports/experimental.js"
+    },
     "./constants": {
       "types": "./dist/types/exports/constants.d.ts",
       "import": "./dist/esm/exports/constants.js",
@@ -52,6 +57,9 @@
       ],
       "constants": [
         "./dist/types/exports/constants.d.ts"
+      ],
+      "experimental": [
+        "./dist/types/exports/experimental.d.ts"
       ],
       "sessions": [
         "./dist/types/exports/sessions.d.ts"

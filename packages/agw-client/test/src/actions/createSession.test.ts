@@ -19,6 +19,7 @@ import { SESSION_KEY_VALIDATOR_ADDRESS } from '../../../src/constants.js';
 import { isSmartAccountDeployed } from '../../../src/utils.js';
 import { anvilAbstractTestnet } from '../../anvil.js';
 import { address } from '../../constants.js';
+
 vi.mock('../../../src/utils.js');
 
 import { readContract, writeContract } from 'viem/actions';
@@ -43,12 +44,6 @@ const baseClient = createClient({
   account: address.smartAccountAddress,
   chain: anvilAbstractTestnet.chain as ChainEIP712,
   transport: anvilAbstractTestnet.clientConfig.transport,
-});
-
-const signerClient = createWalletClient({
-  account: toAccount(address.signerAddress),
-  chain: anvilAbstractTestnet.chain as ChainEIP712,
-  transport: http(baseClient.transport.url),
 });
 
 const publicClient = createPublicClient({

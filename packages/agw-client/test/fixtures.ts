@@ -2,8 +2,8 @@ import {
   encodeAbiParameters,
   maxInt256,
   parseEther,
-  toFunctionSelector,
   TypedDataDefinition,
+  toFunctionSelector,
 } from 'viem';
 
 import {

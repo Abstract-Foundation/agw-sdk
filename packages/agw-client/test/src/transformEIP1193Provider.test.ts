@@ -452,7 +452,7 @@ describe('transformEIP1193Provider', () => {
       ];
 
       (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
-      const result = await transformedProvider.request({
+      await transformedProvider.request({
         method: 'wallet_getCapabilities',
         params: [mockAccounts[0] as any],
       });
@@ -463,19 +463,7 @@ describe('transformEIP1193Provider', () => {
       });
     });
     it('should throw an error on wallet_getCapabilities if there are not accounts', async () => {
-      const mockAccounts = [];
       const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
-      const calls: SendCallsParams['calls'] = [
-        {
-          to: privateKeyToAccount(generatePrivateKey()).address,
-          data: '0x12345678',
-        },
-        {
-          to: privateKeyToAccount(generatePrivateKey()).address,
-          value: toHex(parseEther('0.01')),
-        },
-      ];
-      (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
 
       await expect(
         transformedProvider.request({
@@ -737,7 +725,7 @@ describe('transformEIP1193Provider', () => {
           .fn()
           .mockResolvedValueOnce(mockSignedTransaction),
       } as any);
-      const result = await transformedProvider.request({
+      await transformedProvider.request({
         method: 'wallet_sendCalls',
         params: [
           {

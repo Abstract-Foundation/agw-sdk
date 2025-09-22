@@ -15,8 +15,8 @@ import {
   type CreateSessionData,
   type CreateSessionMutate,
   type CreateSessionMutateAsync,
-  createSessionMutationOptions,
   type CreateSessionVariables,
+  createSessionMutationOptions,
 } from '../query/createSession.js';
 
 export type CreateSessionArgs = {

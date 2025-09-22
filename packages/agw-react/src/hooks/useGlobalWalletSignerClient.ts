@@ -1,9 +1,9 @@
 import {
   type Config,
   type ResolvedRegister,
-  useWalletClient,
   type UseWalletClientParameters,
   type UseWalletClientReturnType,
+  useWalletClient,
 } from 'wagmi';
 import type { GetWalletClientData } from 'wagmi/query';
 

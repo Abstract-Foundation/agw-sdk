@@ -1,8 +1,8 @@
 import {
   type Account,
   type Address,
-  checksumAddress,
   type Client,
+  checksumAddress,
   getAddress,
   InvalidAddressError,
   isAddress,

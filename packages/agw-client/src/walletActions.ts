@@ -16,9 +16,9 @@ import {
   type SignTypedDataReturnType,
   type Transport,
   type WalletActions,
-  walletActions,
   type WalletClient,
   type WriteContractParameters,
+  walletActions,
 } from 'viem';
 import { parseAccount, type SignTransactionReturnType } from 'viem/accounts';
 import { getChainId } from 'viem/actions';
@@ -32,38 +32,38 @@ import {
 
 import { type AbstractClient } from './abstractClient.js';
 import {
-  createSession,
   type CreateSessionParameters,
   type CreateSessionReturnType,
+  createSession,
 } from './actions/createSession.js';
 import { deployContract } from './actions/deployContract.js';
 import {
-  getLinkedAccounts,
   type GetLinkedAccountsParameters,
   type GetLinkedAccountsReturnType,
+  getLinkedAccounts,
 } from './actions/getLinkedAccounts.js';
 import {
-  getLinkedAgw,
   type GetLinkedAgwParameters,
   type GetLinkedAgwReturnType,
-  isLinkedAccount,
+  getLinkedAgw,
   type IsLinkedAccountParameters,
+  isLinkedAccount,
 } from './actions/getLinkedAgw.js';
 import { getSessionStatus } from './actions/getSessionStatus.js';
 import {
-  linkToAgw,
   type LinkToAgwParameters,
   type LinkToAgwReturnType,
+  linkToAgw,
 } from './actions/linkToAgw.js';
 import {
-  prepareTransactionRequest,
   type PrepareTransactionRequestParameters,
   type PrepareTransactionRequestRequest,
+  prepareTransactionRequest,
 } from './actions/prepareTransaction.js';
 import {
-  revokeSessions,
   type RevokeSessionsParameters,
   type RevokeSessionsReturnType,
+  revokeSessions,
 } from './actions/revokeSessions.js';
 import { sendTransaction } from './actions/sendTransaction.js';
 import { sendTransactionBatch } from './actions/sendTransactionBatch.js';

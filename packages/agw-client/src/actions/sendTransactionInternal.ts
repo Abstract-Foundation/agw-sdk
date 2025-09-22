@@ -13,9 +13,9 @@ import {
 import { getChainId, sendRawTransaction } from 'viem/actions';
 import {
   assertCurrentChain,
+  type GetTransactionErrorParameters,
   getAction,
   getTransactionError,
-  type GetTransactionErrorParameters,
   parseAccount,
 } from 'viem/utils';
 import {

@@ -18,6 +18,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { SESSION_KEY_VALIDATOR_ADDRESS } from '../../../src/constants.js';
 import { anvilAbstractTestnet } from '../../anvil.js';
 import { address } from '../../constants.js';
+
 vi.mock('../../../src/actions/sendTransaction', () => ({
   sendTransaction: vi.fn(),
 }));
@@ -42,17 +43,6 @@ const sessionSigner = privateKeyToAccount(generatePrivateKey());
 
 const baseClient = createClient({
   account: address.smartAccountAddress,
-  chain: anvilAbstractTestnet.chain as ChainEIP712,
-  transport: anvilAbstractTestnet.clientConfig.transport,
-});
-
-const signerClient = createWalletClient({
-  account: toAccount(address.signerAddress),
-  chain: anvilAbstractTestnet.chain as ChainEIP712,
-  transport: http(baseClient.transport.url),
-});
-
-const publicClient = createPublicClient({
   chain: anvilAbstractTestnet.chain as ChainEIP712,
   transport: anvilAbstractTestnet.clientConfig.transport,
 });

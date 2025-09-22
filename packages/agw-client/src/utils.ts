@@ -8,10 +8,10 @@ import {
   isHex,
   keccak256,
   type PublicClient,
-  toBytes,
-  toHex,
   type Transport,
   type TypedDataDefinition,
+  toBytes,
+  toHex,
   type UnionRequiredBy,
 } from 'viem';
 import { parseAccount } from 'viem/accounts';

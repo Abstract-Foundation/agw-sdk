@@ -2,10 +2,10 @@ import {
   type Address,
   assertCurrentChain,
   type Chain,
+  type CustomSource,
   createPublicClient,
   createWalletClient,
   custom,
-  type CustomSource,
   type EIP1193Provider,
   type EIP1193RequestFn,
   type EIP1474Methods,
@@ -14,8 +14,8 @@ import {
   hexToBigInt,
   hexToNumber,
   isHex,
-  toHex,
   type Transport,
+  toHex,
 } from 'viem';
 import { parseAccount, toAccount } from 'viem/accounts';
 

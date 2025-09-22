@@ -6,11 +6,11 @@ import {
   type Client,
   type DeriveAccount,
   type DeriveChain,
-  encodeFunctionData,
   type ExactPartial,
   ExecutionRevertedError,
-  formatGwei,
+  encodeFunctionData,
   type FormattedTransactionRequest,
+  formatGwei,
   type GetChainParameter,
   type GetTransactionRequestKzgParameter,
   type IsNever,
@@ -20,7 +20,6 @@ import {
   type PublicClient,
   RpcRequestError,
   type SendTransactionParameters,
-  toBytes,
   type TransactionRequest,
   type TransactionRequestEIP1559,
   type TransactionRequestEIP2930,
@@ -28,6 +27,7 @@ import {
   type TransactionRequestEIP7702,
   type TransactionRequestLegacy,
   type Transport,
+  toBytes,
   type UnionOmit,
   type UnionRequiredBy,
   type WalletClient,
@@ -35,21 +35,21 @@ import {
 import type { ParseAccountErrorType } from 'viem/accounts';
 import {
   type EstimateFeesPerGasErrorType,
-  estimateGas,
   type EstimateGasErrorType,
   type EstimateGasParameters,
-  getBalance,
+  estimateGas,
   type GetBlockErrorType,
+  type GetTransactionCountErrorType,
+  getBalance,
   getChainId as getChainId_,
   getGasPrice,
   getTransactionCount,
-  type GetTransactionCountErrorType,
 } from 'viem/actions';
 import {
-  assertRequest,
   type AssertRequestErrorType,
-  getAction,
+  assertRequest,
   type GetTransactionType,
+  getAction,
   parseAccount,
 } from 'viem/utils';
 import type { ChainEIP712 } from 'viem/zksync';
@@ -62,8 +62,11 @@ import {
 import { InsufficientBalanceError } from '../errors/insufficientBalance.js';
 import { AccountFactoryAbi } from '../exports/constants.js';
 import type { Call } from '../types/call.js';
-import { isSmartAccountDeployed, transformHexValues } from '../utils.js';
-import { getInitializerCalldata } from '../utils.js';
+import {
+  getInitializerCalldata,
+  isSmartAccountDeployed,
+  transformHexValues,
+} from '../utils.js';
 
 export type IsUndefined<T> = [undefined] extends [T] ? true : false;
 
@@ -95,12 +98,11 @@ export type GetAccountParameter<
   account extends Account | undefined = Account | undefined,
   accountOverride extends Account | Address | undefined = Account | Address,
   required extends boolean = true,
-> =
-  IsUndefined<account> extends true
-    ? required extends true
-      ? { account: accountOverride | Account | Address }
-      : { account?: accountOverride | Account | Address | undefined }
-    : { account?: accountOverride | Account | Address | undefined };
+> = IsUndefined<account> extends true
+  ? required extends true
+    ? { account: accountOverride | Account | Address }
+    : { account?: accountOverride | Account | Address | undefined }
+  : { account?: accountOverride | Account | Address | undefined };
 
 export type PrepareTransactionRequestParameterType =
   | 'blobVersionedHashes'

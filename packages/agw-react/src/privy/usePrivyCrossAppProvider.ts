@@ -1,9 +1,9 @@
 import {
   type CrossAppAccount,
   type SignTypedDataParams,
+  type User,
   useCrossAppAccounts,
   usePrivy,
-  type User,
 } from '@privy-io/react-auth';
 import { useCallback, useMemo } from 'react';
 import {
@@ -16,8 +16,8 @@ import {
   fromHex,
   http,
   type RpcSchema,
-  toHex,
   type Transport,
+  toHex,
 } from 'viem';
 
 import { AGW_APP_ID } from '../constants.js';

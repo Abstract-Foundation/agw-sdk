@@ -9,8 +9,8 @@ import {
   keccak256,
   parseAbiParameters,
   serializeErc6492Signature,
-  toBytes,
   type Transport,
+  toBytes,
   zeroAddress,
 } from 'viem';
 import { getCode, signTypedData } from 'viem/actions';

@@ -2,17 +2,17 @@ import type { Abi, WriteContractErrorType } from 'viem';
 import { type Config, type ResolvedRegister, useConfig } from 'wagmi';
 import type { ConfigParameter } from 'wagmi/dist/types/types/properties';
 import {
-  useMutation,
   type UseMutationParameters,
   type UseMutationReturnType,
+  useMutation,
   type WriteContractData,
 } from 'wagmi/query';
 
 import {
   type WriteContractSponsoredMutate,
   type WriteContractSponsoredMutateAsync,
-  writeContractSponsoredMutationOptions,
   type WriteContractSponsoredVariables,
+  writeContractSponsoredMutationOptions,
 } from '../query/writeContractSponsored.js';
 
 export type UseWriteContractSponsoredParameters<

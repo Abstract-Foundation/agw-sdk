@@ -405,6 +405,3 @@ test.each([
     await expect(txRequest).resolves.not.toThrow();
   }
 });
-function jsonRpc(): import('viem').NonceManagerSource {
-  throw new Error('Function not implemented.');
-}

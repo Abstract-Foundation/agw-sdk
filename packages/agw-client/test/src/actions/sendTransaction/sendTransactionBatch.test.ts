@@ -122,26 +122,6 @@ describe('sendTransactionBatch', () => {
       },
     ];
 
-    const batchCallABI = [
-      {
-        name: 'batchCall',
-        type: 'function',
-        inputs: [
-          {
-            type: 'tuple[]',
-            name: 'calls',
-            components: [
-              { name: 'target', type: 'address' },
-              { name: 'allowFailure', type: 'bool' },
-              { name: 'value', type: 'uint256' },
-              { name: 'callData', type: 'bytes' },
-            ],
-          },
-        ],
-        outputs: [],
-      },
-    ];
-
     const transactionHash = await sendTransactionBatch(
       baseClient,
       signerClient,

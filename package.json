@@ -12,7 +12,9 @@
   },
   "packageManager": "pnpm@9.4.0",
   "lint-staged": {
-    "**/*.{js,jsx,ts,tsx,json,css,scss,md}": ["biome check --write"]
+    "**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "biome check --write"
+    ]
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.16.4",
@@ -37,7 +39,10 @@
       "image-size@>=1.1.0 <1.2.1": ">=1.2.1",
       "elliptic@<6.6.0": ">=6.6.0",
       "on-headers@<1.1.0": ">=1.1.0",
-      "tmp@<=0.2.3": ">=0.2.4"
+      "tmp@<=0.2.3": ">=0.2.4",
+      "viem@<=2.21.49": "2.21.49",
+      "@metamask/sdk@<=0.33.1": "0.33.1",
+      "@metamask/sdk-communication-layer@<=0.33.1": "0.33.1"
     }
   }
 }

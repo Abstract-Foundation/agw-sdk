@@ -703,6 +703,51 @@ describe('transformEIP1193Provider', () => {
         message: 'Unauthorized',
       });
     });
+    it('should return error response for empty to address for wallet_sendCalls v2.0.0', async () => {
+      const mockAccounts: Address[] = [
+        '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+      ];
+      const mockSmartAccount = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
+
+      const mockSignedTransaction = '0xsigned';
+
+      const calls: SendCallsParams['calls'] = [
+        {
+          to: privateKeyToAccount(generatePrivateKey()).address,
+          data: '0x12345678',
+        },
+        {
+          value: toHex(parseEther('0.01')),
+        },
+      ];
+
+      (mockProvider.request as Mock).mockResolvedValueOnce(mockAccounts);
+      vi.spyOn(
+        abstractClientModule,
+        'createAbstractClient',
+      ).mockResolvedValueOnce({
+        sendTransactionBatch: vi
+          .fn()
+          .mockResolvedValueOnce(mockSignedTransaction),
+        account: parseAccount(mockSmartAccount),
+      } as any);
+      const result = await transformedProvider.request({
+        method: 'wallet_sendCalls',
+        params: [
+          {
+            version: '2.0.0',
+            from: '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199', // not smart account
+            chainId: toHex(abstractTestnet.id),
+            calls,
+          },
+        ],
+      });
+
+      expect(result).toStrictEqual({
+        code: -32602,
+        message: 'Invalid call to unspecified address',
+      });
+    });
     it('should pass wallet_sendCalls through to base client when called with external signer', async () => {
       const mockAccounts: Address[] = [
         '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',

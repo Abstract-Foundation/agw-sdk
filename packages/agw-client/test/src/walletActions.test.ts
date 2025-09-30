@@ -10,6 +10,7 @@ import * as sendCallsModule from '../../src/actions/sendCalls.js';
 import * as sendTransactionModule from '../../src/actions/sendTransaction.js';
 import * as sendTransactionBatchModule from '../../src/actions/sendTransactionBatch.js';
 import * as sendTransactionForSessionModule from '../../src/actions/sendTransactionForSession.js';
+import * as signMessageModule from '../../src/actions/signMessage.js';
 import * as signTransactionModule from '../../src/actions/signTransaction.js';
 import * as signTransactionBatchModule from '../../src/actions/signTransactionBatch.js';
 import * as writeContractModule from '../../src/actions/writeContract.js';
@@ -34,6 +35,7 @@ vi.mock('../../src/actions/sendCalls');
 vi.mock('../../src/actions/getCapabilities');
 vi.mock('../../src/actions/getCallsStatus');
 vi.mock('../../src/actions/getLinkedAccounts');
+vi.mock('../../src/actions/signMessage');
 
 describe('globalWalletActions', () => {
   const mockSignerClient = {
@@ -64,6 +66,7 @@ describe('globalWalletActions', () => {
     expect(actions).toHaveProperty('sendCalls');
     expect(actions).toHaveProperty('showCallsStatus');
     expect(actions).toHaveProperty('getLinkedAccounts');
+    expect(actions).toHaveProperty('signMessage');
   });
 
   it('should call sendTransaction with correct arguments', async () => {
@@ -237,6 +240,19 @@ describe('globalWalletActions', () => {
     const result = actions.showCallsStatus({ id: '1' });
     expect(result).toBeInstanceOf(Promise);
     expect(result).resolves.toBeUndefined();
+  });
+
+  it('should call signMessage with correct arguments', async () => {
+    const mockArgs = {
+      message: '0xCD2a39F938E13CD947Ec05AbC7FE734Df8DD826',
+    };
+    await actions.signMessage(mockArgs as any);
+    expect(signMessageModule.signMessage).toHaveBeenCalledWith(
+      mockClient,
+      mockSignerClient,
+      mockArgs,
+      false,
+    );
   });
 });
 

@@ -262,7 +262,7 @@ export function globalWalletActions<
         isPrivyCrossApp,
         customPaymasterHandler,
       ),
-    getCapabilities: () => getCapabilities(client),
+    getCapabilities: (args) => getCapabilities(client, args),
     showCallsStatus: (_args) => {
       // requires UI implementation; not implemented in raw client
       return Promise.resolve();

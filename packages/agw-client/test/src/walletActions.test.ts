@@ -1,8 +1,11 @@
 import { parseEther } from 'viem';
+import { parseAccount } from 'viem/accounts';
 import { describe, expect, it, vi } from 'vitest';
-
 import * as deployContractModule from '../../src/actions/deployContract.js';
+import * as getCallsStatusModule from '../../src/actions/getCallsStatus.js';
+import * as getCapabilitiesModule from '../../src/actions/getCapabilities.js';
 import * as prepareTransactionRequestModule from '../../src/actions/prepareTransaction.js';
+import * as sendCallsModule from '../../src/actions/sendCalls.js';
 import * as sendTransactionModule from '../../src/actions/sendTransaction.js';
 import * as sendTransactionBatchModule from '../../src/actions/sendTransactionBatch.js';
 import * as sendTransactionForSessionModule from '../../src/actions/sendTransactionForSession.js';
@@ -26,6 +29,10 @@ vi.mock('../../src/actions/writeContractForSession');
 vi.mock('../../src/actions/sendTransactionForSession');
 vi.mock('../../src/actions/sendTransactionBatch');
 vi.mock('../../src/actions/signTransactionBatch');
+vi.mock('../../src/actions/sendCalls');
+vi.mock('../../src/actions/getCapabilities');
+vi.mock('../../src/actions/getCallsStatus');
+
 describe('globalWalletActions', () => {
   const mockSignerClient = {
     account: {
@@ -50,6 +57,9 @@ describe('globalWalletActions', () => {
     expect(actions).toHaveProperty('signTransaction');
     expect(actions).toHaveProperty('deployContract');
     expect(actions).toHaveProperty('writeContract');
+    expect(actions).toHaveProperty('getCapabilities');
+    expect(actions).toHaveProperty('getCallsStatus');
+    expect(actions).toHaveProperty('sendCalls');
   });
 
   it('should call sendTransaction with correct arguments', async () => {
@@ -171,6 +181,43 @@ describe('globalWalletActions', () => {
       mockSignerClient,
       mockPublicClient,
       mockArgs,
+    );
+  });
+
+  it('should call getCapabilities with correct arguments', async () => {
+    const mockArgs = {
+      account: parseAccount('0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826'),
+      chainId: 11124,
+    };
+    await actions.getCapabilities(mockArgs);
+    expect(getCapabilitiesModule.getCapabilities).toHaveBeenCalledWith(
+      mockClient,
+      mockArgs,
+    );
+  });
+
+  it('should call getCallsStatus with correct arguments', async () => {
+    await actions.getCallsStatus({ id: '1' });
+    expect(getCallsStatusModule.getCallsStatus).toHaveBeenCalledWith(
+      mockPublicClient,
+      { id: '1' },
+    );
+  });
+
+  it('should call sendCalls with correct arguments', async () => {
+    const mockArgs = {
+      calls: [
+        { to: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826', value: 100n },
+      ],
+    };
+    await actions.sendCalls(mockArgs as any);
+    expect(sendCallsModule.sendCalls).toHaveBeenCalledWith(
+      mockClient,
+      mockSignerClient,
+      mockPublicClient,
+      mockArgs,
+      false,
+      undefined,
     );
   });
 });

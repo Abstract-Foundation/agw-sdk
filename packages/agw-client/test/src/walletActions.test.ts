@@ -5,6 +5,7 @@ import * as deployContractModule from '../../src/actions/deployContract.js';
 import * as getCallsStatusModule from '../../src/actions/getCallsStatus.js';
 import * as getCapabilitiesModule from '../../src/actions/getCapabilities.js';
 import * as getLinkedAccountsModule from '../../src/actions/getLinkedAccounts.js';
+import * as getSessionStatusModule from '../../src/actions/getSessionStatus.js';
 import * as prepareTransactionRequestModule from '../../src/actions/prepareTransaction.js';
 import * as sendCallsModule from '../../src/actions/sendCalls.js';
 import * as sendTransactionModule from '../../src/actions/sendTransaction.js';
@@ -13,6 +14,8 @@ import * as sendTransactionForSessionModule from '../../src/actions/sendTransact
 import * as signMessageModule from '../../src/actions/signMessage.js';
 import * as signTransactionModule from '../../src/actions/signTransaction.js';
 import * as signTransactionBatchModule from '../../src/actions/signTransactionBatch.js';
+import * as signTransactionForSessionModule from '../../src/actions/signTransactionForSession.js';
+import * as signTypedDataModule from '../../src/actions/signTypedData.js';
 import * as writeContractModule from '../../src/actions/writeContract.js';
 import * as writeContractForSessionModule from '../../src/actions/writeContractForSession.js';
 import { globalWalletActions } from '../../src/clients/decorators/abstract.js';
@@ -36,6 +39,9 @@ vi.mock('../../src/actions/getCapabilities');
 vi.mock('../../src/actions/getCallsStatus');
 vi.mock('../../src/actions/getLinkedAccounts');
 vi.mock('../../src/actions/signMessage');
+vi.mock('../../src/actions/signTypedData');
+vi.mock('../../src/actions/signTransactionForSession');
+vi.mock('../../src/actions/getSessionStatus');
 
 describe('globalWalletActions', () => {
   const mockSignerClient = {
@@ -290,6 +296,9 @@ describe('sessionWalletActions', () => {
   it('should return an object with all expected methods', () => {
     expect(actions).toHaveProperty('writeContract');
     expect(actions).toHaveProperty('sendTransaction');
+    expect(actions).toHaveProperty('signTransaction');
+    expect(actions).toHaveProperty('signTypedData');
+    expect(actions).toHaveProperty('getSessionStatus');
   });
 
   it('should call sendTransactionForSession with correct arguments', async () => {
@@ -327,6 +336,52 @@ describe('sessionWalletActions', () => {
       mockArgs,
       session,
       undefined,
+    );
+  });
+
+  it('should call signTypedDataForSession with correct arguments', async () => {
+    const mockArgs = {
+      domain: {
+        name: 'zkSync',
+        version: '2',
+        chainId: 11124,
+      },
+    };
+    await actions.signTypedData(mockArgs as any);
+    expect(signTypedDataModule.signTypedDataForSession).toHaveBeenCalledWith(
+      mockClient,
+      mockSignerClient,
+      mockPublicClient,
+      mockArgs,
+      session,
+      undefined,
+    );
+  });
+
+  it('should call signTransactionForSession with correct arguments', async () => {
+    const mockArgs = {
+      to: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+      value: 100n,
+    };
+    await actions.signTransaction(mockArgs as any);
+    expect(
+      signTransactionForSessionModule.signTransactionForSession,
+    ).toHaveBeenCalledWith(
+      mockClient,
+      mockSignerClient,
+      mockPublicClient,
+      mockArgs,
+      session,
+      undefined,
+    );
+  });
+
+  it('should call getSessionStatus with correct arguments', async () => {
+    await actions.getSessionStatus();
+    expect(getSessionStatusModule.getSessionStatus).toHaveBeenCalledWith(
+      mockPublicClient,
+      mockClient.account.address,
+      session,
     );
   });
 });

@@ -63,10 +63,10 @@ export async function sendCalls<
   const { calls, capabilities } = parameters;
 
   if (capabilities) {
-    const hasNonOptionalCapability = Object.values(capabilities).filter(
-      (capability) => !capability.optional,
+    const nonOptionalCapabilities = Object.entries(capabilities).filter(
+      ([_, capability]) => !capability.optional,
     );
-    for (const capability of hasNonOptionalCapability) {
+    for (const [capability] of nonOptionalCapabilities) {
       if (!agwCapabilities[capability]) {
         const message = `non-optional capability ${capability} is not supported`;
         throw new UnsupportedNonOptionalCapabilityError(

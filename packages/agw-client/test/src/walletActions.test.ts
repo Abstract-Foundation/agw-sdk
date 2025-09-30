@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import * as deployContractModule from '../../src/actions/deployContract.js';
 import * as getCallsStatusModule from '../../src/actions/getCallsStatus.js';
 import * as getCapabilitiesModule from '../../src/actions/getCapabilities.js';
+import * as getLinkedAccountsModule from '../../src/actions/getLinkedAccounts.js';
 import * as prepareTransactionRequestModule from '../../src/actions/prepareTransaction.js';
 import * as sendCallsModule from '../../src/actions/sendCalls.js';
 import * as sendTransactionModule from '../../src/actions/sendTransaction.js';
@@ -32,6 +33,7 @@ vi.mock('../../src/actions/signTransactionBatch');
 vi.mock('../../src/actions/sendCalls');
 vi.mock('../../src/actions/getCapabilities');
 vi.mock('../../src/actions/getCallsStatus');
+vi.mock('../../src/actions/getLinkedAccounts');
 
 describe('globalWalletActions', () => {
   const mockSignerClient = {
@@ -60,6 +62,8 @@ describe('globalWalletActions', () => {
     expect(actions).toHaveProperty('getCapabilities');
     expect(actions).toHaveProperty('getCallsStatus');
     expect(actions).toHaveProperty('sendCalls');
+    expect(actions).toHaveProperty('showCallsStatus');
+    expect(actions).toHaveProperty('getLinkedAccounts');
   });
 
   it('should call sendTransaction with correct arguments', async () => {
@@ -219,6 +223,20 @@ describe('globalWalletActions', () => {
       false,
       undefined,
     );
+  });
+
+  it('should call call getLinkedAccounts with correct arguments', async () => {
+    await actions.getLinkedAccounts();
+    expect(getLinkedAccountsModule.getLinkedAccounts).toHaveBeenCalledWith(
+      mockClient,
+      { agwAddress: address.smartAccountAddress },
+    );
+  });
+
+  it('should return a resolved promise when showCallsStatus is called', async () => {
+    const result = actions.showCallsStatus({ id: '1' });
+    expect(result).toBeInstanceOf(Promise);
+    expect(result).resolves.toBeUndefined();
   });
 });
 

@@ -1,7 +1,9 @@
 import {
   type Address,
   assertCurrentChain,
+  type Capabilities,
   type Chain,
+  type ChainIdToCapabilities,
   type CustomSource,
   createPublicClient,
   createWalletClient,
@@ -19,15 +21,17 @@ import {
 } from 'viem';
 import { parseAccount, toAccount } from 'viem/accounts';
 
-import { createAbstractClient } from './abstractClient.js';
+import { createAbstractClient } from './clients/abstractClient.js';
 import {
-  agwCapabilitiesV2,
+  agwCapabilities,
   getReceiptStatus,
   type SendCallsParams,
-  type WalletCapabilities,
 } from './eip5792.js';
 import { type CustomPaymasterHandler, validChains } from './exports/index.js';
-import { getSmartAccountAddressFromInitialSigner } from './utils.js';
+import {
+  getSmartAccountAddressFromInitialSigner,
+  VALID_CHAINS,
+} from './utils.js';
 
 interface TransformEIP1193ProviderOptions {
   provider: EIP1193Provider;
@@ -268,12 +272,29 @@ export function transformEIP1193Provider(
           };
         }
 
-        const txHash = await abstractClient.sendTransactionBatch({
-          calls: sendCallsParams.calls.map((call) => ({
+        const calls: {
+          to: Address;
+          value: bigint;
+          data: Hex;
+        }[] = [];
+
+        for (const call of sendCallsParams.calls) {
+          if (!call.to) {
+            return {
+              code: -32602,
+              message: 'Invalid call to unspecified address',
+            };
+          }
+
+          calls.push({
             to: call.to,
-            value: call.value ? hexToBigInt(call.value) : undefined,
-            data: call.data,
-          })),
+            value: call.value ? hexToBigInt(call.value) : 0n,
+            data: call.data ?? '0x',
+          });
+        }
+
+        const txHash = await abstractClient.sendTransactionBatch({
+          calls,
         });
 
         if (
@@ -332,17 +353,19 @@ export function transformEIP1193Provider(
         }
         const chainIds = params[1] as Hex[] | undefined;
 
-        const capabilities = agwCapabilitiesV2;
         if (chainIds) {
-          const filteredCapabilities: WalletCapabilities = {};
+          const filteredCapabilities: Capabilities = {};
           for (const chainId of chainIds) {
-            if (capabilities[chainId]) {
-              filteredCapabilities[chainId] = capabilities[chainId];
+            if (VALID_CHAINS[fromHex(chainId, 'number')]) {
+              filteredCapabilities[chainId] = agwCapabilities;
             }
           }
           return filteredCapabilities;
         } else {
-          return capabilities;
+          return Object.keys(VALID_CHAINS).reduce((acc, chainId) => {
+            acc[toHex(Number(chainId))] = agwCapabilities;
+            return acc;
+          }, {} as ChainIdToCapabilities);
         }
       }
       default: {

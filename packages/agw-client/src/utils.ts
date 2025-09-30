@@ -1,18 +1,22 @@
 import {
   type Address,
   BaseError,
+  type Calls,
   type Chain,
+  concat,
   encodeFunctionData,
   fromHex,
   type Hex,
   isHex,
   keccak256,
+  type Narrow,
   type PublicClient,
   type Transport,
   type TypedDataDefinition,
   toBytes,
   toHex,
   type UnionRequiredBy,
+  type Call as ViemCall,
 } from 'viem';
 import { parseAccount } from 'viem/accounts';
 import {
@@ -22,7 +26,6 @@ import {
   zksyncSepoliaTestnet,
 } from 'viem/chains';
 import type { ChainEIP712, SignEip712TransactionParameters } from 'viem/zksync';
-
 import AccountFactoryAbi from './abis/AccountFactory.js';
 import { AGWRegistryAbi } from './abis/AGWRegistryAbi.js';
 import {
@@ -37,7 +40,7 @@ export const VALID_CHAINS: Record<number, Chain> = {
   [abstract.id]: abstract,
   [zksync.id]: zksync,
   [zksyncSepoliaTestnet.id]: zksyncSepoliaTestnet,
-};
+} as const;
 
 export function convertBigIntToString(value: any): any {
   if (typeof value === 'bigint') {
@@ -206,4 +209,51 @@ export function transformEip712TypedData(
         ? (typedData.message['paymasterInput'] as Hex)
         : undefined,
   };
+}
+
+function encodeCall(call_: unknown): {
+  to: Address;
+  value?: bigint;
+  data?: Hex;
+} {
+  const call = call_ as ViemCall;
+
+  const data = call.abi
+    ? encodeFunctionData({
+        abi: call.abi,
+        functionName: call.functionName,
+        args: call.args,
+      })
+    : call.data;
+
+  return {
+    data: call.dataSuffix && data ? concat([data, call.dataSuffix]) : data,
+    to: call.to,
+    value: call.value,
+  };
+}
+
+export function encodeCalls<const calls extends readonly unknown[]>(
+  calls: Calls<Narrow<calls>>,
+): {
+  to: Address;
+  value?: bigint;
+  data?: Hex;
+}[] {
+  return calls.map(encodeCall);
+}
+
+export function formatCalls<const calls extends readonly unknown[]>(
+  calls: Calls<Narrow<calls>>,
+): Call[] {
+  return calls.map((call_: unknown) => {
+    const call = encodeCall(call_);
+
+    return {
+      callData: call.data ?? '0x',
+      target: call.to,
+      value: call.value ?? 0n,
+      allowFailure: false,
+    };
+  });
 }

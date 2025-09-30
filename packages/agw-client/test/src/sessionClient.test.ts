@@ -2,7 +2,7 @@ import { parseAccount, toAccount } from 'viem/accounts';
 import { ChainEIP712 } from 'viem/zksync';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createAbstractClient } from '../../src/abstractClient.js';
+import { createAbstractClient } from '../../src/clients/abstractClient.js';
 import { anvilAbstractTestnet } from '../anvil.js';
 import { address } from '../constants.js';
 
@@ -44,7 +44,7 @@ vi.mock('../../src/utils', () => ({
 import {
   createSessionClient,
   toSessionClient,
-} from '../../src/sessionClient.js';
+} from '../../src/clients/sessionClient.js';
 import { LimitType, LimitZero, SessionConfig } from '../../src/sessions.js';
 import { getSmartAccountAddressFromInitialSigner } from '../../src/utils.js';
 

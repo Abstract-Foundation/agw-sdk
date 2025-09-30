@@ -2,6 +2,7 @@ import {
   createClient,
   createPublicClient,
   createWalletClient,
+  erc20Abi,
   http,
   keccak256,
   toBytes,
@@ -15,7 +16,6 @@ import { EOA_VALIDATOR_ADDRESS } from '../../../../src/constants.js';
 import { anvilAbstractTestnet } from '../../../anvil.js';
 import { address } from '../../../constants.js';
 
-vi.mock('../../../../src/utils.js');
 vi.mock('viem', async (importOriginal) => {
   const original = await importOriginal();
   return {
@@ -217,6 +217,67 @@ describe('sendTransactionBatch', () => {
     );
     expect(transactionHash).toBe('0xmockedTransactionHash');
   });
+
+  it('should allow calling with a strongly typed abi and parameters', async () => {
+    const transactionHash = await sendTransactionBatch(
+      baseClient,
+      signerClient,
+      publicClient,
+      {
+        calls: [
+          {
+            to: '0xabcdef0123456789abcdef0123456789abcdef01',
+            abi: erc20Abi,
+            functionName: 'transfer',
+            args: ['0x5432100000000000000000000000000000000000', 1000n],
+          },
+        ],
+        paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
+        paymasterInput: '0xabc',
+        gas: 1000000n,
+        maxFeePerGas: 100000000000n,
+        maxPriorityFeePerGas: 100000000000n,
+      } as any,
+    );
+
+    expect(sendTransactionInternal).toHaveBeenCalledWith(
+      baseClient,
+      signerClient,
+      publicClient,
+      expect.objectContaining({
+        to: address.smartAccountAddress,
+        data: encodeFunctionData({
+          abi: AGWAccountAbi,
+          functionName: 'batchCall',
+          args: [
+            [
+              {
+                target: '0xabcdef0123456789abcdef0123456789abcdef01',
+                allowFailure: false,
+                value: BigInt(0),
+                callData: encodeFunctionData({
+                  abi: erc20Abi,
+                  functionName: 'transfer',
+                  args: ['0x5432100000000000000000000000000000000000', 1000n],
+                }),
+              },
+            ],
+          ],
+        }),
+        type: 'eip712',
+        paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
+        paymasterInput: '0xabc',
+        value: 0n,
+        gas: 1000000n,
+        maxFeePerGas: 100000000000n,
+        maxPriorityFeePerGas: 100000000000n,
+      }),
+      EOA_VALIDATOR_ADDRESS,
+      {},
+      undefined,
+    );
+    expect(transactionHash).toBe('0xmockedTransactionHash');
+  });
 });
 
 describe('sendTransactionBatch with isPrivyCrossApp', () => {
@@ -237,7 +298,18 @@ describe('sendTransactionBatch with isPrivyCrossApp', () => {
 
     expect(signPrivyTransaction).toHaveBeenCalledWith(baseClient, {
       paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
-      calls: [transaction1, transaction2],
+      calls: [
+        {
+          to: transaction1.to,
+          data: transaction1.data,
+          value: transaction1.value,
+        },
+        {
+          to: transaction2.to,
+          data: transaction2.data,
+          value: transaction2.value,
+        },
+      ],
     });
 
     expect(publicClient.sendRawTransaction).toHaveBeenCalledWith({

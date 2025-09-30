@@ -10,12 +10,10 @@ import * as signTransactionModule from '../../src/actions/signTransaction.js';
 import * as signTransactionBatchModule from '../../src/actions/signTransactionBatch.js';
 import * as writeContractModule from '../../src/actions/writeContract.js';
 import * as writeContractForSessionModule from '../../src/actions/writeContractForSession.js';
+import { globalWalletActions } from '../../src/clients/decorators/abstract.js';
+import { sessionWalletActions } from '../../src/clients/decorators/session.js';
 import { EOA_VALIDATOR_ADDRESS } from '../../src/constants.js';
 import { LimitType, SessionConfig } from '../../src/sessions.js';
-import {
-  globalWalletActions,
-  sessionWalletActions,
-} from '../../src/walletActions.js';
 import { address } from '../constants.js';
 
 // Mock the imported modules

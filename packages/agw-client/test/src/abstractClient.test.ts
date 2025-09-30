@@ -2,7 +2,7 @@ import { toAccount } from 'viem/accounts';
 import { ChainEIP712 } from 'viem/zksync';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createAbstractClient } from '../../src/abstractClient.js';
+import { createAbstractClient } from '../../src/clients/abstractClient.js';
 import { anvilAbstractTestnet } from '../anvil.js';
 import { address } from '../constants.js';
 

@@ -12,14 +12,13 @@ import {
 } from 'viem';
 import { toAccount } from 'viem/accounts';
 import type { ChainEIP712 } from 'viem/chains';
-
+import type { SessionConfig } from '../sessions.js';
+import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
 import type { AbstractClient } from './abstractClient.js';
-import type { SessionConfig } from './sessions.js';
-import type { CustomPaymasterHandler } from './types/customPaymaster.js';
 import {
   type SessionClientActions,
   sessionWalletActions,
-} from './walletActions.js';
+} from './decorators/session.js';
 
 type GetNonceManagerParameter<account extends Account | Address = Address> =
   account extends Account

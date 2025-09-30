@@ -1,10 +1,12 @@
 import {
   type Account,
   type Address,
+  type Calls,
   type Client,
   encodeFunctionData,
+  type Hex,
+  type Narrow,
   type PublicClient,
-  type SendTransactionRequest,
   type SendTransactionReturnType,
   type Transport,
   type WalletClient,
@@ -15,35 +17,33 @@ import AGWAccountAbi from '../abis/AGWAccount.js';
 import { EOA_VALIDATOR_ADDRESS } from '../constants.js';
 import { type Call } from '../types/call.js';
 import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
-import type { SendTransactionBatchParameters } from '../types/sendTransactionBatch.js';
-import type { SignTransactionBatchParameters } from '../types/signTransactionBatch.js';
+import { encodeCalls, formatCalls } from '../utils.js';
 import { signPrivyTransaction } from './sendPrivyTransaction.js';
 import { sendTransactionInternal } from './sendTransactionInternal.js';
+import type { SignTransactionBatchParameters } from './signTransactionBatch.js';
+
+export interface SendTransactionBatchParameters<
+  calls extends readonly unknown[] = readonly unknown[],
+> {
+  calls: Calls<Narrow<calls>>;
+  paymaster?: Address | undefined;
+  paymasterInput?: Hex | undefined;
+}
 
 export function getBatchTransactionObject<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
   chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
-  request extends SendTransactionRequest<
-    chain,
-    chainOverride
-  > = SendTransactionRequest<chain, chainOverride>,
+  const calls extends readonly unknown[] = readonly unknown[],
 >(
   address: Address,
   parameters:
-    | SendTransactionBatchParameters<request>
-    | SignTransactionBatchParameters<chain, account, chainOverride>,
+    | SendTransactionBatchParameters<calls>
+    | SignTransactionBatchParameters<chain, account, chainOverride, calls>,
 ) {
   const { calls, paymaster, paymasterInput } = parameters;
-  const batchCalls: Call[] = calls.map((tx) => {
-    if (!tx.to) throw new Error('Transaction target (to) is required');
-    return {
-      target: tx.to,
-      allowFailure: false,
-      value: BigInt(tx.value ?? 0),
-      callData: tx.data ?? '0x',
-    };
-  });
+
+  const batchCalls: Call[] = formatCalls(calls);
 
   const batchCallData = encodeFunctionData({
     abi: AGWAccountAbi,
@@ -57,16 +57,14 @@ export function getBatchTransactionObject<
     BigInt(0),
   );
 
-  const batchTransaction = {
+  return {
     to: address,
     data: batchCallData,
     value: totalValue,
     paymaster: paymaster,
     paymasterInput: paymasterInput,
     type: 'eip712',
-  } as any;
-
-  return batchTransaction;
+  };
 }
 
 /**
@@ -138,17 +136,12 @@ export function getBatchTransactionObject<
  * @returns The transaction hash of the submitted transaction batch
  */
 export async function sendTransactionBatch<
-  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
-  chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
-  request extends SendTransactionRequest<
-    chain,
-    chainOverride
-  > = SendTransactionRequest<chain, chainOverride>,
+  const calls extends readonly unknown[],
 >(
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
-  parameters: SendTransactionBatchParameters<request>,
+  parameters: SendTransactionBatchParameters<calls>,
   isPrivyCrossApp = false,
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<SendTransactionReturnType> {
@@ -157,16 +150,19 @@ export async function sendTransactionBatch<
     throw new Error('No calls provided');
   }
   if (isPrivyCrossApp) {
-    const signedTx = await signPrivyTransaction(client, parameters as any);
+    const signedTx = await signPrivyTransaction(client, {
+      ...rest,
+      calls: encodeCalls(calls),
+    } as any);
     return await publicClient.sendRawTransaction({
       serializedTransaction: signedTx,
     });
   }
 
-  const batchTransaction = getBatchTransactionObject(
-    client.account.address,
-    parameters,
-  );
+  const batchTransaction = getBatchTransactionObject(client.account.address, {
+    calls,
+    ...rest,
+  });
 
   return sendTransactionInternal(
     client,
@@ -175,7 +171,7 @@ export async function sendTransactionBatch<
     {
       ...batchTransaction,
       ...rest,
-    },
+    } as any,
     EOA_VALIDATOR_ADDRESS,
     {},
     customPaymasterHandler,

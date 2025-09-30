@@ -16,8 +16,8 @@ import { abstract, abstractTestnet } from 'viem/chains';
 import { getGeneralPaymasterInput } from 'viem/zksync';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
-import * as abstractClientModule from '../../src/abstractClient.js';
-import { agwCapabilitiesV2, SendCallsParams } from '../../src/eip5792.js';
+import * as abstractClientModule from '../../src/clients/abstractClient.js';
+import { agwCapabilities, SendCallsParams } from '../../src/eip5792.js';
 import { transformEIP1193Provider } from '../../src/transformEIP1193Provider.js';
 import * as utilsModule from '../../src/utils.js';
 import { exampleTypedData } from '../fixtures.js';
@@ -427,7 +427,12 @@ describe('transformEIP1193Provider', () => {
         params: [mockSmartAccount as any],
       });
 
-      expect(result).toBe(agwCapabilitiesV2);
+      expect(result).toStrictEqual({
+        '0x12c': agwCapabilities,
+        '0x144': agwCapabilities,
+        '0xab5': agwCapabilities,
+        '0x2b74': agwCapabilities,
+      });
     });
 
     it('should handle wallet_getCapabilities for specific chain', async () => {
@@ -443,7 +448,7 @@ describe('transformEIP1193Provider', () => {
       });
 
       expect(result).toStrictEqual({
-        '0x2b74': agwCapabilitiesV2['0x2b74'],
+        '0x2b74': agwCapabilities,
       });
     });
     it('should pass through wallet_getCapabilities to base client when called with external signer', async () => {
@@ -591,7 +596,7 @@ describe('transformEIP1193Provider', () => {
         account: parseAccount(mockSmartAccount),
       } as any);
 
-      expect(
+      await expect(
         transformedProvider.request({
           method: 'wallet_sendCalls',
           params: [

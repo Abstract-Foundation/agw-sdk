@@ -20,6 +20,7 @@ vi.mock('viem/actions', () => ({
 import AGWAccountAbi from '../../../src/abis/AGWAccount.js';
 
 import { createSession } from '../../../src/actions/createSession.js';
+import { AccountNotFoundError } from '../../../src/errors/account.js';
 
 import {
   encodeSession,
@@ -137,4 +138,30 @@ test('should add module and create a session with module not installed', async (
       ],
     }),
   });
+});
+
+test('should throw AccountNotFoundError when account is undefined', async () => {
+  const clientWithoutAccount = createClient({
+    chain: anvilAbstractTestnet.chain as ChainEIP712,
+    transport: anvilAbstractTestnet.clientConfig.transport,
+  });
+
+  const session: SessionConfig = {
+    signer: sessionSigner.address,
+    expiresAt: 1099511627775n,
+    callPolicies: [],
+    transferPolicies: [],
+    feeLimit: {
+      limit: parseEther('1'),
+      limitType: LimitType.Lifetime,
+      period: 0n,
+    },
+  };
+
+  await expect(
+    createSession(clientWithoutAccount, {
+      session,
+      account: undefined as any,
+    }),
+  ).rejects.toThrow(AccountNotFoundError);
 });

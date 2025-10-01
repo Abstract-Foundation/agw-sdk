@@ -99,6 +99,9 @@ export type AbstractWalletActions<
     signTypedData: (
       args: Omit<SignTypedDataParameters, 'account' | 'privateKey'>,
     ) => Promise<SignTypedDataReturnType>;
+    /**
+     * @deprecated use sendCalls to send a batch of transactions
+     */
     sendTransactionBatch: <const calls extends readonly unknown[]>(
       args: SendTransactionBatchParameters<calls>,
     ) => Promise<SendTransactionReturnType>;

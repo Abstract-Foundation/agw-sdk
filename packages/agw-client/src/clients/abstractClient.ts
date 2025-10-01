@@ -11,12 +11,12 @@ import {
 import { toAccount } from 'viem/accounts';
 import { type ChainEIP712 } from 'viem/zksync';
 
-import type { CustomPaymasterHandler } from './types/customPaymaster.js';
-import { getSmartAccountAddressFromInitialSigner } from './utils.js';
+import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
+import { getSmartAccountAddressFromInitialSigner } from '../utils.js';
 import {
   type AbstractWalletActions,
   globalWalletActions,
-} from './walletActions.js';
+} from './decorators/abstract.js';
 
 /**
  * Parameters for creating an AbstractClient instance.
@@ -72,10 +72,13 @@ interface CreateAbstractClientParameters {
   customPaymasterHandler?: CustomPaymasterHandler;
 }
 
-type AbstractClientActions = AbstractWalletActions<ChainEIP712, Account>;
+type AbstractClientActions<
+  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  account extends Account | undefined = Account | undefined,
+> = AbstractWalletActions<chain, account>;
 
 export type AbstractClient = Client<Transport, ChainEIP712, Account> &
-  AbstractClientActions;
+  AbstractClientActions<ChainEIP712, Account>;
 
 export async function createAbstractClient({
   signer,

@@ -9,16 +9,16 @@ import { toAccount } from 'viem/accounts';
 import { ChainEIP712, ZksyncTransactionRequestEIP712 } from 'viem/zksync';
 import { describe, expect, test, vi } from 'vitest';
 
-import { sendTransaction } from '../../../../src/actions/sendTransaction.js';
-import { EOA_VALIDATOR_ADDRESS } from '../../../../src/constants.js';
-import { anvilAbstractTestnet } from '../../../anvil.js';
-import { address } from '../../../constants.js';
+import { sendTransaction } from '../../../src/actions/sendTransaction.js';
+import { EOA_VALIDATOR_ADDRESS } from '../../../src/constants.js';
+import { anvilAbstractTestnet } from '../../anvil.js';
+import { address } from '../../constants.js';
 
-vi.mock('../../../../src/actions/sendTransactionInternal');
-vi.mock('../../../../src/actions/sendPrivyTransaction');
+vi.mock('../../../src/actions/sendTransactionInternal');
+vi.mock('../../../src/actions/sendPrivyTransaction');
 
-import { signPrivyTransaction } from '../../../../src/actions/sendPrivyTransaction.js';
-import { sendTransactionInternal } from '../../../../src/actions/sendTransactionInternal.js';
+import { signPrivyTransaction } from '../../../src/actions/sendPrivyTransaction.js';
+import { sendTransactionInternal } from '../../../src/actions/sendTransactionInternal.js';
 
 // Client setup
 const baseClient = createClient({

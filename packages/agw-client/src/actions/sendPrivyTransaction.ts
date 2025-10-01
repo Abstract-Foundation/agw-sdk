@@ -16,8 +16,9 @@ import {
 } from 'viem/zksync';
 
 import { replaceBigInts } from '../replaceBigInts.js';
-import type { SendTransactionBatchParameters } from '../types/sendTransactionBatch.js';
-import type { SignTransactionBatchParameters } from '../types/signTransactionBatch.js';
+import type { SendTransactionBatchParameters } from './sendTransactionBatch.js';
+import type { SignTransactionBatchParameters } from './signTransactionBatch.js';
+
 export async function sendPrivyTransaction<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
@@ -26,11 +27,12 @@ export async function sendPrivyTransaction<
     chain,
     chainOverride
   > = SendTransactionRequest<chain, chainOverride>,
+  const calls extends readonly unknown[] = readonly unknown[],
 >(
   client: Client<Transport, ChainEIP712, Account>,
   parameters:
     | SendEip712TransactionParameters<chain, account, chainOverride, request>
-    | SendTransactionBatchParameters<request>,
+    | SendTransactionBatchParameters<calls>,
 ): Promise<SignEip712TransactionReturnType> {
   const result = (await client.request(
     {
@@ -77,11 +79,12 @@ export async function signPrivyTransaction<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
   chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  const calls extends readonly unknown[] = readonly unknown[],
 >(
   client: Client<Transport, ChainEIP712, Account>,
   parameters:
     | SignEip712TransactionParameters<chain, account, chainOverride>
-    | SignTransactionBatchParameters<chain, account, chainOverride>,
+    | SignTransactionBatchParameters<chain, account, chainOverride, calls>,
 ): Promise<SignEip712TransactionReturnType> {
   const { chain: _chain, account: _account, ...request } = parameters;
 

@@ -1,22 +1,38 @@
 import {
   type Account,
   type Address,
+  type Calls,
   type Client,
+  type GetChainParameter,
   type Hex,
+  type Narrow,
   type PublicClient,
   type Transport,
   type WalletClient,
 } from 'viem';
+import type { GetAccountParameter } from 'viem/_types/types/account.js';
 import {
   type ChainEIP712,
   type SignEip712TransactionReturnType,
 } from 'viem/zksync';
-
 import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
-import type { SignTransactionBatchParameters } from '../types/signTransactionBatch.js';
+import { encodeCalls } from '../utils.js';
 import { signPrivyTransaction } from './sendPrivyTransaction.js';
 import { getBatchTransactionObject } from './sendTransactionBatch.js';
 import { signTransaction } from './signTransaction.js';
+
+export type SignTransactionBatchParameters<
+  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  account extends Account | undefined = Account | undefined,
+  chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  calls extends readonly unknown[] = readonly unknown[],
+> = {
+  calls: Calls<Narrow<calls>>;
+  forceAtomic?: boolean;
+  paymaster?: Address | undefined;
+  paymasterInput?: Hex | undefined;
+} & GetAccountParameter<account, Account | Address, true, true> &
+  GetChainParameter<chain, chainOverride>;
 
 /**
  * Function to sign a batch of transactions in a single call using the connected Abstract Global Wallet.
@@ -81,11 +97,17 @@ export async function signTransactionBatch<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
   chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  const calls extends readonly unknown[] = readonly unknown[],
 >(
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
-  parameters: SignTransactionBatchParameters<chain, account, chainOverride>,
+  parameters: SignTransactionBatchParameters<
+    chain,
+    account,
+    chainOverride,
+    calls
+  >,
   validator: Address,
   validationHookData: Record<string, Hex> = {},
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
@@ -96,13 +118,21 @@ export async function signTransactionBatch<
     throw new Error('No calls provided');
   }
   if (isPrivyCrossApp) {
-    return await signPrivyTransaction(client, parameters);
+    return await signPrivyTransaction(client, {
+      ...rest,
+      calls: encodeCalls(calls),
+    } as any);
   }
 
-  const batchTransaction = getBatchTransactionObject(
-    client.account.address,
-    parameters,
-  );
+  const batchTransaction = getBatchTransactionObject<
+    chain,
+    account,
+    chainOverride,
+    calls
+  >(client.account.address, {
+    calls,
+    ...rest,
+  });
 
   return signTransaction(
     client,
@@ -111,7 +141,7 @@ export async function signTransactionBatch<
     {
       ...batchTransaction,
       ...rest,
-    },
+    } as any,
     validator,
     validationHookData,
     customPaymasterHandler,

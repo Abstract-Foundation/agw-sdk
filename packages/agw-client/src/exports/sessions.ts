@@ -3,7 +3,7 @@ import {
   createSessionClient,
   type SessionClient,
   toSessionClient,
-} from '../sessionClient.js';
+} from '../clients/sessionClient.js';
 import type {
   CallPolicy,
   Constraint,

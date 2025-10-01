@@ -1,4 +1,10 @@
-import type { Address, Hex, RpcTransactionReceipt } from 'viem';
+import {
+  type Address,
+  type Capabilities,
+  type ExtractCapabilities,
+  type Hex,
+  type RpcTransactionReceipt,
+} from 'viem';
 
 enum CallStatus {
   Pending = 100,
@@ -7,37 +13,6 @@ enum CallStatus {
   Reverted = 500,
   PartiallyReverted = 600,
 }
-
-interface PaymasterServiceCapability {
-  url: string;
-}
-
-interface AtomicCapabilityV1 {
-  supported: boolean;
-}
-
-interface AtomicCapabilityV2 {
-  status: 'supported' | 'ready' | 'unsupported';
-}
-
-interface ChainCapabilitiesV1 {
-  paymasterService?: PaymasterServiceCapability;
-  atomicBatch?: AtomicCapabilityV1;
-}
-
-interface ChainCapabilitiesV2 {
-  paymasterService?: PaymasterServiceCapability;
-  atomic?: AtomicCapabilityV2;
-}
-
-type WalletCapabilitiesV1 = Record<`0x${string}`, ChainCapabilitiesV1>;
-
-type WalletCapabilitiesV2 = Record<`0x${string}`, ChainCapabilitiesV2>;
-
-export type WalletCapabilities = Record<
-  `0x${string}`,
-  ChainCapabilitiesV1 & ChainCapabilitiesV2
->;
 
 export type SendCallsParams = SendCallsParamsV1 | SendCallsParamsV2;
 
@@ -50,7 +25,7 @@ export interface SendCallsParamsV1 {
     value?: Hex | undefined;
     chainId?: Hex | undefined;
   }[];
-  capabilities?: WalletCapabilitiesV1 | undefined;
+  capabilities?: Capabilities;
 }
 
 export interface SendCallsParamsV2 {
@@ -64,27 +39,8 @@ export interface SendCallsParamsV2 {
     data?: Hex | undefined;
     value?: Hex | undefined;
   }[];
-  capabilities: WalletCapabilitiesV2 | undefined;
+  capabilities: Capabilities;
 }
-
-export const agwCapabilitiesV2: WalletCapabilities = {
-  '0xab5': {
-    atomicBatch: {
-      supported: true,
-    },
-    atomic: {
-      status: 'supported',
-    },
-  },
-  '0x2b74': {
-    atomicBatch: {
-      supported: true,
-    },
-    atomic: {
-      status: 'supported',
-    },
-  },
-};
 
 export function getReceiptStatus(
   receipt: RpcTransactionReceipt | undefined,
@@ -98,3 +54,15 @@ export function getReceiptStatus(
       return CallStatus.Reverted;
   }
 }
+
+export const agwCapabilities: ExtractCapabilities<
+  'getCapabilities',
+  'ReturnType'
+> = {
+  atomicBatch: {
+    supported: true,
+  },
+  atomic: {
+    status: 'supported',
+  },
+};

@@ -11,17 +11,17 @@ import {
   toFunctionSelector,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
-import {
-  ChainEIP712,
-  parseEip712Transaction,
-  ZksyncTransactionRequestEIP712,
-} from 'viem/zksync';
+import { ChainEIP712, parseEip712Transaction } from 'viem/zksync';
 import { describe, expect, test, vi } from 'vitest';
 
 import { signTransactionBatch } from '../../../src/actions/signTransactionBatch.js';
 import { EOA_VALIDATOR_ADDRESS } from '../../../src/constants.js';
 import { anvilAbstractTestnet } from '../../anvil.js';
 import { address } from '../../constants.js';
+
+vi.mock('../../../src/actions/sendPrivyTransaction');
+
+import { signPrivyTransaction } from '../../../src/actions/sendPrivyTransaction.js';
 
 const RAW_SIGNATURE =
   '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -101,5 +101,63 @@ describe('signTransactionBatch', () => {
       toFunctionSelector('function batchCall((address,bool,uint256,bytes)[])'),
     );
     expect(parsedBatch.value).toBe(3n);
+  });
+
+  test('prepares calls correctly for privy cross app', async () => {
+    vi.mocked(signPrivyTransaction).mockResolvedValue('0x01abab');
+
+    const transactions = [
+      {
+        to: '0xAbc1230000000000000000000000000000000000',
+        value: 1n,
+        extraValue: 1n,
+      },
+      {
+        to: '0xDEF4560000000000000000000000000000000000',
+        value: 2n,
+        data: '0xabababab',
+      },
+      {
+        to: '0x1234567890123456789012345678901234567890',
+        data: '0x1234567890123456789012345678901234567890',
+      },
+    ];
+
+    const signedBatch = await signTransactionBatch(
+      baseClient,
+      signerClient,
+      publicClient,
+      {
+        calls: transactions,
+      },
+      EOA_VALIDATOR_ADDRESS,
+      {},
+      undefined,
+      true,
+    );
+
+    expect(signedBatch).toBe('0x01abab');
+
+    expect(signPrivyTransaction).toHaveBeenCalledWith(baseClient, {
+      calls: transactions.map((transaction) => ({
+        to: transaction.to,
+        data: transaction.data,
+        value: transaction.value,
+      })),
+    });
+  });
+
+  test('should throw an error if no calls are provided', async () => {
+    await expect(
+      signTransactionBatch(
+        baseClient,
+        signerClient,
+        publicClient,
+        {
+          calls: [],
+        },
+        EOA_VALIDATOR_ADDRESS,
+      ),
+    ).rejects.toThrowError('No calls provided');
   });
 });

@@ -1,17 +1,9 @@
-import type {
-  Account,
-  Address,
-  Chain,
-  Hex,
-  SendTransactionRequest,
-} from 'viem';
-import type { SendEip712TransactionParameters } from 'viem/zksync';
+import type { Address, Calls, Hex, Narrow } from 'viem';
 
 export interface SendTransactionBatchParameters<
-  request extends SendTransactionRequest<Chain> = SendTransactionRequest<Chain>,
+  calls extends readonly unknown[] = readonly unknown[],
 > {
-  // TODO: figure out if more fields need to be lifted up
-  calls: SendEip712TransactionParameters<Chain, Account, Chain, request>[];
+  calls: Calls<Narrow<calls>>;
   paymaster?: Address | undefined;
   paymasterInput?: Hex | undefined;
 }

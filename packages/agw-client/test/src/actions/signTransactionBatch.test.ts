@@ -146,4 +146,18 @@ describe('signTransactionBatch', () => {
       })),
     });
   });
+
+  test('should throw an error if no calls are provided', async () => {
+    await expect(
+      signTransactionBatch(
+        baseClient,
+        signerClient,
+        publicClient,
+        {
+          calls: [],
+        },
+        EOA_VALIDATOR_ADDRESS,
+      ),
+    ).rejects.toThrowError('No calls provided');
+  });
 });

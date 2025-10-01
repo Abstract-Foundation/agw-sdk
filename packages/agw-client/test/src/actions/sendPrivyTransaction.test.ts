@@ -7,9 +7,9 @@ import {
 import { ChainEIP712 } from 'viem/zksync';
 import { describe, expect, test, vi } from 'vitest';
 
-import { sendPrivyTransaction } from '../../../../src/actions/sendPrivyTransaction.js';
-import { anvilAbstractTestnet } from '../../../anvil.js';
-import { address } from '../../../constants.js';
+import { sendPrivyTransaction } from '../../../src/actions/sendPrivyTransaction.js';
+import { anvilAbstractTestnet } from '../../anvil.js';
+import { address } from '../../constants.js';
 
 const MOCK_TRANSACTION_HASH =
   '0x9afe47f3d95eccfc9210851ba5f877f76d372514a26b48bad848a07f77c33b87';

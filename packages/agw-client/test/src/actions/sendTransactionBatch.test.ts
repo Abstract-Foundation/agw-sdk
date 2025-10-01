@@ -11,10 +11,10 @@ import { toAccount } from 'viem/accounts';
 import { ChainEIP712, ZksyncTransactionRequestEIP712 } from 'viem/zksync';
 import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
-import { sendTransactionBatch } from '../../../../src/actions/sendTransactionBatch.js';
-import { EOA_VALIDATOR_ADDRESS } from '../../../../src/constants.js';
-import { anvilAbstractTestnet } from '../../../anvil.js';
-import { address } from '../../../constants.js';
+import { sendTransactionBatch } from '../../../src/actions/sendTransactionBatch.js';
+import { EOA_VALIDATOR_ADDRESS } from '../../../src/constants.js';
+import { anvilAbstractTestnet } from '../../anvil.js';
+import { address } from '../../constants.js';
 
 vi.mock('viem', async (importOriginal) => {
   const original = await importOriginal();
@@ -26,15 +26,12 @@ vi.mock('viem', async (importOriginal) => {
 
 import { encodeFunctionData } from 'viem';
 
-vi.mock('../../../../src/actions/sendTransactionInternal');
-vi.mock('../../../../src/actions/sendPrivyTransaction');
+vi.mock('../../../src/actions/sendTransactionInternal');
+vi.mock('../../../src/actions/sendPrivyTransaction');
 
-import AGWAccountAbi from '../../../../src/abis/AGWAccount.js';
-import {
-  sendPrivyTransaction,
-  signPrivyTransaction,
-} from '../../../../src/actions/sendPrivyTransaction.js';
-import { sendTransactionInternal } from '../../../../src/actions/sendTransactionInternal.js';
+import AGWAccountAbi from '../../../src/abis/AGWAccount.js';
+import { signPrivyTransaction } from '../../../src/actions/sendPrivyTransaction.js';
+import { sendTransactionInternal } from '../../../src/actions/sendTransactionInternal.js';
 
 // Client setup
 const baseClient = createClient({

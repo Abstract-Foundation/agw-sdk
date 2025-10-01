@@ -15,13 +15,13 @@ import { abstractTestnet, mainnet } from 'viem/chains';
 import { ChainEIP712, ZksyncTransactionRequestEIP712 } from 'viem/zksync';
 import { describe, expect, test, vi } from 'vitest';
 
-import { sendTransactionInternal } from '../../../../src/actions/sendTransactionInternal.js';
+import { sendTransactionInternal } from '../../../src/actions/sendTransactionInternal.js';
 import {
   EOA_VALIDATOR_ADDRESS,
   SMART_ACCOUNT_FACTORY_ADDRESS,
-} from '../../../../src/constants.js';
-import { anvilAbstractTestnet } from '../../../anvil.js';
-import { address } from '../../../constants.js';
+} from '../../../src/constants.js';
+import { anvilAbstractTestnet } from '../../anvil.js';
+import { address } from '../../constants.js';
 
 vi.mock('viem', async (importOriginal) => {
   const original = await importOriginal();
@@ -31,7 +31,7 @@ vi.mock('viem', async (importOriginal) => {
   };
 });
 
-vi.mock('../../../../src/actions/signTransaction', () => ({
+vi.mock('../../../src/actions/signTransaction', () => ({
   signTransaction: vi
     .fn()
     .mockResolvedValue(
@@ -39,13 +39,13 @@ vi.mock('../../../../src/actions/signTransaction', () => ({
     ),
 }));
 
-import { signTransaction } from '../../../../src/actions/signTransaction.js';
+import { signTransaction } from '../../../src/actions/signTransaction.js';
 import {
   getInitializerCalldata,
   isSmartAccountDeployed,
-} from '../../../../src/utils.js';
+} from '../../../src/utils.js';
 
-vi.mock('../../../../src/utils.js');
+vi.mock('../../../src/utils.js');
 
 const MOCK_TRANSACTION_HASH =
   '0x9afe47f3d95eccfc9210851ba5f877f76d372514a26b48bad848a07f77c33b87';

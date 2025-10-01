@@ -1,3 +1,4 @@
+export { createSession } from '../actions/createSession.js';
 export { deployAccount } from '../actions/deployAccount.js';
 export { getLinkedAccounts } from '../actions/getLinkedAccounts.js';
 export { getLinkedAgw } from '../actions/getLinkedAgw.js';

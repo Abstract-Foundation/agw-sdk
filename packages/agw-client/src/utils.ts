@@ -3,6 +3,7 @@ import {
   BaseError,
   type Calls,
   type Chain,
+  type Client,
   concat,
   encodeFunctionData,
   fromHex,
@@ -19,12 +20,14 @@ import {
   type Call as ViemCall,
 } from 'viem';
 import { parseAccount } from 'viem/accounts';
+import { getCode } from 'viem/actions';
 import {
   abstract,
   abstractTestnet,
   zksync,
   zksyncSepoliaTestnet,
 } from 'viem/chains';
+import { getAction } from 'viem/utils';
 import type { ChainEIP712, SignEip712TransactionParameters } from 'viem/zksync';
 import AccountFactoryAbi from './abis/AccountFactory.js';
 import { AGWRegistryAbi } from './abis/AGWRegistryAbi.js';
@@ -96,12 +99,14 @@ export async function isAGWAccount<
 }
 
 export async function isSmartAccountDeployed<
+  transport extends Transport = Transport,
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
->(
-  publicClient: PublicClient<Transport, chain>,
-  address: Hex,
-): Promise<boolean> {
-  const bytecode = await publicClient.getCode({
+>(client: Client<transport, chain>, address: Hex): Promise<boolean> {
+  const bytecode = await getAction(
+    client,
+    getCode,
+    'getCode',
+  )({
     address: address,
   });
   return bytecode !== undefined;

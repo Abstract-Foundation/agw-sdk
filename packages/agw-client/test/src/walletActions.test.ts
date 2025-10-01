@@ -73,6 +73,7 @@ describe('globalWalletActions', () => {
     expect(actions).toHaveProperty('showCallsStatus');
     expect(actions).toHaveProperty('getLinkedAccounts');
     expect(actions).toHaveProperty('signMessage');
+    expect(actions).toHaveProperty('getSessionStatus');
   });
 
   it('should call sendTransaction with correct arguments', async () => {
@@ -258,6 +259,26 @@ describe('globalWalletActions', () => {
       mockSignerClient,
       mockArgs,
       false,
+    );
+  });
+
+  it('should call getSessionStatus with correct arguments', async () => {
+    const session: SessionConfig = {
+      signer: mockSignerClient.account.address,
+      expiresAt: BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7),
+      feeLimit: {
+        limit: parseEther('1'),
+        limitType: LimitType.Lifetime,
+        period: 0n,
+      },
+      callPolicies: [],
+      transferPolicies: [],
+    };
+    await actions.getSessionStatus(session);
+    expect(getSessionStatusModule.getSessionStatus).toHaveBeenCalledWith(
+      mockPublicClient,
+      mockClient.account.address,
+      session,
     );
   });
 });

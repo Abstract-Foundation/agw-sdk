@@ -2,9 +2,9 @@ import { parseAccount, toAccount } from 'viem/accounts';
 import { ChainEIP712 } from 'viem/zksync';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createAbstractClient } from '../../src/clients/abstractClient.js';
-import { anvilAbstractTestnet } from '../anvil.js';
-import { address } from '../constants.js';
+import { createAbstractClient } from '../../../src/clients/abstractClient.js';
+import { anvilAbstractTestnet } from '../../anvil.js';
+import { address } from '../../constants.js';
 
 // Mock the entire viem module
 vi.mock('viem', async () => {
@@ -35,7 +35,7 @@ import {
   toFunctionSelector,
 } from 'viem';
 
-vi.mock('../../src/utils', () => ({
+vi.mock('../../../src/utils', () => ({
   getSmartAccountAddressFromInitialSigner: vi
     .fn()
     .mockResolvedValue('0x0000000000000000000000000000000000012345'),
@@ -44,9 +44,9 @@ vi.mock('../../src/utils', () => ({
 import {
   createSessionClient,
   toSessionClient,
-} from '../../src/clients/sessionClient.js';
-import { LimitType, LimitZero, SessionConfig } from '../../src/sessions.js';
-import { getSmartAccountAddressFromInitialSigner } from '../../src/utils.js';
+} from '../../../src/clients/sessionClient.js';
+import { LimitType, LimitZero, SessionConfig } from '../../../src/sessions.js';
+import { getSmartAccountAddressFromInitialSigner } from '../../../src/utils.js';
 
 const MOCK_CONTRACT_ADDRESS = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
 

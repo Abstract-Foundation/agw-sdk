@@ -1,47 +1,43 @@
 import { parseEther } from 'viem';
 import { parseAccount } from 'viem/accounts';
 import { describe, expect, it, vi } from 'vitest';
-import * as deployContractModule from '../../src/actions/deployContract.js';
-import * as getCallsStatusModule from '../../src/actions/getCallsStatus.js';
-import * as getCapabilitiesModule from '../../src/actions/getCapabilities.js';
-import * as getLinkedAccountsModule from '../../src/actions/getLinkedAccounts.js';
-import * as getSessionStatusModule from '../../src/actions/getSessionStatus.js';
-import * as prepareTransactionRequestModule from '../../src/actions/prepareTransaction.js';
-import * as sendCallsModule from '../../src/actions/sendCalls.js';
-import * as sendTransactionModule from '../../src/actions/sendTransaction.js';
-import * as sendTransactionBatchModule from '../../src/actions/sendTransactionBatch.js';
-import * as sendTransactionForSessionModule from '../../src/actions/sendTransactionForSession.js';
-import * as signMessageModule from '../../src/actions/signMessage.js';
-import * as signTransactionModule from '../../src/actions/signTransaction.js';
-import * as signTransactionBatchModule from '../../src/actions/signTransactionBatch.js';
-import * as signTransactionForSessionModule from '../../src/actions/signTransactionForSession.js';
-import * as signTypedDataModule from '../../src/actions/signTypedData.js';
-import * as writeContractModule from '../../src/actions/writeContract.js';
-import * as writeContractForSessionModule from '../../src/actions/writeContractForSession.js';
-import { globalWalletActions } from '../../src/clients/decorators/abstract.js';
-import { sessionWalletActions } from '../../src/clients/decorators/session.js';
-import { EOA_VALIDATOR_ADDRESS } from '../../src/constants.js';
-import { LimitType, SessionConfig } from '../../src/sessions.js';
-import { address } from '../constants.js';
+import * as deployContractModule from '../../../../src/actions/deployContract.js';
+import * as getCallsStatusModule from '../../../../src/actions/getCallsStatus.js';
+import * as getCapabilitiesModule from '../../../../src/actions/getCapabilities.js';
+import * as getLinkedAccountsModule from '../../../../src/actions/getLinkedAccounts.js';
+import * as getSessionStatusModule from '../../../../src/actions/getSessionStatus.js';
+import * as prepareTransactionRequestModule from '../../../../src/actions/prepareTransaction.js';
+import * as sendCallsModule from '../../../../src/actions/sendCalls.js';
+import * as sendTransactionModule from '../../../../src/actions/sendTransaction.js';
+import * as sendTransactionBatchModule from '../../../../src/actions/sendTransactionBatch.js';
+import * as signMessageModule from '../../../../src/actions/signMessage.js';
+import * as signTransactionModule from '../../../../src/actions/signTransaction.js';
+import * as signTransactionBatchModule from '../../../../src/actions/signTransactionBatch.js';
+import * as signTypedDataModule from '../../../../src/actions/signTypedData.js';
+import * as writeContractModule from '../../../../src/actions/writeContract.js';
+import { globalWalletActions } from '../../../../src/clients/decorators/abstract.js';
+import * as sessionClientModule from '../../../../src/clients/sessionClient.js';
+import { EOA_VALIDATOR_ADDRESS } from '../../../../src/constants.js';
+import { address } from '../../../constants.js';
+import { emptySession } from '../../../fixtures/sessions.js';
+import { basicTypedData } from '../../../fixtures/typedData.js';
 
 // Mock the imported modules
-vi.mock('../../src/actions/sendTransaction');
-vi.mock('../../src/actions/signTransaction');
-vi.mock('../../src/actions/deployContract');
-vi.mock('../../src/actions/writeContract');
-vi.mock('../../src/actions/prepareTransaction');
-vi.mock('../../src/actions/writeContractForSession');
-vi.mock('../../src/actions/sendTransactionForSession');
-vi.mock('../../src/actions/sendTransactionBatch');
-vi.mock('../../src/actions/signTransactionBatch');
-vi.mock('../../src/actions/sendCalls');
-vi.mock('../../src/actions/getCapabilities');
-vi.mock('../../src/actions/getCallsStatus');
-vi.mock('../../src/actions/getLinkedAccounts');
-vi.mock('../../src/actions/signMessage');
-vi.mock('../../src/actions/signTypedData');
-vi.mock('../../src/actions/signTransactionForSession');
-vi.mock('../../src/actions/getSessionStatus');
+vi.mock('../../../../src/actions/sendTransaction');
+vi.mock('../../../../src/actions/signTransaction');
+vi.mock('../../../../src/actions/deployContract');
+vi.mock('../../../../src/actions/writeContract');
+vi.mock('../../../../src/actions/prepareTransaction');
+vi.mock('../../../../src/actions/sendTransactionBatch');
+vi.mock('../../../../src/actions/signTransactionBatch');
+vi.mock('../../../../src/actions/sendCalls');
+vi.mock('../../../../src/actions/getCapabilities');
+vi.mock('../../../../src/actions/getCallsStatus');
+vi.mock('../../../../src/actions/getLinkedAccounts');
+vi.mock('../../../../src/actions/signMessage');
+vi.mock('../../../../src/actions/signTypedData');
+vi.mock('../../../../src/actions/getSessionStatus');
+vi.mock('../../../../src/clients/sessionClient');
 
 describe('globalWalletActions', () => {
   const mockSignerClient = {
@@ -74,6 +70,8 @@ describe('globalWalletActions', () => {
     expect(actions).toHaveProperty('getLinkedAccounts');
     expect(actions).toHaveProperty('signMessage');
     expect(actions).toHaveProperty('getSessionStatus');
+    expect(actions).toHaveProperty('signTypedData');
+    expect(actions).toHaveProperty('writeContract');
   });
 
   it('should call sendTransaction with correct arguments', async () => {
@@ -263,146 +261,31 @@ describe('globalWalletActions', () => {
   });
 
   it('should call getSessionStatus with correct arguments', async () => {
-    const session: SessionConfig = {
-      signer: mockSignerClient.account.address,
-      expiresAt: BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7),
-      feeLimit: {
-        limit: parseEther('1'),
-        limitType: LimitType.Lifetime,
-        period: 0n,
-      },
-      callPolicies: [],
-      transferPolicies: [],
-    };
-    await actions.getSessionStatus(session);
+    await actions.getSessionStatus(emptySession);
     expect(getSessionStatusModule.getSessionStatus).toHaveBeenCalledWith(
       mockPublicClient,
       mockClient.account.address,
-      session,
+      emptySession,
     );
   });
-});
 
-describe('sessionWalletActions', () => {
-  const mockSignerClient = {
-    account: {
-      address: address.sessionSignerAddress,
-    },
-  } as any;
-  const mockPublicClient = {} as any;
-  const mockClient = {
-    account: {
-      address: address.smartAccountAddress,
-    },
-  } as any;
-
-  const session: SessionConfig = {
-    signer: mockSignerClient.account.address,
-    expiresAt: BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7),
-    feeLimit: {
-      limit: parseEther('1'),
-      limitType: LimitType.Lifetime,
-      period: 0n,
-    },
-    callPolicies: [],
-    transferPolicies: [],
-  };
-
-  const actions = sessionWalletActions(
-    mockSignerClient,
-    mockPublicClient,
-    session,
-  )(mockClient);
-
-  it('should return an object with all expected methods', () => {
-    expect(actions).toHaveProperty('writeContract');
-    expect(actions).toHaveProperty('sendTransaction');
-    expect(actions).toHaveProperty('signTransaction');
-    expect(actions).toHaveProperty('signTypedData');
-    expect(actions).toHaveProperty('getSessionStatus');
-  });
-
-  it('should call sendTransactionForSession with correct arguments', async () => {
-    const mockArgs = {
-      to: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-      value: 100n,
-    };
-    await actions.sendTransaction(mockArgs as any);
-    expect(
-      sendTransactionForSessionModule.sendTransactionForSession,
-    ).toHaveBeenCalledWith(
+  it('should call signTypedData with correct arguments', async () => {
+    await actions.signTypedData(basicTypedData);
+    expect(signTypedDataModule.signTypedData).toHaveBeenCalledWith(
       mockClient,
       mockSignerClient,
       mockPublicClient,
-      mockArgs,
-      session,
-      undefined,
+      basicTypedData,
+      false,
     );
   });
 
-  it('should call writeContractForSession with correct arguments', async () => {
-    const mockArgs = {
-      address: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-      abi: [],
-      functionName: 'transfer',
-      args: [],
-    };
-    await actions.writeContract(mockArgs as any);
-    expect(
-      writeContractForSessionModule.writeContractForSession,
-    ).toHaveBeenCalledWith(
-      mockClient,
-      mockSignerClient,
-      mockPublicClient,
-      mockArgs,
-      session,
-      undefined,
-    );
-  });
-
-  it('should call signTypedDataForSession with correct arguments', async () => {
-    const mockArgs = {
-      domain: {
-        name: 'zkSync',
-        version: '2',
-        chainId: 11124,
-      },
-    };
-    await actions.signTypedData(mockArgs as any);
-    expect(signTypedDataModule.signTypedDataForSession).toHaveBeenCalledWith(
-      mockClient,
-      mockSignerClient,
-      mockPublicClient,
-      mockArgs,
-      session,
-      undefined,
-    );
-  });
-
-  it('should call signTransactionForSession with correct arguments', async () => {
-    const mockArgs = {
-      to: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-      value: 100n,
-    };
-    await actions.signTransaction(mockArgs as any);
-    expect(
-      signTransactionForSessionModule.signTransactionForSession,
-    ).toHaveBeenCalledWith(
-      mockClient,
-      mockSignerClient,
-      mockPublicClient,
-      mockArgs,
-      session,
-      undefined,
-    );
-  });
-
-  it('should call getSessionStatus with correct arguments', async () => {
-    await actions.getSessionStatus();
-    expect(getSessionStatusModule.getSessionStatus).toHaveBeenCalledWith(
-      mockPublicClient,
-      mockClient.account.address,
-      session,
-    );
+  it('should call toSessionClient with correct arguments', async () => {
+    actions.toSessionClient(mockSignerClient, emptySession);
+    expect(sessionClientModule.toSessionClient).toHaveBeenCalledWith({
+      client: mockClient,
+      signer: mockSignerClient,
+      session: emptySession,
+    });
   });
 });

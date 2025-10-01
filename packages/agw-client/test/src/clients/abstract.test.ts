@@ -2,9 +2,9 @@ import { toAccount } from 'viem/accounts';
 import { ChainEIP712 } from 'viem/zksync';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createAbstractClient } from '../../src/clients/abstractClient.js';
-import { anvilAbstractTestnet } from '../anvil.js';
-import { address } from '../constants.js';
+import { createAbstractClient } from '../../../src/clients/abstractClient.js';
+import { anvilAbstractTestnet } from '../../anvil.js';
+import { address } from '../../constants.js';
 
 const MOCK_SMART_ACCOUNT_ADDRESS = address.smartAccountAddress;
 
@@ -33,13 +33,13 @@ vi.mock('viem', async () => {
 
 import { createClient, createPublicClient, createWalletClient } from 'viem';
 
-vi.mock('../../src/utils', () => ({
+vi.mock('../../../src/utils', () => ({
   getSmartAccountAddressFromInitialSigner: vi
     .fn()
     .mockResolvedValue('0x0000000000000000000000000000000000012345'),
 }));
 
-import { getSmartAccountAddressFromInitialSigner } from '../../src/utils.js';
+import { getSmartAccountAddressFromInitialSigner } from '../../../src/utils.js';
 
 describe('createAbstractClient', () => {
   const signer = toAccount(address.signerAddress);

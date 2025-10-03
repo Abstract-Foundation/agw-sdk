@@ -62,5 +62,5 @@ export async function createSession<
     chain: chainId ? { id: chainId } : null,
   });
 
-  return result as CreateSessionReturnType;
+  return result;
 }

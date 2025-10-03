@@ -1,5 +1,12 @@
 # @abstract-foundation/agw-client
 
+## 1.10.0-beta.0
+
+### Minor Changes
+
+- 1fafa7c: feat: add EIP-5792 methods to abstract client
+- 49cfeda: feat: new improved creataeSession function definitions
+
 ## 1.9.1
 
 ### Patch Changes

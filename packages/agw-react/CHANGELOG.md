@@ -1,5 +1,17 @@
 # @abstract-foundation/agw-react
 
+## 1.10.0-beta.0
+
+### Minor Changes
+
+- 49cfeda: feat: new improved creataeSession function definitions
+
+### Patch Changes
+
+- Updated dependencies [1fafa7c]
+- Updated dependencies [49cfeda]
+  - @abstract-foundation/agw-client@1.10.0-beta.0
+
 ## 1.9.1
 
 ### Patch Changes

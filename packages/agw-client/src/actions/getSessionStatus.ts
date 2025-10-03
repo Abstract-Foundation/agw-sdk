@@ -8,6 +8,8 @@ import {
   SessionStatus,
 } from '../sessions.js';
 
+export type GetSessionStatusReturnType = SessionStatus;
+
 /**
  * Function to check the current status of a session key from the validator contract.
  *
@@ -56,7 +58,7 @@ export async function getSessionStatus(
   publicClient: PublicClient<Transport>,
   address: Address,
   sessionHashOrConfig: Hash | SessionConfig,
-): Promise<SessionStatus> {
+): Promise<GetSessionStatusReturnType> {
   const sessionHash =
     typeof sessionHashOrConfig === 'string'
       ? sessionHashOrConfig

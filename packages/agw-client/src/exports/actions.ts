@@ -1,7 +1,34 @@
-export { createSession } from '../actions/createSession.js';
-export { deployAccount } from '../actions/deployAccount.js';
-export { getLinkedAccounts } from '../actions/getLinkedAccounts.js';
-export { getLinkedAgw } from '../actions/getLinkedAgw.js';
-export { getSessionStatus } from '../actions/getSessionStatus.js';
-export { linkToAgw } from '../actions/linkToAgw.js';
-export { getBatchTransactionObject } from '../actions/sendTransactionBatch.js';
+export {
+  type CreateSessionParameters,
+  type CreateSessionReturnType,
+  createSession,
+} from '../actions/createSession.js';
+export {
+  type DeployAccountParameters,
+  type DeployAccountReturnType,
+  deployAccount,
+} from '../actions/deployAccount.js';
+export {
+  type GetLinkedAccountsParameters,
+  type GetLinkedAccountsReturnType,
+  getLinkedAccounts,
+} from '../actions/getLinkedAccounts.js';
+export {
+  type GetLinkedAgwParameters,
+  type GetLinkedAgwReturnType,
+  getLinkedAgw,
+} from '../actions/getLinkedAgw.js';
+export {
+  type GetSessionStatusReturnType,
+  getSessionStatus,
+} from '../actions/getSessionStatus.js';
+export {
+  type LinkToAgwParameters,
+  type LinkToAgwReturnType,
+  linkToAgw,
+} from '../actions/linkToAgw.js';
+export {
+  getBatchTransactionObject,
+  type SendTransactionBatchParameters,
+  type SendTransactionBatchReturnType,
+} from '../actions/sendTransactionBatch.js';

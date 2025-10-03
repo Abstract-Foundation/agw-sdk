@@ -1,8 +1,8 @@
 import {
   type CreateSessionParameters as client_CreateSessionParameters,
   createSession as client_createSession,
-} from '@abstract-foundation/agw-client/dist/types/actions/createSession';
-import type { SessionConfig } from '@abstract-foundation/agw-client/dist/types/sessions';
+} from '@abstract-foundation/agw-client/actions';
+import type { SessionConfig } from '@abstract-foundation/agw-client/sessions';
 import { getConnectorClient, type SelectChains } from '@wagmi/core';
 import type { Compute } from '@wagmi/core/dist/types/types/utils';
 import type {
@@ -55,12 +55,12 @@ export async function createSession<
       connector,
     });
 
-  const action = getAction(client, client_createSession, 'sendTransaction');
+  const action = getAction(client, client_createSession, 'createSession');
   const result = await action({
     ...(rest as any),
     ...(account ? { account } : {}),
     chain: chainId ? { id: chainId } : null,
   });
 
-  return result;
+  return result as CreateSessionReturnType;
 }

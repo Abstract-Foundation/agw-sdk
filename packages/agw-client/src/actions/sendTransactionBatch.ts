@@ -22,6 +22,8 @@ import { signPrivyTransaction } from './sendPrivyTransaction.js';
 import { sendTransactionInternal } from './sendTransactionInternal.js';
 import type { SignTransactionBatchParameters } from './signTransactionBatch.js';
 
+export type SendTransactionBatchReturnType = SendTransactionReturnType;
+
 export interface SendTransactionBatchParameters<
   calls extends readonly unknown[] = readonly unknown[],
 > {
@@ -144,7 +146,7 @@ export async function sendTransactionBatch<
   parameters: SendTransactionBatchParameters<calls>,
   isPrivyCrossApp = false,
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
-): Promise<SendTransactionReturnType> {
+): Promise<SendTransactionBatchReturnType> {
   const { calls, ...rest } = parameters;
   if (calls.length === 0) {
     throw new Error('No calls provided');

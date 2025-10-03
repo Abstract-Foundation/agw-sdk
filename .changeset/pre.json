@@ -7,5 +7,5 @@
     "@abstract-foundation/agw-web": "1.9.1",
     "@abstract-foundation/web3-react-agw": "1.7.9"
   },
-  "changesets": ["empty-socks-hunt", "grumpy-pears-drive"]
+  "changesets": ["empty-socks-hunt", "grumpy-pears-drive", "hip-maps-compare"]
 }

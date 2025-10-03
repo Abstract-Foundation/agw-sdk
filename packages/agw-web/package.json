@@ -1,7 +1,7 @@
 {
   "name": "@abstract-foundation/agw-web",
   "description": "Abstract Global Wallet for the web (generic EIP-6963 provider)",
-  "version": "1.9.2-beta.0",
+  "version": "1.9.2-beta.1",
   "license": "MIT",
   "repository": {
     "type": "git",

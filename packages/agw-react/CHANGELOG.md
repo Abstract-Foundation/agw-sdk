@@ -1,5 +1,13 @@
 # @abstract-foundation/agw-react
 
+## 1.10.0-beta.1
+
+### Patch Changes
+
+- fix imports
+- Updated dependencies
+  - @abstract-foundation/agw-client@1.10.0-beta.1
+
 ## 1.10.0-beta.0
 
 ### Minor Changes

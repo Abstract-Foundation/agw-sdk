@@ -1,28 +1,37 @@
 import {
   type Account,
   type Address,
+  type Call,
   type Client,
   concatHex,
+  encodeFunctionData,
+  type GetChainParameter,
   type Hash,
   type Hex,
-  type PublicClient,
   type Transport,
 } from 'viem';
-import { readContract, writeContract } from 'viem/actions';
-import type { ChainEIP712 } from 'viem/chains';
-import { getAction } from 'viem/utils';
+import { readContract, sendTransaction } from 'viem/actions';
+import type { Chain } from 'viem/chains';
+import { getAction, parseAccount } from 'viem/utils';
 
 import AGWAccountAbi from '../abis/AGWAccount.js';
 import { SessionKeyValidatorAbi } from '../abis/SessionKeyValidator.js';
 import { SESSION_KEY_VALIDATOR_ADDRESS } from '../constants.js';
+import { AccountNotFoundError } from '../errors/account.js';
 import { encodeSession, type SessionConfig } from '../sessions.js';
 import { isSmartAccountDeployed } from '../utils.js';
+import type { GetAccountParameter } from './prepareTransaction.js';
 
-export interface CreateSessionParameters {
+export type CreateSessionParameters<
+  chain extends Chain | undefined = Chain | undefined,
+  account extends Account | undefined = Account | undefined,
+  chainOverride extends Chain | undefined = Chain | undefined,
+> = {
   session: SessionConfig;
   paymaster?: Address;
   paymasterInput?: Hex;
-}
+} & GetAccountParameter<account, Account | Address, true> &
+  GetChainParameter<chain, chainOverride>;
 
 export interface CreateSessionReturnType {
   transactionHash: Hash | undefined;
@@ -92,61 +101,100 @@ export interface CreateSessionReturnType {
  * @see {@link SessionConfig} - The session configuration type
  * @see {@link encodeSession} - Function to encode a session configuration
  */
-export async function createSession(
-  client: Client<Transport, ChainEIP712, Account>,
-  publicClient: PublicClient<Transport, ChainEIP712>,
-  args: CreateSessionParameters,
+export async function createSession<
+  transport extends Transport,
+  chain extends Chain | undefined = Chain,
+  account extends Account | undefined = Account,
+  chainOverride extends Chain | undefined = Chain | undefined,
+>(
+  client: Client<transport, chain, account>,
+  args: CreateSessionParameters<chain, account, chainOverride>,
 ): Promise<CreateSessionReturnType> {
-  const { session, ...rest } = args;
+  const {
+    account: account_ = client.account,
+    chain = client.chain,
+    session,
+    ...rest
+  } = args;
 
-  const isDeployed = await isSmartAccountDeployed(
-    publicClient,
-    client.account.address,
+  if (typeof account_ === 'undefined')
+    throw new AccountNotFoundError({
+      docsPath: '/docs/actions/wallet/sendTransaction',
+    });
+  const account = parseAccount(account_);
+
+  const createSessionCall = await prepareCreateSessionCall(
+    account,
+    client,
+    session,
   );
 
-  const hasModule = isDeployed ? await hasSessionModule(client) : false;
-
-  let transactionHash: Hash | undefined = undefined;
-
-  if (!hasModule) {
-    const encodedSession = encodeSession(session);
-    transactionHash = await getAction(
-      client,
-      writeContract,
-      'writeContract',
-    )({
-      address: client.account.address,
-      abi: AGWAccountAbi,
-      functionName: 'addModule',
-      args: [concatHex([SESSION_KEY_VALIDATOR_ADDRESS, encodedSession])],
-      ...rest,
-    } as any);
-  } else {
-    transactionHash = await getAction(
-      client,
-      writeContract,
-      'writeContract',
-    )({
-      address: SESSION_KEY_VALIDATOR_ADDRESS,
-      abi: SessionKeyValidatorAbi,
-      functionName: 'createSession',
-      args: [session as any],
-      ...rest,
-    } as any);
-  }
+  const transactionHash = await getAction(
+    client,
+    sendTransaction,
+    'sendTransaction',
+  )({
+    ...createSessionCall,
+    ...rest,
+    account: account,
+    chain: chain,
+  });
 
   return { transactionHash, session };
 }
 
-async function hasSessionModule(
-  client: Client<Transport, ChainEIP712, Account>,
-) {
+export async function prepareCreateSessionCall<
+  transport extends Transport,
+  chain extends Chain | undefined = Chain,
+  account extends Account | undefined = Account,
+>(
+  accountOrAddress: Account | Address,
+  client: Client<transport, chain, account>,
+  session: SessionConfig,
+): Promise<Call> {
+  const account = parseAccount(accountOrAddress);
+
+  const isDeployed = await isSmartAccountDeployed(client, account.address);
+
+  const hasModule = isDeployed
+    ? await hasSessionModule(account, client)
+    : false;
+
+  if (!hasModule) {
+    const encodedSession = encodeSession(session);
+    return {
+      to: account.address,
+      value: 0n,
+      data: encodeFunctionData({
+        abi: AGWAccountAbi,
+        functionName: 'addModule',
+        args: [concatHex([SESSION_KEY_VALIDATOR_ADDRESS, encodedSession])],
+      }),
+    };
+  } else {
+    return {
+      to: SESSION_KEY_VALIDATOR_ADDRESS,
+      value: 0n,
+      data: encodeFunctionData({
+        abi: SessionKeyValidatorAbi,
+        functionName: 'createSession',
+        args: [session],
+      }),
+    };
+  }
+}
+
+async function hasSessionModule<
+  transport extends Transport = Transport,
+  chain extends Chain | undefined = Chain,
+  account extends Account | undefined = Account,
+>(account: Account, client: Client<transport, chain, account>) {
   const validationHooks = await getAction(
     client,
     readContract,
     'readContract',
   )({
-    address: client.account.address,
+    address: account.address,
     abi: AGWAccountAbi,
     functionName: 'listHooks',
     args: [true],

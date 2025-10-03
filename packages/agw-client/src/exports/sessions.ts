@@ -1,4 +1,5 @@
 import { SessionKeyValidatorAbi } from '../abis/SessionKeyValidator.js';
+import { prepareCreateSessionCall } from '../actions/createSession.js';
 import {
   createSessionClient,
   type SessionClient,
@@ -40,4 +41,5 @@ export {
   type SessionStatus,
   toSessionClient,
   type TransferPolicy,
+  prepareCreateSessionCall,
 };

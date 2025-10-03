@@ -158,7 +158,7 @@ export function globalWalletActions<
         agwAddress: parseAccount(client.account).address,
       }),
     isLinkedAccount: (args) => isLinkedAccount(client, args),
-    createSession: (args) => createSession(client, publicClient, args),
+    createSession: (args) => createSession(client, args),
     revokeSessions: (args) => revokeSessions(client, args),
     prepareAbstractTransactionRequest: (args) =>
       prepareTransactionRequest(

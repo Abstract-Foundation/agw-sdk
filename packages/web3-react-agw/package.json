@@ -51,6 +51,6 @@
     "@web3-react/core": "^8.2.3",
     "@web3-react/store": "^8.2.3",
     "viem": "^2.44.2",
-    "wagmi": "^2.14.11"
+    "wagmi": "^2.19.5"
   }
 }

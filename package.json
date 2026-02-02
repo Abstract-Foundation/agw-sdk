@@ -37,7 +37,10 @@
       "image-size@>=1.1.0 <1.2.1": ">=1.2.1",
       "elliptic@<6.6.0": ">=6.6.0",
       "on-headers@<1.1.0": ">=1.1.0",
-      "tmp@<=0.2.3": ">=0.2.4"
+      "tmp@<=0.2.3": ">=0.2.4",
+      "zod@4": "^3 >=3.22.0",
+      "@react-native-community/cli@<=17.0.1": "17.0.1",
+      "@react-native-community/cli-server-api@<=17.0.1": "17.0.1"
     }
   }
 }

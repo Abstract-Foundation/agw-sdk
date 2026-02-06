@@ -49,12 +49,12 @@
     "@abstract-foundation/agw-client": "workspace:*"
   },
   "peerDependencies": {
-    "@privy-io/cross-app-connect": "^0.2.2",
+    "@privy-io/cross-app-connect": "^0.5.2",
     "viem": "^2.37.0"
   },
   "devDependencies": {
     "@abstract-foundation/agw-client": "workspace:*",
-    "@privy-io/cross-app-connect": "^0.2.2",
+    "@privy-io/cross-app-connect": "^0.5.2",
     "viem": "^2.37.0"
   },
   "peerDependenciesMeta": {

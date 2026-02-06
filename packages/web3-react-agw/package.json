@@ -41,7 +41,7 @@
   "files": ["dist", "src", "package.json"],
   "dependencies": {
     "@abstract-foundation/agw-client": "workspace:^",
-    "@privy-io/cross-app-connect": "^0.2.2",
+    "@privy-io/cross-app-connect": "^0.5.2",
     "@web3-react/types": "^8.2.3"
   },
   "devDependencies": {

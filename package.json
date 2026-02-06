@@ -12,9 +12,7 @@
   },
   "packageManager": "pnpm@9.4.0",
   "lint-staged": {
-    "**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
-      "biome check --write"
-    ]
+    "**/*.{js,jsx,ts,tsx,json,css,scss,md}": ["biome check --write"]
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.16.4",

@@ -1,5 +1,5 @@
-import { Address } from 'abitype';
 import {
+  type Address,
   createClient,
   createPublicClient,
   createWalletClient,

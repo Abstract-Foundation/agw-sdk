@@ -1,3 +1,4 @@
+import type { Address } from 'viem';
 import {
   type Config,
   type ResolvedRegister,
@@ -73,9 +74,10 @@ export function useGlobalWalletSignerClient<
 >(
   parameters: UseWalletClientParameters<config, chainId, selectData> = {},
 ): UseWalletClientReturnType<config, chainId, selectData> {
-  const { address } = useGlobalWalletSignerAccount();
+  const { address }: { address: Address | undefined } =
+    useGlobalWalletSignerAccount();
 
-  const walletClient = useWalletClient({
+  const walletClient = useWalletClient<config, chainId, selectData>({
     ...parameters,
     account: address,
   });

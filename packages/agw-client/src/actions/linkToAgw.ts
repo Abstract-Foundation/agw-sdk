@@ -1,7 +1,7 @@
-import { BaseError } from 'abitype';
 import {
   type Account,
   type Address,
+  BaseError,
   type Chain,
   createPublicClient,
   decodeEventLog,

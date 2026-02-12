@@ -1,5 +1,16 @@
 # @abstract-foundation/agw-react
 
+## 1.11.0
+
+### Minor Changes
+
+- bf0e595: Update dependencies
+
+### Patch Changes
+
+- Updated dependencies [bf0e595]
+  - @abstract-foundation/agw-client@1.11.0
+
 ## 1.10.0
 
 ### Minor Changes

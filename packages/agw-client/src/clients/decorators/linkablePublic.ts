@@ -4,12 +4,12 @@ import {
   type GetLinkedAccountsParameters,
   type GetLinkedAccountsReturnType,
   getLinkedAccounts,
-} from '../../actions/getLinkedAccounts';
+} from '../../actions/getLinkedAccounts.js';
 import {
   type GetLinkedAgwParameters,
   type GetLinkedAgwReturnType,
   getLinkedAgw,
-} from '../../actions/getLinkedAgw';
+} from '../../actions/getLinkedAgw.js';
 
 export interface LinkablePublicActions {
   getLinkedAgw: (

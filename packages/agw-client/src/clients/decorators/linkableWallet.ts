@@ -9,12 +9,12 @@ import {
 import {
   type GetLinkedAgwReturnType,
   getLinkedAgw,
-} from '../../actions/getLinkedAgw';
+} from '../../actions/getLinkedAgw.js';
 import {
   type LinkToAgwParameters,
   type LinkToAgwReturnType,
   linkToAgw,
-} from '../../actions/linkToAgw';
+} from '../../actions/linkToAgw.js';
 
 export type LinkableWalletActions<
   chain extends Chain | undefined = Chain | undefined,

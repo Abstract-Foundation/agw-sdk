@@ -6,7 +6,7 @@ import {
   type CreateSessionParameters,
   type CreateSessionReturnType,
   createSession,
-} from '../actions/createSession';
+} from '../actions/createSession.js';
 
 export function createSessionMutationOptions<config extends Config>(
   config: config,

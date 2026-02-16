@@ -40,7 +40,7 @@ const signer: Account = {
   const abstractClient = await createAbstractClient({
     signer,
     chain,
-    transport: http(), // optional, defaults to HTTP transport if omitted
+    transport: http(), // required
   });
 
   // Use the abstractClient instance
@@ -111,7 +111,7 @@ import { Account } from 'viem/accounts';
   const abstractClient = await createAbstractClient({
     signer,
     chain,
-    transport: http(), // Optional, defaults to HTTP transport if omitted
+    transport: http(), // required
   });
 
   // Example of a sponsored transaction using a Paymaster

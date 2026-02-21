@@ -46,12 +46,22 @@
   },
   "typesVersions": {
     "*": {
-      "connectors": ["dist/types/exports/connectors.d.ts"],
-      "privy": ["dist/types/exports/privy.d.ts"],
-      "thirdweb": ["dist/types/exports/thirdweb.d.ts"]
+      "connectors": [
+        "dist/types/exports/connectors.d.ts"
+      ],
+      "privy": [
+        "dist/types/exports/privy.d.ts"
+      ],
+      "thirdweb": [
+        "dist/types/exports/thirdweb.d.ts"
+      ]
     }
   },
-  "files": ["dist", "src", "package.json"],
+  "files": [
+    "dist",
+    "src",
+    "package.json"
+  ],
   "dependencies": {
     "@abstract-foundation/agw-client": "workspace:*"
   },
@@ -61,8 +71,8 @@
     "@tanstack/react-query": "^5",
     "react": ">=18",
     "secp256k1": ">=5.0.1",
-    "typescript": ">=5.0.4",
     "thirdweb": "^5.72.0",
+    "typescript": ">=5.0.4",
     "viem": "^2.37.0",
     "wagmi": "^2.17.5"
   },
@@ -78,7 +88,7 @@
     "@wagmi/core": "2.22.1",
     "react": ">=18.3.1",
     "react-dom": ">=18.3.1",
-    "thirdweb": "^5.68.0",
+    "thirdweb": "5.93.5-nightly-b51157c0ff17e9535029fc8790cfa8538d1c995f-20250326000337",
     "viem": "^2.37.0"
   },
   "peerDependenciesMeta": {

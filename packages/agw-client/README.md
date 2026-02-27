@@ -119,9 +119,8 @@ import { Account } from 'viem/accounts';
     const txHash = await abstractClient.sendTransaction({
       to: '0xRecipientAddress',
       value: 1000000000000000000n, // 1 ETH in wei
-      sponsor: {
-        paymaster: '0xPaymasterAddress', // Address of the Paymaster contract
-      },
+      paymaster: '0xPaymasterAddress',
+      paymasterInput: '0x',
     });
 
     console.log('Sponsored Transaction Hash:', txHash);

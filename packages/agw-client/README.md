@@ -29,12 +29,15 @@ import { createAbstractClient } from '@abstract-foundation/agw-client'
 import { createAbstractClient } from '@abstract-foundation/agw-client';
 import { ChainEIP712, http } from 'viem';
 import { Account } from 'viem/accounts';
+import { abstractTestnet } from 'viem/chains';
 
 // Assume you have a signer account and chain configuration
 const signer: Account = {
   address: '0xYourSignerAddress',
   // ...other account properties
 };
+
+const chain = abstractTestnet;
 
 (async () => {
   const abstractClient = await createAbstractClient({

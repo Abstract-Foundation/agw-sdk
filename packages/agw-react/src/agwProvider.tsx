@@ -40,7 +40,7 @@ interface AbstractWalletConfig {
  * It provides the AbstractWalletContext to its children.
  * @example
  * ```tsx
- * import { AbstractWalletProvider } from '@abstractwallet/agw-react';
+ * import { AbstractWalletProvider } from '@abstract-foundation/agw-react';
  *
  * const App = () => {
  *   // optional configuration overrides

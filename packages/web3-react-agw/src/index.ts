@@ -115,7 +115,10 @@ export class AbstractGlobalWallet extends Connector {
       await this.isomorphicInitialize();
       if (!this.provider) throw new Error('No AGW provider');
 
-      await this.provider.request({ method: 'wallet_requestPermissions' });
+      await this.provider.request({
+        method: 'wallet_requestPermissions',
+        params: [{ eth_accounts: {} }],
+      });
       // Wallets may resolve eth_chainId and hang on eth_accounts pending user interaction, which may include changing
       // chains; they should be requested serially, with accounts first, so that the chainId can settle.
       const accounts = (await this.provider.request({

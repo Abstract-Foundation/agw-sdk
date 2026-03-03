@@ -24,7 +24,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/abstract-foundation/agw-sdk.git",
+    "url": "https://github.com/Abstract-Foundation/agw-sdk.git",
     "directory": "packages/web3-react-agw"
   },
   "main": "./dist/cjs/index.js",

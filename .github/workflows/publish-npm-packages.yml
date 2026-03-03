@@ -10,6 +10,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
     environment: production
     steps:
       - name: Checkout
@@ -23,8 +24,8 @@ jobs:
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org/
-          cache: 'pnpm'
-          scope: '@abstract-foundation'
+          cache: "pnpm"
+          scope: "@abstract-foundation"
 
       - name: Install dependencies
         run: pnpm install
@@ -34,5 +35,3 @@ jobs:
 
       - name: Publish packages
         run: pnpm -r publish --no-git-checks --access public ${{ github.event.release.prerelease == true && '--tag next' || '--tag latest' }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

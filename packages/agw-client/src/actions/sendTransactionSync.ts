@@ -8,6 +8,7 @@ import {
   type WalletClient,
 } from 'viem';
 import {
+  type SendTransactionSyncParameters,
   type SendTransactionSyncReturnType,
   sendRawTransactionSync,
 } from 'viem/actions';
@@ -34,6 +35,20 @@ import type {
 import { signPrivyTransaction } from './sendPrivyTransaction.js';
 import { sendTransactionInternal } from './sendTransactionInternal.js';
 
+export type SendEip712TransactionSyncParameters<
+  chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  account extends Account | undefined = Account | undefined,
+  chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  request extends SendTransactionRequest<
+    chain,
+    chainOverride
+  > = SendTransactionRequest<chain, chainOverride>,
+> = SendEip712TransactionParameters<chain, account, chainOverride, request> &
+  Pick<
+    SendTransactionSyncParameters<chain>,
+    'pollingInterval' | 'throwOnReceiptRevert' | 'timeout'
+  >;
+
 export async function sendTransactionSync<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
@@ -46,15 +61,12 @@ export async function sendTransactionSync<
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
-  parameters: SendEip712TransactionParameters<
+  parameters: SendEip712TransactionSyncParameters<
     chain,
     account,
     chainOverride,
     request
-  > & {
-    throwOnReceiptRevert?: boolean;
-    timeout?: number;
-  },
+  >,
   isPrivyCrossApp = false,
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<SendTransactionSyncReturnType<ChainEIP712>> {

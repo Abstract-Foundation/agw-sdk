@@ -26,6 +26,7 @@ import {
 } from '../sessions.js';
 import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
 import { sendTransactionInternal } from './sendTransactionInternal.js';
+import type { SendEip712TransactionSyncParameters } from './sendTransactionSync.js';
 
 export async function sendTransactionForSessionSync<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
@@ -39,15 +40,12 @@ export async function sendTransactionForSessionSync<
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
   publicClient: PublicClient<Transport, ChainEIP712>,
-  parameters: SendEip712TransactionParameters<
+  parameters: SendEip712TransactionSyncParameters<
     chain,
     account,
     chainOverride,
     request
-  > & {
-    throwOnReceiptRevert?: boolean;
-    timeout?: number;
-  },
+  >,
   session: SessionConfig,
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<SendTransactionSyncReturnType<ChainEIP712>> {

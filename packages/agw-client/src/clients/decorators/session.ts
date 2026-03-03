@@ -27,6 +27,7 @@ import {
 import { getSessionStatus } from '../../actions/getSessionStatus.js';
 import { sendTransactionForSession } from '../../actions/sendTransactionForSession.js';
 import { sendTransactionForSessionSync } from '../../actions/sendTransactionForSessionSync.js';
+import type { SendEip712TransactionSyncParameters } from '../../actions/sendTransactionSync.js';
 import { signTransactionForSession } from '../../actions/signTransactionForSession.js';
 import { signTypedDataForSession } from '../../actions/signTypedData.js';
 import { writeContractForSession } from '../../actions/writeContractForSession.js';
@@ -59,15 +60,12 @@ export type SessionClientActions<
     const request extends SendTransactionRequest<chain, chainOverride>,
     chainOverride extends ChainEIP712 | undefined = undefined,
   >(
-    args: SendEip712TransactionParameters<
+    args: SendEip712TransactionSyncParameters<
       chain,
       account,
       chainOverride,
       request
-    > & {
-      throwOnReceiptRevert?: boolean;
-      timeout?: number;
-    },
+    >,
   ) => Promise<SendTransactionSyncReturnType<ChainEIP712>>;
   writeContractSync: <
     const abi extends Abi | readonly unknown[],
@@ -124,7 +122,7 @@ export function sessionWalletActions(
         client,
         signerClient,
         publicClient,
-        args as any,
+        args,
         session,
         paymasterHandler,
       ),
@@ -133,7 +131,7 @@ export function sessionWalletActions(
         client,
         signerClient,
         publicClient,
-        args as any,
+        args,
         session,
         paymasterHandler,
       ),

@@ -65,6 +65,7 @@ import {
 import { sendCalls } from '../../actions/sendCalls.js';
 import { sendTransaction } from '../../actions/sendTransaction.js';
 import { sendTransactionBatch } from '../../actions/sendTransactionBatch.js';
+import type { SendEip712TransactionSyncParameters } from '../../actions/sendTransactionSync.js';
 import { sendTransactionSync } from '../../actions/sendTransactionSync.js';
 import { signMessage } from '../../actions/signMessage.js';
 import { signTransaction } from '../../actions/signTransaction.js';
@@ -146,10 +147,7 @@ export type AbstractWalletActions<
     sendTransactionSync: <
       chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
     >(
-      args: SendEip712TransactionParameters<chain, account, chainOverride> & {
-        throwOnReceiptRevert?: boolean;
-        timeout?: number;
-      },
+      args: SendEip712TransactionSyncParameters<chain, account, chainOverride>,
     ) => Promise<SendTransactionSyncReturnType<ChainEIP712>>;
     writeContractSync: <
       const abi extends Abi | readonly unknown[],
@@ -282,7 +280,7 @@ export function globalWalletActions<
         client,
         signerClient,
         publicClient,
-        args as any,
+        args,
         isPrivyCrossApp,
         customPaymasterHandler,
       ),
@@ -291,7 +289,7 @@ export function globalWalletActions<
         client,
         signerClient,
         publicClient,
-        args as any,
+        args,
         isPrivyCrossApp,
       ),
     toSessionClient: (signer, session) =>

@@ -1,5 +1,17 @@
 # @abstract-foundation/web3-react-agw
 
+## 1.8.0
+
+### Minor Changes
+
+- bf0e595: Update dependencies
+
+### Patch Changes
+
+- 2aab778: pass eth_accounts params to wallet_requestPermissions
+- Updated dependencies [bf0e595]
+  - @abstract-foundation/agw-client@1.11.0
+
 ## 1.7.10
 
 ### Patch Changes

@@ -1,7 +1,10 @@
 import {
+  type Abi,
   type Account,
   type Chain,
   type Client,
+  type ContractFunctionArgs,
+  type ContractFunctionName,
   type PublicClient,
   type SendTransactionRequest,
   type SendTransactionReturnType,
@@ -10,6 +13,11 @@ import {
   type WalletClient,
 } from 'viem';
 import { parseAccount, type SignTransactionReturnType } from 'viem/accounts';
+import {
+  type SendTransactionSyncReturnType,
+  type WriteContractSyncParameters,
+  type WriteContractSyncReturnType,
+} from 'viem/actions';
 
 import {
   type ChainEIP712,
@@ -18,9 +26,11 @@ import {
 } from 'viem/zksync';
 import { getSessionStatus } from '../../actions/getSessionStatus.js';
 import { sendTransactionForSession } from '../../actions/sendTransactionForSession.js';
+import { sendTransactionForSessionSync } from '../../actions/sendTransactionForSessionSync.js';
 import { signTransactionForSession } from '../../actions/signTransactionForSession.js';
 import { signTypedDataForSession } from '../../actions/signTypedData.js';
 import { writeContractForSession } from '../../actions/writeContractForSession.js';
+import { writeContractForSessionSync } from '../../actions/writeContractForSessionSync.js';
 import type { SessionConfig, SessionStatus } from '../../sessions.js';
 import type { CustomPaymasterHandler } from '../../types/customPaymaster.js';
 
@@ -45,6 +55,39 @@ export type SessionClientActions<
     args: SignEip712TransactionParameters<chain, account, chainOverride>,
   ) => Promise<SignTransactionReturnType>;
   writeContract: WalletActions<chain, account>['writeContract'];
+  sendTransactionSync: <
+    const request extends SendTransactionRequest<chain, chainOverride>,
+    chainOverride extends ChainEIP712 | undefined = undefined,
+  >(
+    args: SendEip712TransactionParameters<
+      chain,
+      account,
+      chainOverride,
+      request
+    > & {
+      throwOnReceiptRevert?: boolean;
+      timeout?: number;
+    },
+  ) => Promise<SendTransactionSyncReturnType<ChainEIP712>>;
+  writeContractSync: <
+    const abi extends Abi | readonly unknown[],
+    functionName extends ContractFunctionName<abi, 'nonpayable' | 'payable'>,
+    args extends ContractFunctionArgs<
+      abi,
+      'nonpayable' | 'payable',
+      functionName
+    >,
+    chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  >(
+    args: WriteContractSyncParameters<
+      abi,
+      functionName,
+      args,
+      chain,
+      account,
+      chainOverride
+    >,
+  ) => Promise<WriteContractSyncReturnType<ChainEIP712>>;
   signTypedData: WalletActions<chain, account>['signTypedData'];
   getSessionStatus: () => Promise<SessionStatus>;
 };
@@ -73,6 +116,24 @@ export function sessionWalletActions(
         signerClient,
         publicClient,
         args,
+        session,
+        paymasterHandler,
+      ),
+    sendTransactionSync: (args) =>
+      sendTransactionForSessionSync(
+        client,
+        signerClient,
+        publicClient,
+        args as any,
+        session,
+        paymasterHandler,
+      ),
+    writeContractSync: (args) =>
+      writeContractForSessionSync(
+        client,
+        signerClient,
+        publicClient,
+        args as any,
         session,
         paymasterHandler,
       ),

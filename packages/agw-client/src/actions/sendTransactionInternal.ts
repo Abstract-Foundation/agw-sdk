@@ -36,6 +36,7 @@ export async function sendTransactionInternal<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
   chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+  TReturnType = SendEip712TransactionReturnType,
 >(
   client: Client<Transport, ChainEIP712, Account>,
   signerClient: WalletClient<Transport, ChainEIP712, Account>,
@@ -49,7 +50,10 @@ export async function sendTransactionInternal<
   validator: Address,
   validationHookData: Record<string, Hex> = {},
   customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
-): Promise<SendEip712TransactionReturnType> {
+  sendSerializedTransaction?: (
+    serializedTransaction: `0x${string}`,
+  ) => Promise<TReturnType>,
+): Promise<TReturnType> {
   const { chain = client.chain } = parameters;
 
   if (!signerClient.account)
@@ -97,13 +101,16 @@ export async function sendTransactionInternal<
       validationHookData,
       customPaymasterHandler,
     );
-    return await getAction(
+    if (sendSerializedTransaction) {
+      return await sendSerializedTransaction(serializedTransaction);
+    }
+    return (await getAction(
       client,
       sendRawTransaction,
       'sendRawTransaction',
     )({
       serializedTransaction,
-    });
+    })) as TReturnType;
   } catch (err) {
     if (
       err instanceof Error &&

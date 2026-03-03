@@ -32,3 +32,7 @@ export {
   type SendTransactionBatchParameters,
   type SendTransactionBatchReturnType,
 } from '../actions/sendTransactionBatch.js';
+export { sendTransactionForSessionSync } from '../actions/sendTransactionForSessionSync.js';
+export { sendTransactionSync } from '../actions/sendTransactionSync.js';
+export { writeContractForSessionSync } from '../actions/writeContractForSessionSync.js';
+export { writeContractSync } from '../actions/writeContractSync.js';

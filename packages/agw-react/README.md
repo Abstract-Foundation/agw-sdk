@@ -125,6 +125,8 @@ export default function SponsoredContractWrite() {
       abi: contractAbi,
       functionName: 'yourFunctionName',
       args: ['arg1', 'arg2'],
+      paymaster: '0xYourPaymasterAddress',
+      paymasterInput: '0x',
     });
   };
 

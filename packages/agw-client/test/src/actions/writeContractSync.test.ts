@@ -125,6 +125,7 @@ test('basic', async () => {
       timeout: undefined,
     },
     false,
+    undefined,
   );
 });
 
@@ -151,6 +152,56 @@ test('passes sync-specific params', async () => {
       timeout: 5000,
     }),
     false,
+    undefined,
+  );
+});
+
+test('forwards customPaymasterHandler to sendTransactionSync', async () => {
+  vi.mocked(sendTransactionSync).mockResolvedValue(mockReceipt as any);
+
+  const mockPaymasterHandler = vi.fn().mockResolvedValue({
+    paymaster: '0x5407B5040dec3D339A9247f3654E59EEccbb6391',
+    paymasterInput: '0xabc',
+  });
+
+  const expectedData = encodeFunctionData({
+    abi: TestTokenABI,
+    args: [address.signerAddress, 1n],
+    functionName: 'mint',
+  });
+
+  const receipt = await writeContractSync(
+    baseClient,
+    signerClient,
+    publicClient,
+    {
+      abi: TestTokenABI,
+      account: baseClient.account,
+      address: MOCK_CONTRACT_ADDRESS,
+      chain: anvilAbstractTestnet.chain as ChainEIP712,
+      functionName: 'mint',
+      args: [address.signerAddress, 1n],
+    },
+    false,
+    mockPaymasterHandler,
+  );
+
+  expect(receipt).toBe(mockReceipt);
+
+  expect(sendTransactionSync).toHaveBeenCalledWith(
+    baseClient,
+    signerClient,
+    publicClient,
+    {
+      account: baseClient.account,
+      chain: anvilAbstractTestnet.chain as ChainEIP712,
+      data: expectedData,
+      to: MOCK_CONTRACT_ADDRESS,
+      throwOnReceiptRevert: undefined,
+      timeout: undefined,
+    },
+    false,
+    mockPaymasterHandler,
   );
 });
 

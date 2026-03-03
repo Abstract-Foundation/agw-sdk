@@ -291,6 +291,7 @@ export function globalWalletActions<
         publicClient,
         args,
         isPrivyCrossApp,
+        customPaymasterHandler,
       ),
     toSessionClient: (signer, session) =>
       toSessionClient({

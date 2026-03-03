@@ -19,6 +19,7 @@ import { getContractError, parseAccount } from 'viem/utils';
 import { type ChainEIP712 } from 'viem/zksync';
 
 import { AccountNotFoundError } from '../errors/account.js';
+import type { CustomPaymasterHandler } from '../types/customPaymaster.js';
 import { sendTransactionSync } from './sendTransactionSync.js';
 
 export async function writeContractSync<
@@ -45,6 +46,7 @@ export async function writeContractSync<
     chainOverride
   >,
   isPrivyCrossApp = false,
+  customPaymasterHandler: CustomPaymasterHandler | undefined = undefined,
 ): Promise<WriteContractSyncReturnType<ChainEIP712>> {
   const {
     abi,
@@ -84,6 +86,7 @@ export async function writeContractSync<
         ...request,
       },
       isPrivyCrossApp,
+      customPaymasterHandler,
     );
   } catch (error) {
     throw getContractError(error as BaseError, {

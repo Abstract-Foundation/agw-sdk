@@ -46,7 +46,7 @@ export type SendEip712TransactionSyncParameters<
 > = SendEip712TransactionParameters<chain, account, chainOverride, request> &
   Pick<
     SendTransactionSyncParameters<chain>,
-    'pollingInterval' | 'throwOnReceiptRevert' | 'timeout'
+    'throwOnReceiptRevert' | 'timeout'
   >;
 
 export async function sendTransactionSync<

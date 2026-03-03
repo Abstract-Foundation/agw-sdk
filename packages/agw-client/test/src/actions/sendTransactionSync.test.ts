@@ -140,6 +140,105 @@ describe('sendTransactionSync', () => {
     expect(callArgs[7]).toBeInstanceOf(Function);
   });
 
+  test('calls customPaymasterHandler and uses its output in Privy cross-app flow', async () => {
+    const transactionWithoutPaymaster: ZksyncTransactionRequestEIP712 = {
+      to: '0x5432100000000000000000000000000000000000',
+      from: zeroAddress,
+      data: '0x1234',
+    };
+
+    const mockPaymasterHandler = vi.fn().mockResolvedValue({
+      paymaster: '0xCustomPaymaster0000000000000000000000000',
+      paymasterInput: '0xdeadbeef',
+    });
+
+    vi.mocked(signPrivyTransaction).mockResolvedValue('0xsigned');
+    vi.mocked(sendRawTransactionSync).mockResolvedValue(mockReceipt as any);
+
+    await sendTransactionSync(
+      baseClient,
+      signerClient,
+      publicClient,
+      {
+        ...transactionWithoutPaymaster,
+        type: 'eip712',
+      } as any,
+      true,
+      mockPaymasterHandler,
+    );
+
+    expect(mockPaymasterHandler).toHaveBeenCalledOnce();
+    expect(mockPaymasterHandler).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: transactionWithoutPaymaster.to,
+        data: transactionWithoutPaymaster.data,
+        from: baseClient.account.address,
+        chainId: baseClient.chain.id,
+      }),
+    );
+
+    // The paymaster output should be merged into the params passed to signPrivyTransaction
+    expect(signPrivyTransaction).toHaveBeenCalledWith(
+      baseClient,
+      expect.objectContaining({
+        paymaster: '0xCustomPaymaster0000000000000000000000000',
+        paymasterInput: '0xdeadbeef',
+      }),
+    );
+  });
+
+  test('skips customPaymasterHandler when paymaster already set in Privy cross-app flow', async () => {
+    const mockPaymasterHandler = vi.fn();
+
+    vi.mocked(signPrivyTransaction).mockResolvedValue('0xsigned');
+    vi.mocked(sendRawTransactionSync).mockResolvedValue(mockReceipt as any);
+
+    await sendTransactionSync(
+      baseClient,
+      signerClient,
+      publicClient,
+      {
+        ...transaction, // already has paymaster + paymasterInput
+        type: 'eip712',
+      } as any,
+      true,
+      mockPaymasterHandler,
+    );
+
+    expect(mockPaymasterHandler).not.toHaveBeenCalled();
+  });
+
+  test('forwards customPaymasterHandler to sendTransactionInternal in non-Privy flow', async () => {
+    vi.mocked(sendTransactionInternal).mockResolvedValue(mockReceipt);
+
+    const mockPaymasterHandler = vi.fn();
+
+    await sendTransactionSync(
+      baseClient,
+      signerClient,
+      publicClient,
+      {
+        ...transaction,
+        type: 'eip712',
+        account: baseClient.account,
+        chain: anvilAbstractTestnet.chain as ChainEIP712,
+      } as any,
+      false,
+      mockPaymasterHandler,
+    );
+
+    expect(sendTransactionInternal).toHaveBeenCalledWith(
+      baseClient,
+      signerClient,
+      publicClient,
+      expect.any(Object),
+      EOA_VALIDATOR_ADDRESS,
+      {},
+      mockPaymasterHandler,
+      expect.any(Function),
+    );
+  });
+
   test('calls signPrivyTransaction for Privy cross-app flow', async () => {
     vi.mocked(signPrivyTransaction).mockResolvedValue('0x01abab');
     vi.mocked(sendRawTransactionSync).mockResolvedValue({

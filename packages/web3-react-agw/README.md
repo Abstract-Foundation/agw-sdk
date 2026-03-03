@@ -37,7 +37,7 @@ export const [agw, hooks] = initializeConnector<AbstractGlobalWallet>(
 ### Using the connector
 
 ```tsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import { agw, hooks } from './connector';
 
 const { useIsActive } = hooks;

@@ -4,6 +4,8 @@ import {
   type Address,
   type Chain,
   type Client,
+  type ContractFunctionArgs,
+  type ContractFunctionName,
   type GetChainIdReturnType,
   type Hash,
   type PrepareTransactionRequestReturnType,
@@ -19,7 +21,12 @@ import {
   type WriteContractParameters,
 } from 'viem';
 import { parseAccount } from 'viem/accounts';
-import { getChainId } from 'viem/actions';
+import {
+  getChainId,
+  type SendTransactionSyncReturnType,
+  type WriteContractSyncParameters,
+  type WriteContractSyncReturnType,
+} from 'viem/actions';
 import {
   type ChainEIP712,
   type Eip712WalletActions,
@@ -58,11 +65,14 @@ import {
 import { sendCalls } from '../../actions/sendCalls.js';
 import { sendTransaction } from '../../actions/sendTransaction.js';
 import { sendTransactionBatch } from '../../actions/sendTransactionBatch.js';
+import type { SendEip712TransactionSyncParameters } from '../../actions/sendTransactionSync.js';
+import { sendTransactionSync } from '../../actions/sendTransactionSync.js';
 import { signMessage } from '../../actions/signMessage.js';
 import { signTransaction } from '../../actions/signTransaction.js';
 import { signTransactionBatch } from '../../actions/signTransactionBatch.js';
 import { signTypedData } from '../../actions/signTypedData.js';
 import { writeContract } from '../../actions/writeContract.js';
+import { writeContractSync } from '../../actions/writeContractSync.js';
 import { EOA_VALIDATOR_ADDRESS } from '../../constants.js';
 import type { SessionConfig, SessionStatus } from '../../sessions.js';
 import type { CustomPaymasterHandler } from '../../types/customPaymaster.js';
@@ -134,6 +144,30 @@ export type AbstractWalletActions<
         request
       >,
     ) => Promise<PrepareTransactionRequestReturnType>;
+    sendTransactionSync: <
+      chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+    >(
+      args: SendEip712TransactionSyncParameters<chain, account, chainOverride>,
+    ) => Promise<SendTransactionSyncReturnType<ChainEIP712>>;
+    writeContractSync: <
+      const abi extends Abi | readonly unknown[],
+      functionName extends ContractFunctionName<abi, 'nonpayable' | 'payable'>,
+      args extends ContractFunctionArgs<
+        abi,
+        'nonpayable' | 'payable',
+        functionName
+      >,
+      chainOverride extends ChainEIP712 | undefined = ChainEIP712 | undefined,
+    >(
+      args: WriteContractSyncParameters<
+        abi,
+        functionName,
+        args,
+        chain,
+        account,
+        chainOverride
+      >,
+    ) => Promise<WriteContractSyncReturnType<ChainEIP712>>;
     toSessionClient: (signer: Account, session: SessionConfig) => SessionClient;
     getSessionStatus: (
       sessionHashOrConfig: Hash | SessionConfig,
@@ -240,6 +274,24 @@ export function globalWalletActions<
           Account
         >,
         isPrivyCrossApp,
+      ),
+    sendTransactionSync: (args) =>
+      sendTransactionSync(
+        client,
+        signerClient,
+        publicClient,
+        args,
+        isPrivyCrossApp,
+        customPaymasterHandler,
+      ),
+    writeContractSync: (args) =>
+      writeContractSync(
+        client,
+        signerClient,
+        publicClient,
+        args,
+        isPrivyCrossApp,
+        customPaymasterHandler,
       ),
     toSessionClient: (signer, session) =>
       toSessionClient({

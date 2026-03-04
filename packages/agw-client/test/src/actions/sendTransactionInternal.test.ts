@@ -193,6 +193,42 @@ describe('sendTransactionInternal', () => {
   );
 });
 
+test('sendTransactionInternal with custom sendSerializedTransaction callback', async () => {
+  vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
+  baseClientRequestSpy.mockClear();
+  const mockReceipt = {
+    blockHash: '0x1234',
+    blockNumber: 1n,
+    transactionHash: MOCK_TRANSACTION_HASH,
+    status: 'success' as const,
+  };
+  const customCallback = vi.fn().mockResolvedValue(mockReceipt);
+
+  const result = await sendTransactionInternal(
+    baseClient,
+    signerClient,
+    publicClient,
+    {
+      ...transaction,
+      type: 'eip712',
+      account: baseClient.account,
+      chain: anvilAbstractTestnet.chain as ChainEIP712,
+    } as any,
+    EOA_VALIDATOR_ADDRESS,
+    {},
+    undefined,
+    customCallback,
+  );
+
+  expect(result).toBe(mockReceipt);
+  expect(customCallback).toHaveBeenCalledWith(MOCK_TRANSACTION_HASH);
+  // Verify that sendRawTransaction was NOT called
+  const sendRawTransactionCall = baseClientRequestSpy.mock.calls.find(
+    (call) => call[0].method === 'eth_sendRawTransaction',
+  );
+  expect(sendRawTransactionCall).toBeUndefined();
+});
+
 test('sendTransactionInternal with mismatched chain', async () => {
   const invalidChain = mainnet;
   expect(

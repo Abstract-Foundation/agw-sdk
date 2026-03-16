@@ -32,27 +32,25 @@ export function announceProvider({
     return () => void 0;
   }
 
+  const resolvedTransport =
+    transport ??
+    http(undefined, {
+      batch: true,
+    });
+
   const privyProvider = toPrivyWalletProvider({
     chainId: chain.id,
     providerAppId: 'cm04asygd041fmry9zmcyn5o5',
     chains: [chain],
     transports: {
-      [chain.id]:
-        transport ??
-        http(undefined, {
-          batch: true,
-        }),
+      [chain.id]: resolvedTransport,
     },
   }) as EIP1193Provider;
 
   const abstractProvider = transformEIP1193Provider({
     provider: privyProvider,
     chain,
-    transport:
-      transport ??
-      http(undefined, {
-        batch: true,
-      }),
+    transport: resolvedTransport,
     isPrivyCrossApp: true,
     customPaymasterHandler,
   });

@@ -25,7 +25,7 @@ type GetNonceManagerParameter<account extends Account | Address = Address> =
     ? { nonceManager?: never }
     : { nonceManager?: NonceManager };
 
-type CreateSessionClientParameters<
+export type CreateSessionClientParameters<
   account extends Account | Address = Address,
 > = {
   account: account;

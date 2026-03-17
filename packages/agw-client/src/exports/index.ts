@@ -1,6 +1,7 @@
 export { deployAccount } from '../actions/deployAccount.js';
 export {
   type AbstractClient,
+  type CreateAbstractClientParameters,
   createAbstractClient,
 } from '../clients/abstractClient.js';
 export { linkablePublicActions } from '../clients/decorators/linkablePublic.js';

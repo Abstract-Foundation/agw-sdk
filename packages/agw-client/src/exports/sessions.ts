@@ -1,6 +1,7 @@
 import { SessionKeyValidatorAbi } from '../abis/SessionKeyValidator.js';
 import { prepareCreateSessionCall } from '../actions/createSession.js';
 import {
+  type CreateSessionClientParameters,
   createSessionClient,
   type SessionClient,
   toSessionClient,
@@ -27,6 +28,7 @@ export {
   type CallPolicy,
   type Constraint,
   ConstraintCondition,
+  type CreateSessionClientParameters,
   createSessionClient,
   encodeSession,
   getSessionHash,

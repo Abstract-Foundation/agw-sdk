@@ -22,7 +22,7 @@ import {
  * Parameters for creating an AbstractClient instance.
  * @interface CreateAbstractClientParameters
  */
-interface CreateAbstractClientParameters {
+export interface CreateAbstractClientParameters {
   /**
    * The account used for signing AGW transactions.
    * @type {Account}

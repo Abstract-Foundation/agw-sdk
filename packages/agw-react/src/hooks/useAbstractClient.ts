@@ -60,7 +60,12 @@ export const useAbstractClient = ({
 
   return useQuery({
     gcTime: 0,
-    queryKey: ['abstractClient'],
+    queryKey: [
+      'abstractClient',
+      chain?.id,
+      signer?.account?.address,
+      customPaymasterHandler ? customPaymasterHandler.constructor.name : null,
+    ],
     queryFn: async () => {
       if (error) {
         throw error;

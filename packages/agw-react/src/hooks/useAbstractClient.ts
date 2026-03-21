@@ -69,7 +69,7 @@ export const useAbstractClient = ({
         throw new Error('No signer found');
       }
 
-      const client = createAbstractClient({
+      const client = await createAbstractClient({
         signer: signer.account,
         chain,
         transport: custom(signer.transport),

@@ -64,7 +64,7 @@ export const useAbstractClient = ({
       'abstractClient',
       chain?.id,
       signer?.account?.address,
-      customPaymasterHandler ? customPaymasterHandler.constructor.name : null,
+      customPaymasterHandler ?? null,
     ],
     queryFn: async () => {
       if (error) {

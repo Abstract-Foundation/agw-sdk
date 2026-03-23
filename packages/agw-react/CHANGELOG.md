@@ -1,5 +1,14 @@
 # @abstract-foundation/agw-react
 
+## 1.11.1
+
+### Patch Changes
+
+- dbed661: fix: make `useAbstractClient` `queryKey` depend on chain and signer
+- Updated dependencies [8b09879]
+- Updated dependencies [69bce9e]
+  - @abstract-foundation/agw-client@1.12.0
+
 ## 1.11.0
 
 ### Minor Changes

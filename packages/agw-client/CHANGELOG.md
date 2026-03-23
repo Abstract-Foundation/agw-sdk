@@ -1,5 +1,15 @@
 # @abstract-foundation/agw-client
 
+## 1.12.0
+
+### Minor Changes
+
+- 8b09879: Add `sendTransactionSync` and `writeContractSync` to `AbstractClient` and `SessionClient` for EIP-7966 support
+
+### Patch Changes
+
+- 69bce9e: fix: export CreateAbstractClientParameters and CreateSessionClientParameters types
+
 ## 1.11.0
 
 ### Minor Changes

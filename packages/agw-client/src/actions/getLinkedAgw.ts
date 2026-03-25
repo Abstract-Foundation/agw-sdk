@@ -72,7 +72,7 @@ export async function getLinkedAgw<
   account extends Account | undefined = Account | undefined,
 >(
   client: Client<Transport, chain, account>,
-  parameters: GetLinkedAgwParameters,
+  parameters: GetLinkedAgwParameters = {},
 ): Promise<GetLinkedAgwReturnType> {
   const { address = client.account?.address } = parameters;
 

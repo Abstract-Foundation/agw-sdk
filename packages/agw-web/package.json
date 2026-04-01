@@ -50,6 +50,7 @@
   },
   "peerDependencies": {
     "@privy-io/cross-app-connect": "^0.5.2",
+    "typescript": ">=5.0.4",
     "viem": "^2.37.0"
   },
   "devDependencies": {

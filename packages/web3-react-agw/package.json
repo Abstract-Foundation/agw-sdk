@@ -44,6 +44,14 @@
     "@privy-io/cross-app-connect": "^0.5.2",
     "@web3-react/types": "^8.2.3"
   },
+  "peerDependencies": {
+    "typescript": ">=5.0.4"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@tanstack/react-query": "^5.80.3",
     "react-dom": "^18",

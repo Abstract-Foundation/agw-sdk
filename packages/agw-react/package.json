@@ -53,10 +53,10 @@
   },
   "files": ["dist", "src", "package.json"],
   "dependencies": {
-    "@abstract-foundation/agw-client": "workspace:*"
+    "@abstract-foundation/agw-client": "workspace:*",
+    "@privy-io/cross-app-connect": "^0.5.2"
   },
   "peerDependencies": {
-    "@privy-io/cross-app-connect": "^0.5.2",
     "@privy-io/react-auth": "^2.21.2 || ^3",
     "@tanstack/react-query": "^5",
     "react": ">=18",
@@ -70,7 +70,6 @@
     "@abstract-foundation/agw-client": "workspace:*",
     "@babel/core": "^7.27.4",
     "@babel/preset-env": "^7.27.2",
-    "@privy-io/cross-app-connect": "^0.5.2",
     "@privy-io/react-auth": "^3.15.0",
     "@tanstack/query-core": "^5.56.2",
     "@types/react": ">=18.3.1",

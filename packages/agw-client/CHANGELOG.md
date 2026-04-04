@@ -1,5 +1,16 @@
 # @abstract-foundation/agw-client
 
+## 1.12.0
+
+### Minor Changes
+
+- 88a2e4c: Tighten `getLinkedAgw` typing so account-hoisted clients can call it with zero arguments, while clients without a hoisted account must pass `{ address }`.
+- 8b09879: Add `sendTransactionSync` and `writeContractSync` to `AbstractClient` and `SessionClient` for EIP-7966 support
+
+### Patch Changes
+
+- 69bce9e: fix: export CreateAbstractClientParameters and CreateSessionClientParameters types
+
 ## 1.11.0
 
 ### Minor Changes

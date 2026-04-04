@@ -1,5 +1,20 @@
 # @abstract-foundation/agw-react
 
+## 1.12.0
+
+### Minor Changes
+
+- ae74121: Move `@privy-io/cross-app-connect` from peerDependencies to dependencies to ensure the correct version is auto-installed for consumers
+
+### Patch Changes
+
+- dbed661: fix: make `useAbstractClient` `queryKey` depend on chain and signer
+- 9f673e4: Fix: add missing await when creating Abstract client
+- Updated dependencies [88a2e4c]
+- Updated dependencies [8b09879]
+- Updated dependencies [69bce9e]
+  - @abstract-foundation/agw-client@1.12.0
+
 ## 1.11.0
 
 ### Minor Changes

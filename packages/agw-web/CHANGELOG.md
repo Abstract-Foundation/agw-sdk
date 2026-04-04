@@ -1,5 +1,15 @@
 # @abstract-foundation/agw-web
 
+## 1.10.1
+
+### Patch Changes
+
+- 9bc1425: chore: deduplicate default http transport initialization
+- Updated dependencies [88a2e4c]
+- Updated dependencies [8b09879]
+- Updated dependencies [69bce9e]
+  - @abstract-foundation/agw-client@1.12.0
+
 ## 1.10.0
 
 ### Minor Changes

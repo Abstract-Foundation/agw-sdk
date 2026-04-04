@@ -6,15 +6,15 @@ import {
   getLinkedAccounts,
 } from '../../actions/getLinkedAccounts.js';
 import {
+  type GetLinkedAgwAction,
   type GetLinkedAgwParameters,
-  type GetLinkedAgwReturnType,
   getLinkedAgw,
 } from '../../actions/getLinkedAgw.js';
 
-export interface LinkablePublicActions {
-  getLinkedAgw: (
-    args: GetLinkedAgwParameters,
-  ) => Promise<GetLinkedAgwReturnType>;
+export interface LinkablePublicActions<
+  account extends Account | undefined = Account | undefined,
+> {
+  getLinkedAgw: GetLinkedAgwAction<account>;
   getLinkedAccounts: (
     args: GetLinkedAccountsParameters,
   ) => Promise<GetLinkedAccountsReturnType>;
@@ -25,10 +25,18 @@ export function linkablePublicActions<
   chain extends ChainEIP712 | undefined = ChainEIP712 | undefined,
   account extends Account | undefined = Account | undefined,
 >() {
-  return (
-    client: Client<transport, chain, account>,
-  ): LinkablePublicActions => ({
-    getLinkedAgw: (args) => getLinkedAgw(client, args),
+  return <
+    clientTransport extends transport = transport,
+    clientChain extends chain = chain,
+    clientAccount extends account = account,
+  >(
+    client: Client<clientTransport, clientChain, clientAccount>,
+  ): LinkablePublicActions<clientAccount> => ({
+    getLinkedAgw: ((parameters?: GetLinkedAgwParameters<clientAccount>) =>
+      getLinkedAgw(
+        client as Client<clientTransport, clientChain, Account>,
+        (parameters ?? {}) as GetLinkedAgwParameters<Account>,
+      )) as GetLinkedAgwAction<clientAccount>,
     getLinkedAccounts: (args) => getLinkedAccounts(client, args),
   });
 }

@@ -6,7 +6,9 @@ import {
   type Client,
   getAddress,
   InvalidAddressError,
+  type IsUndefined,
   isAddress,
+  type MaybeRequired,
   type Transport,
 } from 'viem';
 import { readContract } from 'viem/actions';
@@ -24,9 +26,19 @@ export interface GetLinkedAgwReturnType {
   agw: Address | undefined;
 }
 
-export interface GetLinkedAgwParameters {
-  address?: Address | undefined;
-}
+export type GetLinkedAgwParameters<
+  account extends Account | undefined = Account | undefined,
+> = MaybeRequired<{ address?: Address | undefined }, IsUndefined<account>>;
+
+export type GetLinkedAgwAction<
+  account extends Account | undefined = Account | undefined,
+> = IsUndefined<account> extends true
+  ? (
+      parameters: GetLinkedAgwParameters<account>,
+    ) => Promise<GetLinkedAgwReturnType>
+  : (
+      parameters?: GetLinkedAgwParameters<account>,
+    ) => Promise<GetLinkedAgwReturnType>;
 
 export interface IsLinkedAccountParameters {
   address: Address;
@@ -63,18 +75,33 @@ export interface IsLinkedAccountParameters {
  * }
  * ```
  *
- * @param parameters - Parameters for getting the linked AGW
+ * @param parameters - Parameters for getting the linked AGW. If the client has a connected account, this can be omitted
  * @param parameters.address - The Ethereum Mainnet address to check for a linked AGW. If not provided, defaults to the connected account's address
  * @returns Object containing the address of the linked AGW, or undefined if no AGW is linked
  */
 export async function getLinkedAgw<
   chain extends Chain | undefined = Chain | undefined,
+>(
+  client: Client<Transport, chain, undefined>,
+  parameters: GetLinkedAgwParameters<undefined>,
+): Promise<GetLinkedAgwReturnType>;
+export async function getLinkedAgw<
+  chain extends Chain | undefined = Chain | undefined,
+  account extends Account = Account,
+>(
+  client: Client<Transport, chain, account>,
+  parameters?: GetLinkedAgwParameters<account>,
+): Promise<GetLinkedAgwReturnType>;
+export async function getLinkedAgw<
+  chain extends Chain | undefined = Chain | undefined,
   account extends Account | undefined = Account | undefined,
 >(
   client: Client<Transport, chain, account>,
-  parameters: GetLinkedAgwParameters,
+  parameters?: GetLinkedAgwParameters<account>,
 ): Promise<GetLinkedAgwReturnType> {
-  const { address = client.account?.address } = parameters;
+  const { address = client.account?.address } = (parameters ?? {}) as {
+    address?: Address | undefined;
+  };
 
   if (address === undefined) {
     throw new BaseError('No address provided');

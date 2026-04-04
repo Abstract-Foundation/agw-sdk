@@ -7,7 +7,8 @@ import {
   walletActions,
 } from 'viem';
 import {
-  type GetLinkedAgwReturnType,
+  type GetLinkedAgwAction,
+  type GetLinkedAgwParameters,
   getLinkedAgw,
 } from '../../actions/getLinkedAgw.js';
 import {
@@ -21,7 +22,7 @@ export type LinkableWalletActions<
   account extends Account | undefined = Account | undefined,
 > = WalletActions<chain, account> & {
   linkToAgw: (args: LinkToAgwParameters) => Promise<LinkToAgwReturnType>;
-  getLinkedAgw: () => Promise<GetLinkedAgwReturnType>;
+  getLinkedAgw: GetLinkedAgwAction<account>;
 };
 
 export function linkableWalletActions<
@@ -29,11 +30,19 @@ export function linkableWalletActions<
   chain extends Chain | undefined = Chain | undefined,
   account extends Account | undefined = Account | undefined,
 >() {
-  return (
-    client: WalletClient<transport, chain, account>,
-  ): LinkableWalletActions<chain, account> => ({
+  return <
+    clientTransport extends transport = transport,
+    clientChain extends chain = chain,
+    clientAccount extends account = account,
+  >(
+    client: WalletClient<clientTransport, clientChain, clientAccount>,
+  ): LinkableWalletActions<clientChain, clientAccount> => ({
     ...walletActions(client),
     linkToAgw: (args) => linkToAgw(client, args),
-    getLinkedAgw: () => getLinkedAgw(client, {}),
+    getLinkedAgw: ((parameters?: GetLinkedAgwParameters<clientAccount>) =>
+      getLinkedAgw(
+        client as WalletClient<clientTransport, clientChain, Account>,
+        (parameters ?? {}) as GetLinkedAgwParameters<Account>,
+      )) as GetLinkedAgwAction<clientAccount>,
   });
 }

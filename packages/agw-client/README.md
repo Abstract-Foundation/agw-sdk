@@ -60,11 +60,20 @@ Asynchronously creates an `AbstractClient` instance, extending the standard `Cli
 
 ```tsx
 import { createAbstractClient } from '@abstract-foundation/agw-client';
+import { abstractTestnet } from 'viem/chains';
+import { Account } from 'viem/accounts';
+
+const signer: Account = {
+  address: '0xYourSignerAddress',
+  // ...other account properties
+};
+
+const chain = abstractTestnet;
 
 (async () => {
   const abstractClient = await createAbstractClient({
-    signer: /* your signer account */,
-    chain: /* your chain configuration */,
+    signer,
+    chain,
   });
 
   // Use abstractClient to interact with the blockchain

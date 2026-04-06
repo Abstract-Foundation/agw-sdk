@@ -115,7 +115,7 @@ export default function SponsoredContractWrite() {
     writeContractSponsored,
     data,
     error,
-    isLoading,
+    isPending,
     isSuccess,
   } = useWriteContractSponsored();
 
@@ -132,10 +132,10 @@ export default function SponsoredContractWrite() {
 
   return (
     <div>
-      <button onClick={handleWriteContract} disabled={isLoading}>
-        {isLoading ? 'Processing...' : 'Execute Sponsored Transaction'}
+      <button onClick={handleWriteContract} disabled={isPending}>
+        {isPending ? 'Processing...' : 'Execute Sponsored Transaction'}
       </button>
-      {isSuccess && <div>Transaction Hash: {data?.hash}</div>}
+      {isSuccess && <div>Transaction Hash: {data}</div>}
       {error && <div>Error: {error.message}</div>}
     </div>
   );

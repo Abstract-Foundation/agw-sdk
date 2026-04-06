@@ -27,7 +27,7 @@ import { createAbstractClient } from '@abstract-foundation/agw-client'
 
 ```tsx
 import { createAbstractClient } from '@abstract-foundation/agw-client';
-import { ChainEIP712, http } from 'viem';
+import { http } from 'viem';
 import { Account } from 'viem/accounts';
 import { abstractTestnet } from 'viem/chains';
 
@@ -100,8 +100,9 @@ import { createAbstractClient } from '@abstract-foundation/agw-client';
 
 ```tsx
 import { createAbstractClient } from '@abstract-foundation/agw-client';
-import { ChainEIP712, http } from 'viem';
+import { http } from 'viem';
 import { Account } from 'viem/accounts';
+import { getGeneralPaymasterInput } from 'viem/zksync';
 
 (async () => {
   // Create a signer account and chain configuration
@@ -123,7 +124,7 @@ import { Account } from 'viem/accounts';
       to: '0xRecipientAddress',
       value: 1000000000000000000n, // 1 ETH in wei
       paymaster: '0xPaymasterAddress',
-      paymasterInput: '0x',
+      paymasterInput: getGeneralPaymasterInput({ innerInput: '0x' }),
     });
 
     console.log('Sponsored Transaction Hash:', txHash);
@@ -136,7 +137,7 @@ import { Account } from 'viem/accounts';
 
 ### Explanation of Paymaster Usage:
 
-- **Paymaster**: The `paymaster` object is specified in the `sendTransaction` method, allowing the Paymaster contract to cover the gas fees for the transaction.
+- **Paymaster**: The `paymaster` and `paymasterInput` fields are specified in the `sendTransaction` parameters, allowing the Paymaster contract to cover the gas fees for the transaction.
 - **Sponsored Transaction**: The transaction fee is covered by the Paymaster, so the user’s balance is unaffected by gas costs.
 
 ## Documentation

@@ -26,7 +26,7 @@ const CREATE_SESSION_SELECTOR = '0x5a0694d2' as const;
 /** `function batchCall((address,bool,uint256,bytes)[]) external` */
 const BATCH_CALL_SELECTOR = '0x8f0273a9' as const;
 
-/** `error INSUFFICIENT_FUNDS()` */
+/** `error INSUFFICIENT_BALANCE()` */
 const INSUFFICIENT_BALANCE_SELECTOR = '0xe7931438' as const;
 
 const CANONICAL_DELEGATE_REGISTRY_ADDRESS =

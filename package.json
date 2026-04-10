@@ -12,7 +12,9 @@
   },
   "packageManager": "pnpm@10.30.3+sha512.c961d1e0a2d8e354ecaa5166b822516668b7f44cb5bd95122d590dd81922f606f5473b6d23ec4a5be05e7fcd18e8488d47d978bbe981872f1145d06e9a740017",
   "lint-staged": {
-    "**/*.{js,jsx,ts,tsx,json,css,scss,md}": ["biome check --write"]
+    "**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "biome check --write"
+    ]
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.16.4",
@@ -37,7 +39,13 @@
       "image-size@>=1.1.0 <1.2.1": ">=1.2.1",
       "elliptic@<6.6.0": ">=6.6.0",
       "on-headers@<1.1.0": ">=1.1.0",
-      "tmp@<=0.2.3": ">=0.2.4"
+      "tmp@<=0.2.3": ">=0.2.4",
+      "h3@<=1.15.9": "1.15.9",
+      "lodash@<=4.18.1": "4.18.1",
+      "hono@<=4.12.12": "4.12.12",
+      "axios@<=1.15.0": "1.15.0",
+      "socket.io-parser@<=4.2.6": "4.2.6",
+      "defu@<=6.1.5": "6.1.5"
     }
   }
 }

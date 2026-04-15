@@ -1,5 +1,6 @@
 import {
   createClient,
+  createWalletClient,
   EIP1193RequestFn,
   encodeFunctionData,
   http,

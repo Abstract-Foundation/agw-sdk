@@ -1,5 +1,11 @@
 # @abstract-foundation/agw-client
 
+## 1.12.1
+
+### Patch Changes
+
+- a89e697: Use publicClient for estimate gas instead of internal/wrapped transport
+
 ## 1.12.0
 
 ### Minor Changes

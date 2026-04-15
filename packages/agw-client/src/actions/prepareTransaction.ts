@@ -426,7 +426,7 @@ export async function prepareTransactionRequest<
       (async () => {
         try {
           request.gas = await getAction(
-            client,
+            publicClient,
             estimateGas,
             'estimateGas',
           )({

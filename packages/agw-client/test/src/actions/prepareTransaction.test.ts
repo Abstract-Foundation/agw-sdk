@@ -1,15 +1,14 @@
 import {
   createClient,
-  createNonceManager,
-  createPublicClient,
-  createWalletClient,
   EIP1193RequestFn,
   encodeFunctionData,
   http,
   keccak256,
   NonceManager,
-  nonceManager,
+  PublicClient,
   parseEther,
+  publicActions,
+  Transport,
   toBytes,
   toHex,
 } from 'viem';
@@ -63,6 +62,12 @@ const baseClientRequestSpy = vi.fn(async ({ method, params }) => {
   }
   if (method === 'eth_estimateGas') {
     return MOCK_ETH_ESTIMATE_GAS_LIMIT;
+  } else if (method === 'zks_estimateFee') {
+    throw new Error('zks_estimateFee not supported');
+  } else if (method === 'eth_gasPrice') {
+    return toHex(MOCK_FEE_PER_GAS);
+  } else if (method === 'eth_getBalance') {
+    return toHex(1000000000000000000n); // 1 ETH
   }
   return anvilAbstractTestnet.getClient().request({ method, params } as any);
 });
@@ -82,23 +87,9 @@ signerClient.request = (async ({ method, params }) => {
   return anvilAbstractTestnet.getClient().request({ method, params } as any);
 }) as EIP1193RequestFn;
 
-const publicClient = createPublicClient({
-  chain: anvilAbstractTestnet.chain as ChainEIP712,
-  transport: anvilAbstractTestnet.clientConfig.transport,
-});
-
-publicClient.request = (async ({ method, params }) => {
-  if (method === 'zks_estimateFee') {
-    throw new Error('zks_estimateFee not supported');
-  } else if (method === 'eth_estimateGas') {
-    return toHex(MOCK_ETH_ESTIMATE_GAS_LIMIT);
-  } else if (method === 'eth_gasPrice') {
-    return toHex(MOCK_FEE_PER_GAS);
-  } else if (method === 'eth_getBalance') {
-    return toHex(1000000000000000000n); // 1 ETH
-  }
-  return anvilAbstractTestnet.getClient().request({ method, params } as any);
-}) as EIP1193RequestFn;
+const publicClient = baseClient.extend(
+  publicActions,
+) as unknown as PublicClient<Transport, ChainEIP712>;
 
 publicClient.getTransactionCount = vi.fn(async () => {
   return MOCK_NONCE;
@@ -354,13 +345,13 @@ test.each([
 ])('$name', async ({ balance, value, isSponsored, errorType }) => {
   vi.mocked(isSmartAccountDeployed).mockResolvedValue(true);
 
-  // Create a modified public client that returns a specified balance
-  const publicClientWithCustomBalance = createPublicClient({
+  const customBaseClient = createClient({
+    account: address.smartAccountAddress,
     chain: anvilAbstractTestnet.chain as ChainEIP712,
     transport: anvilAbstractTestnet.clientConfig.transport,
   });
 
-  publicClientWithCustomBalance.request = (async ({ method, params }) => {
+  customBaseClient.request = (async ({ method, params }) => {
     if (method === 'zks_estimateFee') {
       throw new Error('zks_estimateFee not supported');
     } else if (method === 'eth_estimateGas') {
@@ -372,6 +363,11 @@ test.each([
     }
     return anvilAbstractTestnet.getClient().request({ method, params } as any);
   }) as EIP1193RequestFn;
+
+  // Create a modified public client that returns a specified balance
+  const publicClientWithCustomBalance = customBaseClient.extend(
+    publicActions,
+  ) as unknown as PublicClient<Transport, ChainEIP712>;
 
   const txWithoutPaymaster = {
     ...transaction,

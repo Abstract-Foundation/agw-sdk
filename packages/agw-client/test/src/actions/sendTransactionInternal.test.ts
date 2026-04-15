@@ -7,7 +7,10 @@ import {
   encodeAbiParameters,
   Hex,
   http,
+  PublicClient,
   parseAbiParameters,
+  publicActions,
+  Transport,
   toFunctionSelector,
 } from 'viem';
 import { toAccount } from 'viem/accounts';
@@ -102,13 +105,14 @@ signerClient.request = (async ({ method, params }) => {
   return anvilAbstractTestnet.getClient().request({ method, params } as any);
 }) as EIP1193RequestFn;
 
-const publicClient = createPublicClient({
-  chain: anvilAbstractTestnet.chain as ChainEIP712,
-  transport: anvilAbstractTestnet.clientConfig.transport,
-});
+const publicClient = baseClient.extend(
+  publicActions,
+) as unknown as PublicClient<Transport, ChainEIP712>;
 
 publicClient.request = (async ({ method, params }) => {
-  if (method === 'zks_estimateFee') {
+  if (method === 'eth_estimateGas') {
+    return 158774n;
+  } else if (method === 'zks_estimateFee') {
     throw new Error('zks_estimateFee not supported');
   }
   return anvilAbstractTestnet.getClient().request({ method, params } as any);

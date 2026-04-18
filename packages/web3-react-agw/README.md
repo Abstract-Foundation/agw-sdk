@@ -1,5 +1,7 @@
 # @abstract-foundation/web3-react-agw
 
+This package README is kept for historical reference. The actively maintained package source now lives in [`Abstract-Foundation/abstract-packages`](https://github.com/Abstract-Foundation/abstract-packages).
+
 The `@abstract-foundation/web3-react-agw` package implements a [web3-react](https://github.com/Uniswap/web3-react) connector for [Abstract Global Wallet (AGW)](https://docs.abs.xyz/overview).
 
 ## Abstract Global Wallet (AGW)
@@ -79,3 +81,5 @@ Creates an `AbstractGlobalWallet` connector, extending the web3-react `Connector
 ## Documentation
 
 For detailed documentation, please refer to the [Abstract Global Wallet Documentation](https://docs.abs.xyz/how-abstract-works/abstract-global-wallet/overview).
+
+For maintained source and repository updates, refer to [`Abstract-Foundation/abstract-packages`](https://github.com/Abstract-Foundation/abstract-packages).

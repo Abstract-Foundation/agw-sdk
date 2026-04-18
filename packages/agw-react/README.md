@@ -1,5 +1,7 @@
 # @abstract-foundation/agw-react
 
+This package README is kept for historical reference. The actively maintained package source now lives in [`Abstract-Foundation/abstract-packages`](https://github.com/Abstract-Foundation/abstract-packages).
+
 The `@abstract-foundation/agw-react` package provides React hooks and components to integrate the [Abstract Global Wallet (AGW)](https://docs.abs.xyz/overview) into your React applications.
 
 ## Abstract Global Wallet (AGW)
@@ -145,3 +147,5 @@ export default function SponsoredContractWrite() {
 ## Documentation
 
 For detailed documentation, please refer to the [Abstract Global Wallet Documentation](https://docs.abs.xyz/how-abstract-works/abstract-global-wallet/overview).
+
+For maintained source and repository updates, refer to [`Abstract-Foundation/abstract-packages`](https://github.com/Abstract-Foundation/abstract-packages).

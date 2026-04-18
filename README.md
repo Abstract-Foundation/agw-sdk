@@ -1,8 +1,8 @@
 # agw-sdk
 
-This repository is archived and no longer the active home for Abstract SDK packages.
-
-For maintained packages, source, and ongoing updates, use [`Abstract-Foundation/abstract-packages`](https://github.com/Abstract-Foundation/abstract-packages).
+> [!IMPORTANT]
+> This repository is archived and no longer the active home for Abstract SDK packages.
+> For maintained packages, source, and ongoing updates, use [`Abstract-Foundation/abstract-packages`](https://github.com/Abstract-Foundation/abstract-packages).
 
 ## Abstract Global Wallet (AGW)
 
